@@ -52,7 +52,7 @@ public class PersistenceContext {
 	    LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 	    factory.setJpaVendorAdapter(vendorAdapter);
 	    //Add package to scan for entities.
-	    factory.setPackagesToScan("com.citi.migracioneucs");
+	    factory.setPackagesToScan("com.citi.euces.pronosticos");
 	    factory.setDataSource(jndiDatasource());
 	    factory.setJpaProperties(jpaProperties);
 
@@ -65,7 +65,7 @@ public class PersistenceContext {
 		JndiTemplate jtmp = new JndiTemplate();
 		try {
 
-			ds = (DataSource) jtmp.lookup("jdbc/DataSource");
+			ds = (DataSource) jtmp.lookup("jdbc/eucWeb");
 
 		}catch (NamingException ne) {
 			LOGGER.error(ne);

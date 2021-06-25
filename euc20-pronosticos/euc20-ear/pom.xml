@@ -12,7 +12,12 @@
 	<artifactId>euc20-ear</artifactId>
 	<packaging>ear</packaging>
 
-	<name>euc20-ear</name>
+	<properties>
+		<ear.name>euc-pronosticos-app</ear.name>
+		<context.app.web>/euc-pronosticos</context.app.web>
+	</properties>
+
+	<name>${ear.name}</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
@@ -46,6 +51,15 @@
 				<configuration>
 					<version>8</version>
 					<defaultLibBundleDir>lib</defaultLibBundleDir>
+					<displayName>${ear.name}</displayName>
+					<finalName>${ear.name}-${project.version}</finalName>
+					<modules>
+						<webModule>
+							<groupId>com.citi.euces</groupId>
+							<artifactId>euc20-web</artifactId>
+							<contextRoot>${context.app.web}</contextRoot>
+						</webModule>
+					</modules>
 				</configuration>
 			</plugin>
 		</plugins>
