@@ -3,19 +3,20 @@
  */
 package com.citi.euces.pronosticos.web;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import javax.annotation.PostConstruct;
+import java.time.Duration;
 
 /**
  * @author lbermejo
@@ -23,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  */
 @Configuration
 @EnableWebMvc
-@ComponentScan( basePackages = "com.citi.euces.pronosticos" )
+@ComponentScan( basePackages = "com.citi.*" )
 @EnableAutoConfiguration
 @PropertySource("classpath:application.properties")
 public class EucApplicationConfig{
@@ -44,15 +45,16 @@ public class EucApplicationConfig{
 	}
 
 	@Bean
-	public MethodValidationPostProcessor methodValidationPostProcessor() {
-	     return new MethodValidationPostProcessor();
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+		return builder.setConnectTimeout(Duration.ofMillis(3000)).setReadTimeout(Duration.ofMillis(3000)).build();
+
 	}
 
-	@Bean
-	public ResourceBundleMessageSource messageSource() {
-		final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setBasename("Messages");
-		return messageSource;
-	}
+	/*@Bean(name = "multipartResolver")
+	public CommonsMultipartResolver multipartResolver() {
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+		multipartResolver.setMaxUploadSize((long)(1024 * 1024) * 5);//5 MB
+		return multipartResolver;
+	}*/
 
 }

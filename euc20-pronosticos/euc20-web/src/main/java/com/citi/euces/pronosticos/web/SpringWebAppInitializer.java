@@ -3,19 +3,16 @@
  */
 package com.citi.euces.pronosticos.web;
 
+import com.citi.euces.pronosticos.PersistenceContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-
-import com.citi.euces.pronosticos.PersistenceContext;
 
 /**
  * @author lbermejo
  *
  */
 @Configuration
-@PropertySource("classpath:application.properties")
 public class SpringWebAppInitializer 
 	extends AbstractAnnotationConfigDispatcherServletInitializer{
 
