@@ -1,5 +1,6 @@
 package com.citi.euces.pronosticos.infra.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,6 +33,12 @@ public class FormatUtils {
         String pattern = "yyMMdd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String formatFecha = simpleDateFormat.format(fecha);
+        return formatFecha;
+    }
+
+    public static Date stringToDate(String fecha) throws ParseException {
+        String pattern = "dd/MM/yyyy";
+        Date formatFecha = new SimpleDateFormat(pattern).parse(fecha);
         return formatFecha;
     }
 

@@ -33,7 +33,7 @@ public class RebajasController {
                 throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
             }
             MensajeResponse response = new MensajeResponse(
-                    rebajasService.aplicarRebajaloadFile(request.getFile()),
+                    rebajasService.aplicarRebajaloadFile(request.getFile(), request.getFechaContable(),request.getFechaMovimiento()),
                     HttpStatus.OK.toString());
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
