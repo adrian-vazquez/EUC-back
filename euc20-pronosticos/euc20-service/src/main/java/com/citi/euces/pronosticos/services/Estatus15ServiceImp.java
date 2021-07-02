@@ -39,7 +39,7 @@ public class Estatus15ServiceImp implements Estatus15Service{
 			}
 
 			MensajeDTO response = new MensajeDTO();
-	        response.setMensajeConfirm("Tabla Estatus15 y Estatus15tmp se han borrado.");
+	        response.setMensajeConfirm("Tabla vacía.");
 	        response.setMensajeInfo("La tabla Estatus15 se encuentra sin registros.");
 	        return response;
 	    }
