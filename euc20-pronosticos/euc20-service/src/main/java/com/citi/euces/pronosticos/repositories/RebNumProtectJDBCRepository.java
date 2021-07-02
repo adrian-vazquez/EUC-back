@@ -16,17 +16,18 @@ public class RebNumProtectJDBCRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+
     public RebNumProtectJDBCRepository(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
     }
 
     @Transactional
-    public int[][] batchInsert(List<RebNumProtectDTO> books, int batchSize) {
-        System.out.println("repository :: content :: " + books.size());
+    public int[][] batchInsert(List<RebNumProtectDTO> content, int batchSize) {
+        System.out.println("repository :: content :: " + content.size());
 
         int[][] updateCounts = jdbcTemplate.batchUpdate(
                 "INSERT INTO PPC_MIS_REB_NUMPROTEC(NUM_PROTECCION, FEC_MOVIMIENTO, FEC_REGISTRO_CONTABLE) values(?,?,?)",
-                books,
+                content,
                 batchSize,
                 new ParameterizedPreparedStatementSetter<RebNumProtectDTO>() {
                     public void setValues(PreparedStatement ps, RebNumProtectDTO argument) throws SQLException {
@@ -37,6 +38,13 @@ public class RebNumProtectJDBCRepository {
                     }
                 });
         return updateCounts;
+    }
+
+    @Transactional
+    public void updateMaestoComisionesSp(){
+        String sql = "call PPC_MIS_SP_REBAJA_MAESTRO_COMISIONES()";
+        jdbcTemplate.execute(sql);
+
     }
 
 }

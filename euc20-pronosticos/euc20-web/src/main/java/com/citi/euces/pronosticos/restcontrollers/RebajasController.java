@@ -34,7 +34,7 @@ public class RebajasController {
             }
             MensajeResponse response = new MensajeResponse(
                     rebajasService.aplicarRebajaloadFile(request.getFile(), request.getFechaContable(),request.getFechaMovimiento()),
-                    HttpStatus.OK.toString());
+                    "200");
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
@@ -53,15 +53,10 @@ public class RebajasController {
         }
     }
 
-   /* @PostMapping(path = "/aplicarRebajaloadFileM")
-    public ResponseEntity<?> aplicarRebajaloadFileM(@RequestParam("file") MultipartFile file) {
+    @PostMapping(path = "/aplicarRebaja")
+    public ResponseEntity<?> aplicarRebaja() {
         try {
-            if (file.isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
-            }
-            MensajeResponse response = new MensajeResponse(
-                    rebajasService.aplicarRebajaloadFileM(file),
-                    HttpStatus.OK.toString());
+            MensajeResponse response = new MensajeResponse(rebajasService.aplicarRebaja(), "200");
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
@@ -79,6 +74,7 @@ public class RebajasController {
             return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
         }
     }
-*/
+
+
 
 }

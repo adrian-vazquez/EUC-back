@@ -10,4 +10,6 @@ public interface RebajasService {
 
     MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws GenericException, IOException, ParseException;
 
+    MensajeDTO aplicarRebaja() throws GenericException;
+
 }

@@ -73,6 +73,13 @@ public class RebajasServiceImp implements RebajasService {
         return response;
     }
 
+    @Override
+    public MensajeDTO aplicarRebaja() throws GenericException {
+        rebNumProtectJDBCRepository.updateMaestoComisionesSp();
+
+        return null;
+    }
+
     public String leerArchivo(Path tempFile, String fechaContable, String fechaMovimiento) throws IOException, GenericException, ParseException {
         String responseMessage = "";
         String cadena;
@@ -102,12 +109,7 @@ public class RebajasServiceImp implements RebajasService {
         content.removeIf(c -> !contentSet.add(c.getNumProteccion()));
         log.info("RebNumProtectDTO content Final  ::  " + content.size());
         log.info("RebNumProtectDTO sumaImporte  ::  " + sumaImporte);
-        Collections.sort(content, new Comparator<RebNumProtectDTO>() {
-            @Override
-            public int compare(RebNumProtectDTO p1, RebNumProtectDTO p2) {
-                return new Long(p1.getNumProteccion()).compareTo(new Long(p2.getNumProteccion()));
-            }
-        });
+        content.sort(Comparator.comparing(RebNumProtectDTO::getNumProteccion));
         try {
             rebNumProtectJDBCRepository.batchInsert(content, 500);
         } catch (Exception e) {
