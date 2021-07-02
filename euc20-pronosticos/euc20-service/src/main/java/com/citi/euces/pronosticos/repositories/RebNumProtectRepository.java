@@ -1,15 +1,10 @@
 package com.citi.euces.pronosticos.repositories;
 
+import com.citi.euces.pronosticos.entities.RebNumProtect;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class RebNumProtectRepository {
+public interface RebNumProtectRepository extends JpaRepository<RebNumProtect, Long> {
 
-    /*@Autowired
-    private  JdbcTemplate jdbcTemplate ;
-
-    public int insertNumProteccion(Long numProteccion, Date fechaM, Date fechaR) {
-        return jdbcTemplate.update("INSERT INTO PPC_MIS_REB_NUMPROTEC(NUM_PROTECCION, FEC_MOVIMIENTO, " +
-                "FEC_REGISTRO_CONTABLE) VALUES(?,?,?)", numProteccion, fechaM,fechaR);
-    }*/
 }
