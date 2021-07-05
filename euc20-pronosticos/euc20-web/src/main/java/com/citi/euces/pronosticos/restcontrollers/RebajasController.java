@@ -35,7 +35,7 @@ public class RebajasController {
             }
             MensajeResponse response = new MensajeResponse(
                     rebajasService.aplicarRebajaloadFile(request.getFile(), request.getFechaContable(),request.getFechaMovimiento()),
-                    "200");
+                    );
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();

@@ -3,6 +3,8 @@ package com.citi.euces.pronosticos.repositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
+
 @Repository
 public class Estatus15JDBCRepository {
     private final JdbcTemplate jdbcTemplate;
@@ -11,13 +13,15 @@ public class Estatus15JDBCRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Transactional
     public void truncateTableEstatus15() {
-        String query = "Truncate table PPC_MIS_ESTATUS15";
+        String query = "DELETE FROM PPC_MIS_ESTATUS15";
         jdbcTemplate.execute(query);
     }
 
+    @Transactional
     public void truncateTableEstatus15tmp() {
-        String query = "Truncate table PPC_MIS_ESTATUS15_TMP";
+        String query = "DELETE FROM PPC_MIS_ESTATUS15_TMP";
         jdbcTemplate.execute(query);
     }
 }
