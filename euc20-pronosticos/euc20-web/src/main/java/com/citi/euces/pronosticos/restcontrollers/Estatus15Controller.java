@@ -28,7 +28,7 @@ public class Estatus15Controller {
         try {
             MensajeResponse response = new MensajeResponse(
             		estatusService.limpiarEstatus(),
-                    HttpStatus.OK.toString());
+                    "200");
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
