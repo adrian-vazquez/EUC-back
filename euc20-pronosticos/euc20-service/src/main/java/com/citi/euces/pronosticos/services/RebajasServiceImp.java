@@ -75,9 +75,16 @@ public class RebajasServiceImp implements RebajasService {
 
     @Override
     public MensajeDTO aplicarRebaja() throws GenericException {
-        rebNumProtectJDBCRepository.updateMaestoComisionesSp();
-
-        return null;
+        String p_numRegCargados = "";
+        try {
+            p_numRegCargados = rebNumProtectJDBCRepository.updateMaestoComisionesSp();
+       }catch (Exception e){
+           throw new GenericException(
+                   "Error al llamar SP :: " , HttpStatus.NOT_FOUND.toString());
+       }
+        MensajeDTO mensjageResponse = new MensajeDTO();
+        mensjageResponse.setMensajeInfo("Confirmando, Actualizando maestro de comisiones: ".concat(p_numRegCargados).concat(" rebajados"));
+        return mensjageResponse;
     }
 
     public String leerArchivo(Path tempFile, String fechaContable, String fechaMovimiento) throws IOException, GenericException, ParseException {

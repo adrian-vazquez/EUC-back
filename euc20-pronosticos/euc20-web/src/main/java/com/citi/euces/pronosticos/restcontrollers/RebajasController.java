@@ -4,6 +4,7 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
 import com.citi.euces.pronosticos.models.LeerArchivoRequest;
 import com.citi.euces.pronosticos.models.MensajeResponse;
+import com.citi.euces.pronosticos.models.ReporteRebajaRequest;
 import com.citi.euces.pronosticos.services.api.RebajasService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,31 @@ public class RebajasController {
     @PostMapping(path = "/aplicarRebaja")
     public ResponseEntity<?> aplicarRebaja() {
         try {
+            MensajeResponse response = new MensajeResponse(rebajasService.aplicarRebaja(), "200");
+            return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
+    @PostMapping(path = "/reporteRebaja")
+    public ResponseEntity<?> reporteRebaja(@RequestBody final ReporteRebajaRequest request) {
+        try {
+            if (request.getFecha().isEmpty() || request.getPage() == null) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+            }
             MensajeResponse response = new MensajeResponse(rebajasService.aplicarRebaja(), "200");
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
