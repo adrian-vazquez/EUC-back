@@ -15,7 +15,7 @@ public class RebajaPronosticoJDBCRepository {
     }
     @Transactional
     public void truncateTable() {
-        String query = "Truncate table PPC_MIS_REBAJA_PRONOSTICO";
+        String query = "DELETE FROM PPC_MIS_REBAJA_PRONOSTICO";
         jdbcTemplate.execute(query);
     }
 
