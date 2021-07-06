@@ -1,6 +1,11 @@
 package com.citi.euces.pronosticos.models;
 
-public class LeerArchivoRequest {
+import java.io.Serializable;
+
+public class LeerArchivoRequest implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
 
     private String file;
     private String fechaMovimiento;

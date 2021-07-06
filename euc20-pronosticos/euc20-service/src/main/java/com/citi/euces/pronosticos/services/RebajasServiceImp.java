@@ -1,18 +1,17 @@
 package com.citi.euces.pronosticos.services;
 
-import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
-import com.citi.euces.pronosticos.infra.dto.RebNumProtectDTO;
-import com.citi.euces.pronosticos.infra.dto.RebajaFileOndemandDTO;
+import com.citi.euces.pronosticos.entities.CatCausaRechazo;
+import com.citi.euces.pronosticos.entities.MaestroDeComisiones;
+import com.citi.euces.pronosticos.infra.dto.*;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
-import com.citi.euces.pronosticos.repositories.RebNumProtectJDBCRepository;
-import com.citi.euces.pronosticos.repositories.RebNumProtectRepository;
-import com.citi.euces.pronosticos.repositories.RebajaPronosticoJDBCRepository;
+import com.citi.euces.pronosticos.repositories.*;
 import com.citi.euces.pronosticos.services.api.RebajasService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +36,14 @@ public class RebajasServiceImp implements RebajasService {
     private RebNumProtectJDBCRepository rebNumProtectJDBCRepository;
     @Autowired
     private RebajaPronosticoJDBCRepository rebajaPronosticoJDBCRepository;
+    @Autowired
+    private MaestroDeComisionesRepository maestroDeComisionesRepository;
+    @Autowired
+    private CuentasContablesJDBCRepository cuentasContablesJDBCRepository;
+    @Autowired
+    private CatCausaRechazoRepository CatCausaRechazoRepository;
+    @Autowired
+    private CatServiciosPronosticoJDBCRepository catServiciosPronosticoRepository;
 
     @Override
     public MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws
@@ -73,6 +80,36 @@ public class RebajasServiceImp implements RebajasService {
         return response;
     }
 
+    @Override
+    public MensajeDTO aplicarRebaja() throws GenericException {
+        String p_numRegCargados = "";
+        try {
+            p_numRegCargados = rebNumProtectJDBCRepository.updateMaestoComisionesSp();
+       }catch (Exception e){
+           throw new GenericException(
+                   "Error al llamar SP :: " , HttpStatus.NOT_FOUND.toString());
+       }
+        MensajeDTO mensjageResponse = new MensajeDTO();
+        mensjageResponse.setMensajeInfo("Confirmando, Actualizando maestro de comisiones: ".concat(p_numRegCargados).concat(" rebajados"));
+        return mensjageResponse;
+    }
+
+    @Override
+    public Page<ReporteRebajaDTO> reporteRebaja(String fechaMovimiento) throws GenericException {
+        List<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findFechaM(fechaMovimiento);
+        listaReb.forEach(mc -> {
+            log.info("requestData ::> "  + mc.getChequeraCargo());
+        } );
+        List<CuentasContablesDTO> cuentasContables = cuentasContablesJDBCRepository.findAll();
+        log.info("cuentasContables size :: "+ cuentasContables.size());
+        List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
+        log.info("listaRechazos size :: "+ listaRechazos.size());
+        List<CatServiciosPronosticosDTO> listaCatServicios = catServiciosPronosticoRepository.findAll();
+        log.info("listaCatServicios size :: "+ listaCatServicios.size());
+
+        return null;
+    }
+
     public String leerArchivo(Path tempFile, String fechaContable, String fechaMovimiento) throws IOException, GenericException, ParseException {
         String responseMessage = "";
         String cadena;
@@ -102,12 +139,7 @@ public class RebajasServiceImp implements RebajasService {
         content.removeIf(c -> !contentSet.add(c.getNumProteccion()));
         log.info("RebNumProtectDTO content Final  ::  " + content.size());
         log.info("RebNumProtectDTO sumaImporte  ::  " + sumaImporte);
-        Collections.sort(content, new Comparator<RebNumProtectDTO>() {
-            @Override
-            public int compare(RebNumProtectDTO p1, RebNumProtectDTO p2) {
-                return new Long(p1.getNumProteccion()).compareTo(new Long(p2.getNumProteccion()));
-            }
-        });
+        content.sort(Comparator.comparing(RebNumProtectDTO::getNumProteccion));
         try {
             rebNumProtectJDBCRepository.batchInsert(content, 500);
         } catch (Exception e) {
