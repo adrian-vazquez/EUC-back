@@ -1,38 +1,29 @@
-package com.citi.euces.pronosticos.entities;
+package com.citi.euces.pronosticos.infra.dto;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
-@Table(name = "PPC_MIS_CUENTAS_CONTABLES")
-public class CuentasContables implements Serializable {
+public class CuentasContablesDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name="ROWID")
-    String rowid;
-    @Column(name = "CUENTA")
     private Long cuenta;
-    @Column(name = "PRODUCTO")
     private String producto;
-    @Column(name = "MODELO_GESTION")
     private String modeloGestion;
-    @Column(name = "DESCRIPCION")
     private String descripcion;
-    @Column(name = "SERVICIO")
     private String servicio;
-    @Column(name = "ID_SERVICIO")
     private Long idServicio;
-    @Column(name = "ID_ONDEMAND")
     private Long idOndemand;
 
-    public String getRowid() {
-        return rowid;
-    }
+    public CuentasContablesDTO() { }
 
-    public void setRowid(String rowid) {
-        this.rowid = rowid;
+    public CuentasContablesDTO(Long cuenta, String producto, String modeloGestion, String descripcion, String servicio, Long idServicio, Long idOndemand) {
+        this.cuenta = cuenta;
+        this.producto = producto;
+        this.modeloGestion = modeloGestion;
+        this.descripcion = descripcion;
+        this.servicio = servicio;
+        this.idServicio = idServicio;
+        this.idOndemand = idOndemand;
     }
 
     public Long getCuenta() {

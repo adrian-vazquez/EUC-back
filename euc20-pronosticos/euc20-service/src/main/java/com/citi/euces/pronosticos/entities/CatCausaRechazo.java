@@ -11,7 +11,7 @@ public class CatCausaRechazo implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID_CAUSA_RECHAZO")
-    private Long idFlujo;
+    private Long idCausaRechazo;
     @Column(name = "CAUSA")
     private String causa;
     @Column(name = "SOLUCION")
@@ -22,13 +22,9 @@ public class CatCausaRechazo implements Serializable {
     private String causaProteccion;
 
 
-    public Long getIdFlujo() {
-        return idFlujo;
-    }
+    public Long getIdCausaRechazo() { return idCausaRechazo; }
 
-    public void setIdFlujo(Long idFlujo) {
-        this.idFlujo = idFlujo;
-    }
+    public void setIdCausaRechazo(Long idCausaRechazo) { this.idCausaRechazo = idCausaRechazo; }
 
     public String getCausa() {
         return causa;
