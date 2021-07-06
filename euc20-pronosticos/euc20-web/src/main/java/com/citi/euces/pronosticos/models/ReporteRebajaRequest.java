@@ -15,10 +15,10 @@ public class ReporteRebajaRequest implements Serializable {
     }
 
     public void setFecha(String fecha) {
-        fecha = fecha;
+        this.fecha = fecha;
     }
 
-    public Integer  getPage() {
+    public Integer getPage() {
         return page;
     }
 

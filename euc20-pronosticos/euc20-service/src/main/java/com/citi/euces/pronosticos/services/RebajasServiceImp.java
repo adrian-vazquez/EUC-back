@@ -1,18 +1,22 @@
 package com.citi.euces.pronosticos.services;
 
+import com.citi.euces.pronosticos.entities.CatCausaRechazo;
+import com.citi.euces.pronosticos.entities.CatServiciosPronostico;
+import com.citi.euces.pronosticos.entities.CuentasContables;
+import com.citi.euces.pronosticos.entities.MaestroDeComisiones;
 import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
 import com.citi.euces.pronosticos.infra.dto.RebNumProtectDTO;
 import com.citi.euces.pronosticos.infra.dto.RebajaFileOndemandDTO;
+import com.citi.euces.pronosticos.infra.dto.ReporteRebajaDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
-import com.citi.euces.pronosticos.repositories.RebNumProtectJDBCRepository;
-import com.citi.euces.pronosticos.repositories.RebNumProtectRepository;
-import com.citi.euces.pronosticos.repositories.RebajaPronosticoJDBCRepository;
+import com.citi.euces.pronosticos.repositories.*;
 import com.citi.euces.pronosticos.services.api.RebajasService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +41,14 @@ public class RebajasServiceImp implements RebajasService {
     private RebNumProtectJDBCRepository rebNumProtectJDBCRepository;
     @Autowired
     private RebajaPronosticoJDBCRepository rebajaPronosticoJDBCRepository;
+    @Autowired
+    private MaestroDeComisionesRepository maestroDeComisionesRepository;
+    @Autowired
+    private CuentasContablesRepository cuentasContablesRepository;
+    @Autowired
+    private CatCausaRechazoRepository CatCausaRechazoRepository;
+    @Autowired
+    private  CatServiciosPronosticoRepository catServiciosPronosticoRepository;
 
     @Override
     public MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws
@@ -85,6 +97,40 @@ public class RebajasServiceImp implements RebajasService {
         MensajeDTO mensjageResponse = new MensajeDTO();
         mensjageResponse.setMensajeInfo("Confirmando, Actualizando maestro de comisiones: ".concat(p_numRegCargados).concat(" rebajados"));
         return mensjageResponse;
+    }
+
+    @Override
+    public Page<ReporteRebajaDTO> reporteRebaja(String fechaMovimiento) throws GenericException {
+        List<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findFechaM(fechaMovimiento);
+       /* if(requestData.isEmpty()){
+            throw new GenericException(
+                    "No hay Datos de MaestroDeComisiones :: " , HttpStatus.NOT_FOUND.toString());
+        }*/
+        listaReb.forEach(mc -> {
+            log.info("requestData ::> "  + mc.getChequeraCargo());
+        } );
+
+        List<CuentasContables> cuentasContables = cuentasContablesRepository.findAll();
+        /*if(cuentasContables.isEmpty()){
+            throw new GenericException(
+                    "No hay Datos de Cuentas Contables :: " , HttpStatus.NOT_FOUND.toString());
+        }*/
+        log.info("cuentasContables size :: "+ cuentasContables.size());
+
+        List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
+
+        log.info("listaRechazos size :: "+ listaRechazos.size());
+
+        List<CatServiciosPronostico> listaCatServicios = catServiciosPronosticoRepository.findAll();
+
+        log.info("listaCatServicios size :: "+ listaCatServicios.size());
+
+
+
+
+
+
+        return null;
     }
 
     public String leerArchivo(Path tempFile, String fechaContable, String fechaMovimiento) throws IOException, GenericException, ParseException {

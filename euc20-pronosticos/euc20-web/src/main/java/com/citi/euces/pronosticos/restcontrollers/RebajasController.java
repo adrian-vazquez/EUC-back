@@ -1,10 +1,7 @@
 package com.citi.euces.pronosticos.restcontrollers;
 
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
-import com.citi.euces.pronosticos.models.ErrorGeneric;
-import com.citi.euces.pronosticos.models.LeerArchivoRequest;
-import com.citi.euces.pronosticos.models.MensajeResponse;
-import com.citi.euces.pronosticos.models.ReporteRebajaRequest;
+import com.citi.euces.pronosticos.models.*;
 import com.citi.euces.pronosticos.services.api.RebajasService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +31,8 @@ public class RebajasController {
                 throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
             }
             MensajeResponse response = new MensajeResponse(
-                    rebajasService.aplicarRebajaloadFile(request.getFile(), request.getFechaContable(),request.getFechaMovimiento()),
-                    );
+                    rebajasService.aplicarRebajaloadFile(request.getFile(), request.getFechaContable(),
+                            request.getFechaMovimiento()), "200");
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
@@ -82,8 +79,8 @@ public class RebajasController {
             if (request.getFecha().isEmpty() || request.getPage() == null) {
                 throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
             }
-            MensajeResponse response = new MensajeResponse(rebajasService.aplicarRebaja(), "200");
-            return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+            ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteRebaja(request.getFecha()), "200");
+            return new ResponseEntity<ReporteRebajaResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
             error.setCode(ex.getCodeError());
