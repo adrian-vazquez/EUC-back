@@ -1,30 +1,28 @@
 package com.citi.euces.pronosticos.infra.dto;
 
 import java.io.Serializable;
-import java.util.Date;
-
-import org.apache.poi.xssf.usermodel.XSSFCell;
 
 public class CtasVirtualesDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	private Long numCliente;
-	private Long numCuenta;
+	private Integer numCliente;
+	private Integer numCuenta;
 	private String fecAlta;
-	private Long cuentasX;
+	private Integer cuentasX;
 	private String nombre;
+	private Integer id;
 	
-	public Long getNumCliente() {
+	public Integer getNumCliente() {
 		return numCliente;
 	}
-	public void setNumCliente(double numCliente) {
-		this.numCliente = (long) numCliente;
+	public void setNumCliente(Integer numCliente) {
+		this.numCliente = numCliente;
 	}
-	public Long getNumCuenta() {
+	public Integer getNumCuenta() {
 		return numCuenta;
 	}
-	public void setNumCuenta(double numCuenta) {
-		this.numCuenta = (long) numCuenta;
+	public void setNumCuenta(Integer numCuenta) {
+		this.numCuenta = numCuenta;
 	}
 	public String getFecAlta() {
 		return fecAlta;
@@ -32,17 +30,23 @@ public class CtasVirtualesDTO implements Serializable{
 	public void setFecAlta(String fecAlta) {
 		this.fecAlta = fecAlta;
 	}
-	public Long getCuentasX() {
+	public Integer getCuentasX() {
 		return cuentasX;
 	}
-	public void setCuentasX(double cuentasX) {
-		this.cuentasX = (long) cuentasX;
+	public void setCuentasX(Integer cuentasX) {
+		this.cuentasX = cuentasX;
 	}
 	public String getNombre() {
 		return nombre;
 	}
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	
 	

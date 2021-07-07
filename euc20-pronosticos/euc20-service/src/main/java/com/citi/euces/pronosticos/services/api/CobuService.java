@@ -12,15 +12,15 @@ public interface CobuService {
 
 	public CobuDTO limpiarCobu() throws GenericException, SQLGrammarException;
 	
-	//public CobuDTO cargaCtasCobu(String file) throws GenericException, IOException;
+	public CobuDTO cargaCtasCobu(String file) throws GenericException, IOException, ParseException;
 	
 	public CobuDTO cargaCtasVirt(String file) throws GenericException, IOException, ParseException;
 	
-	/*public CobuDTO cargaTxsCtas(String file) throws GenericException, IOException;
+	public CobuDTO cargaTxsCtas(String file) throws GenericException, IOException, ParseException;
 	
-	public CobuDTO cargaTarEspCobu(String file) throws GenericException, IOException;
+	public CobuDTO cargaTarEspCobu(String file) throws GenericException, IOException, ParseException;
 	
-	public CobuDTO procesoCobu() throws GenericException;
+	/*public CobuDTO procesoCobu() throws GenericException;
 	
 	public CobuDTO reporte() throws GenericException;
 	
