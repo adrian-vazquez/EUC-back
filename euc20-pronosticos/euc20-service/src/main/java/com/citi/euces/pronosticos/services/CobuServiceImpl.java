@@ -46,36 +46,6 @@ import com.citi.euces.pronosticos.services.api.CobuService;
 public class CobuServiceImpl implements CobuService{
 	static final Logger log = LoggerFactory.getLogger(RebajasServiceImp.class);
 
-	/*@Autowired
-	private CifrasControlRepository cifrasControl;
-	@Autowired
-	private CtasVirtualesGposRepository ctasVirtualesGpos;	
-	@Autowired
-	private CtasVirtualesRepository ctasVirtuales;	
-	@Autowired
-	private CtosUnicosRepository ctosUnicos;	
-	@Autowired
-	private LayoutBeRepository layoutBe;	
-	@Autowired
-	private LayoutMensRepository layoutMens;	
-	@Autowired
-	private LayoutVentRepository layoutVent;	
-	@Autowired
-	private ProcesadoRepository procresado;	
-	@Autowired
-	private QueryCtosAgrupadoRepository queryCtosAgrupado;	
-	@Autowired
-	private QueryCtosCobuRepository queryCtosCobu;	
-	@Autowired
-	private QueryCtosDuplicadosRepository queryCtosDuplicados;	
-	@Autowired
-	private TarifasRepository tarifas;	
-	@Autowired
-	private TxnsImporteRepository txnsImporte;	
-	@Autowired
-	private TxnsXTipoRepository txnsXTipo;	
-	@Autowired
-	private TxsCtasVirtRepository txsCtasVirt;	*/
 	@Autowired
 	private TruncateTablesCobuRepository truncateTables;
 	@Autowired
