@@ -66,7 +66,7 @@ public class PronosticosAltCheqJDBCRepository {
         return updateCounts;
 	}
 	
-	@Transactional
+
 	public void BorrarTCDatosPronosticosAltCheq() {
         String query = "Truncate table PPC_MIS_PRONOSTICOS_ALT_CHEQ";
         jdbcTemplate.execute(query);

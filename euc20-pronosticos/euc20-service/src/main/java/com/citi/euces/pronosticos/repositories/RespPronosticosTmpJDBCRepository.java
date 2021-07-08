@@ -79,7 +79,7 @@ public class RespPronosticosTmpJDBCRepository {
     public String updatePronosticosRespuesta(){
         jdbcTemplate.setResultsMapCaseInsensitive(true);
         simpleJdbcCallRefCursor = new SimpleJdbcCall(jdbcTemplate)
-                .withProcedureName("PPC_MIS_UPDATE_PRONOSTICOS_RESPUESTA")
+                .withProcedureName("PPC_MIS_UPDATE_PRONOSTICO_RESPUESTA")
                 .declareParameters(new SqlParameter("p_numRegCargados", Types.INTEGER),
                 new SqlOutParameter("p_numRegCargados", Types.INTEGER));
         Map<String, Object> out = simpleJdbcCallRefCursor.execute(new MapSqlParameterSource("p_numRegCargados", 0));
@@ -90,9 +90,9 @@ public class RespPronosticosTmpJDBCRepository {
 	@Transactional
     public void updateCobrosResp() throws GenericException{
 		try {
-			jdbcTemplate.update("call sp_upd_cobros_resp_auto");
+			jdbcTemplate.update("call PPC_MIS_SP_UPD_COBROS_RESP_AUTO");
 		} catch (Exception e) {
-            throw new GenericException( "Error al ejecutar el SP sp_upd_cobros_resp_auto:: " , HttpStatus.NOT_FOUND.toString());
+            throw new GenericException( "Error al ejecutar el SP PPC_MIS_SP_UPD_COBROS_RESP_AUTO:: " , HttpStatus.NOT_FOUND.toString());
         }
     }
 }

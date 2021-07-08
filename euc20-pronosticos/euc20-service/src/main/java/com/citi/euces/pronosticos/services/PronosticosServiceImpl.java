@@ -20,9 +20,11 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
+import org.hibernate.exception.SQLGrammarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,25 +65,19 @@ public class PronosticosServiceImpl implements PronosticosService {
 	
 	/**********************************************************************LIMPIAR PRONOSTICOS******************************************************************/
 	@Override
-	public MensajeDTO limpiarPronosticos() throws GenericException 
+	public MensajeDTO limpiarPronosticos() throws GenericException, SQLGrammarException 
 	{	
 		log.info("limpiarPronosticosIMPL:: ");
 		MensajeDTO msg = new MensajeDTO(); 
-		
 		try {
 			pronosticosTmpJDBCRepository.BorrarDLDatosPronosticosTmp();
-		} catch (Exception e) {
-			throw new GenericException(
-					"Error al limpiar la tabla Pronostico :: " , HttpStatus.NOT_FOUND.toString());
-		}
-		
-		try {
 			pronosticosAltCheqJDBCRepository.BorrarTCDatosPronosticosAltCheq();
-		} catch (Exception e) {
+		} catch (EntityNotFoundException e) {
 			throw new GenericException(
-					"Error al limpiar la tabla Pronosticos Alt Cheq :: " , HttpStatus.NOT_FOUND.toString());
+					"Error al limpiar las tablas Pronostico:: " , HttpStatus.BAD_REQUEST.toString());
+		}catch(SQLGrammarException ex) {
+			throw new GenericException("Error e", HttpStatus.BAD_REQUEST.toString());
 		}
-		
 		msg.setMensajeInfo("Aviso");
 		msg.setMensajeConfirm("La tabla de pronósticos se encuentra sin registros.");
 		return msg;
