@@ -6,7 +6,7 @@ import java.io.Serializable;
 @NamedStoredProcedureQueries(
         {
                 @NamedStoredProcedureQuery(name = SpRebajaMaestroDeComisiones.Name_Query_Rebajas,
-                procedureName = "PRUEBA_SP",
+                procedureName = "PPC_MIS_SP_REBAJA_MAESTRO_COMISIONES",
                 parameters = {
                         @StoredProcedureParameter(type = Integer.class, mode = ParameterMode.OUT)
                 })

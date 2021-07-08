@@ -106,7 +106,7 @@ public class RebajasServiceImp implements RebajasService {
 
     @Override
     public ReporteRebajaDTO reporteRebaja(String fechaMovimiento, Integer page) throws GenericException, IOException {
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 50);
         Page<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByFechaMovimeiento(fechaMovimiento,pageable);
         List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>() ;
         List<CuentasContablesDTO> listaCuentasContables = cuentasContablesJDBCRepository.findAll();
@@ -150,9 +150,9 @@ public class RebajasServiceImp implements RebajasService {
         log.info("listReporteRebaja :: > "+listReporteRebaja.size());
         Page<ReporteRebajaPageDTO> pageResponse = new PageImpl<>(listReporteRebaja, pageable, listaReb.getTotalPages());
         String file ="";
-        if(listReporteRebaja.size() > 3) {
+        //if(listaReb.getTotalPages() <= 1200) {
             file = createFileRepRebaja(listReporteRebaja);
-        }
+        //}
         ReporteRebajaDTO response = new ReporteRebajaDTO();
         response.setReporteRebajaPageDTO(pageResponse);
         response.setFile(file);
