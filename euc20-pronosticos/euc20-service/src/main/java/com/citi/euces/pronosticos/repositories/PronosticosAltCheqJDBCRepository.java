@@ -58,8 +58,8 @@ public class PronosticosAltCheqJDBCRepository {
                     	ps.setString(22, content.getConcepto());
                     	ps.setString(23, content.getLeyenda());
                     	ps.setInt(24, content.getDias());
-                    	ps.setInt(25, content.getIdServicio());
-                    	ps.setInt(26, content.getIdOndemand());
+                    	ps.setLong(25, content.getIdServicio());
+                    	ps.setLong(26, content.getIdOndemand());
                     	ps.setInt(27, content.getEvaluacionVirtual());
                     }
                 });

@@ -30,8 +30,8 @@ public class RechazosFileDTO implements Serializable {
 	private String concepto;
 	private String leyenda;
 	private Integer dias;
-	private Integer idServicio;
-	private Integer idOndemand;
+	private Long idServicio;
+	private Long idOndemand;
 	private Integer evaluacionVirtual;
 	private String openItem;
 
@@ -167,16 +167,16 @@ public class RechazosFileDTO implements Serializable {
 	public void setLeyenda(String leyenda) {
 		this.leyenda = leyenda;
 	}
-	public Integer getIdServicio() {
+	public Long getIdServicio() {
 		return idServicio;
 	}
-	public void setIdServicio(Integer idServicio) {
+	public void setIdServicio(Long idServicio) {
 		this.idServicio = idServicio;
 	}
-	public Integer getIdOndemand() {
+	public Long getIdOndemand() {
 		return idOndemand;
 	}
-	public void setIdOndemand(Integer idOndemand) {
+	public void setIdOndemand(Long idOndemand) {
 		this.idOndemand = idOndemand;
 	}
 	public Integer getEvaluacionVirtual() {
