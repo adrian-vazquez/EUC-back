@@ -67,8 +67,8 @@ public class PronosticosAltCheqJDBCRepository {
 	}
 	
 
-	public void BorrarTCDatosPronosticosAltCheq() {
-        String query = "Truncate table PPC_MIS_PRONOSTICOS_ALT_CHEQ";
+	public void BorrarDLDatosPronosticosAltCheq() {
+		String query = "DELETE FROM PPC_MIS_PRONOSTICOS_ALT_CHEQ";
         jdbcTemplate.execute(query);
     }
 	

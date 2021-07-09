@@ -16,6 +16,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -71,7 +72,7 @@ public class PronosticosServiceImpl implements PronosticosService {
 		MensajeDTO msg = new MensajeDTO(); 
 		try {
 			pronosticosTmpJDBCRepository.BorrarDLDatosPronosticosTmp();
-			pronosticosAltCheqJDBCRepository.BorrarTCDatosPronosticosAltCheq();
+			pronosticosAltCheqJDBCRepository.BorrarDLDatosPronosticosAltCheq();
 		} catch (EntityNotFoundException e) {
 			throw new GenericException(
 					"Error al limpiar las tablas Pronostico:: " , HttpStatus.BAD_REQUEST.toString());
@@ -225,7 +226,7 @@ public class PronosticosServiceImpl implements PronosticosService {
         log.info("RechazosFileDTO content init  ::  " + fileRechazos.size());
         
         try {
-        	pronosticosAltCheqJDBCRepository.BorrarTCDatosPronosticosAltCheq();	
+        	pronosticosAltCheqJDBCRepository.BorrarDLDatosPronosticosAltCheq();	
         } catch (Exception e) {
             throw new GenericException( "Error al limpiar la tabla Pronosticos Alt Cheq :: " , HttpStatus.NOT_FOUND.toString());
         }
@@ -437,6 +438,7 @@ public class PronosticosServiceImpl implements PronosticosService {
         b.close();
         log.info("RebajasFileDTO content init  ::  " + listaRebaja.size());
         listaRebaja = listaRebaja.stream().distinct().collect(Collectors.toList());
+        //List<RebajaFileOndemandDTO> listaRebajaGroup = listaRebaja.stream().collect(Collectors.groupingBy(RebajaFileOndemandDTO -> RebajaFileOndemandDTO.getNumProteccion()));
         
         
         return "";

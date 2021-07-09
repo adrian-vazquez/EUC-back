@@ -20,7 +20,6 @@ public class RebajaPronosticoJDBCRepository {
     }
 
     
-    @Transactional
 	public void TCBorrarRebajaPronosticos() {
         String query = "Truncate table PPC_MIS_REBAJA_PRONOSTICO";
         jdbcTemplate.execute(query);

@@ -35,7 +35,6 @@ public class RespPronosticosTmpJDBCRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	@Transactional
 	public void TCBorrarRespPronosticos() {
         String query = "Truncate table PPC_MIS_RESP_PRONOSTICOS_TMP";
         jdbcTemplate.execute(query);
