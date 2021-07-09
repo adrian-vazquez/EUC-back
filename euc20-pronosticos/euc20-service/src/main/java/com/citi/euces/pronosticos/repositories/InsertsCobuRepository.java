@@ -27,27 +27,6 @@ public class InsertsCobuRepository {
 	    }
 	    
 	    @Transactional
-	    public int[][] insertCtasVirtuales(List<CtasVirtualesDTO> books, int batchSize) {
-	        int [][]updateCounts = inserts.batchUpdate(
-	        		"INSERT INTO PPC_PCB_CTAS_VIRTUALES( NUM_CLIENTE, NUM_CUENTA, FEC_ALTA, CUENTAS_X, NOMBRE) VALUES(?,?,?,?,?)",
-	        		books,
-	                batchSize,
-	                new ParameterizedPreparedStatementSetter<CtasVirtualesDTO>() {
-	                    public void setValues(PreparedStatement ps, CtasVirtualesDTO argument) throws SQLException {
-	                    	
-	                        ps.setInt(1, argument.getNumCliente());
-	                        ps.setInt(2, argument.getNumCuenta());
-	                        ps.setString(3, argument.getFecAlta());
-	                        ps.setInt(4, argument.getCuentasX());
-	                        ps.setString(5, argument.getNombre());
-	                        ps.setInt(6, argument.getId());
-	                        
-	                    }
-	                });
-	        return updateCounts;
-	    }
-	    
-	    @Transactional
 	    public int[][] insertCtasCobu(List<QueryCtosAgrupadoDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_QUERY_CTOS_AGRUPADO(CUENTA, PREFMDA, CUENTAMDA, CVE_ESTATUS, NOMBRE, USO, MON, FRANQUICIA, DUPLICADO, ID) VALUES(?,?,?,?,?,?,?,?,?,?)",
@@ -73,9 +52,30 @@ public class InsertsCobuRepository {
 	    }
 	    
 	    @Transactional
-	    public int[][] insertTxsCtas(List<TxsCtasVirtDTO> books, int batchSize) {
+	    public int[][] insertCtasVirtuales(List<CtasVirtualesDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
-	        		"INSERT INTO PPC_PCB_TXS_CTAS_VIRT(NUM_CLIENTE, NUM_CTA, CTE_ALIAS, NOMBRE, CVE_MON_SISTEMA, FEC_INFORMACION, NUM_MED_ACCESO, CVE_TXNSISTEMA, NUM_SUC_PROMTORMDA, IMP_TRANSACCION, NUM_AUT_TRANS, NUM_SUC_OPERADORA, TIPO) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+	        		"INSERT INTO PPC_PCB_CTAS_VIRTUALES( NUM_CLIENTE, NUM_CUENTA, FEC_ALTA, CUENTAS_X, NOMBRE, ID) VALUES(?,?,?,?,?,?)",
+	        		books,
+	                batchSize,
+	                new ParameterizedPreparedStatementSetter<CtasVirtualesDTO>() {
+	                    public void setValues(PreparedStatement ps, CtasVirtualesDTO argument) throws SQLException {
+	                    	
+	                        ps.setInt(1, argument.getNumCliente());
+	                        ps.setInt(2, argument.getNumCuenta());
+	                        ps.setDate(3, new Date(argument.getFecAlta().getTime()));
+	                        ps.setInt(4, argument.getCuentasX());
+	                        ps.setString(5, argument.getNombre());
+	                        ps.setInt(6, argument.getId());
+	                        
+	                    }
+	                });
+	        return updateCounts;
+	    }
+	   // 
+	    @Transactional
+	    public int[][] insertTxsCtas(List<TxsCtasVirtDTO> books, int batchSize) {
+	        int [][]updateCounts = inserts.batchUpdate(											
+	        		"INSERT INTO PPC_PCB_TXS_CTAS_VIRT(NUM_CLIENTE, NUM_CTA, CTE_ALIAS, NOMBRE, CVE_MON_SISTEMA, FEC_INFORMACION, NUM_MED_ACCESO, CVE_TXNSISTEMA, NUM_SUC_PROMTORMDA, IMP_TRANSACCION, NUM_AUT_TRANS, NUM_SUC_OPERADORA, TIPO, ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 	        		books,
 	                batchSize,
 	                new ParameterizedPreparedStatementSetter<TxsCtasVirtDTO>() {
@@ -86,7 +86,7 @@ public class InsertsCobuRepository {
 	                        ps.setString(3, argument.getCteAlias());
 	                        ps.setString(4, argument.getNombre());
 	                        ps.setInt(5, argument.getCveMonSstema());
-	                        ps.setDate(6, (Date) argument.getFecInformacion());
+	                        ps.setDate(6, new Date(argument.getFecInformacion().getTime()));;
 	                        ps.setDouble(7, argument.getNumMedAcceso());
 	                        ps.setInt(8, argument.getCveTxnSistema());
 	                        ps.setInt(9, argument.getNumSucPromtormda());

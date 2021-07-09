@@ -161,16 +161,13 @@ public class CobuController {
         }
 	}
 	
-	/*@PostMapping(path = "/procesoCobu")
-	public ResponseEntity<?>procesoCobu(@RequestBody final String request) {
+	@GetMapping(path = "/procesoCobu")
+	public ResponseEntity<?> procesoCobu() throws GenericException{
 		try {
-            if (request.isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
-            }
             CobuResponse response = new CobuResponse(
             	cobuService.procesoCobu(),
                 HttpStatus.OK.toString());
-            	return new ResponseEntity<CobuResponse>(response, HttpStatus.OK);
+            return new ResponseEntity<CobuResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
             error.setCode(ex.getCodeError());
@@ -188,7 +185,7 @@ public class CobuController {
         }
 	}
 	
-	@GetMapping(path = "/reporte")
+	/*@GetMapping(path = "/reporte")
 	public ResponseEntity<?>reporte(@RequestBody final String request) {
 		try {
             if (request.isEmpty() ) {
