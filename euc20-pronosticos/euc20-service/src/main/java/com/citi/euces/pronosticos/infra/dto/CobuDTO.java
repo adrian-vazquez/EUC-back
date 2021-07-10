@@ -10,7 +10,7 @@ public class CobuDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private String mensajeConfirm;
-	private String procesoResultado;
+	private String procesoCompletado;
 
 	public String getMensajeConfirm() {
 		return mensajeConfirm;
@@ -20,12 +20,12 @@ public class CobuDTO implements Serializable{
 		this.mensajeConfirm = mensajeConfirm;
 	}
 	
-	public String getProcesoResultado() {
-		return procesoResultado;
+	public String getProcesoCompletado() {
+		return procesoCompletado;
 	}
 
-	public void setProcesoResultado(String procesoResultado) {
-		this.procesoResultado = procesoResultado;
+	public void setProcesoCompletado(String procesoCompletado) {
+		this.procesoCompletado = procesoCompletado;
 	}
 
 	

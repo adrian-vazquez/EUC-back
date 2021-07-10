@@ -13,6 +13,7 @@ public class CobuResponse implements Serializable{
 	
 	private CobuDTO mensaje;
 	private String codigo;
+	private String archivo;
 	
 	public CobuResponse(CobuDTO mensaje, String codigo) {
 		this.mensaje = mensaje;
@@ -34,4 +35,15 @@ public class CobuResponse implements Serializable{
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
 	}
+
+	public String getArchivo() {
+		return archivo;
+	}
+
+	public void setArchivo(String archivo) {
+		this.archivo = archivo;
+	}
+	
+	
+
 }

@@ -1,14 +1,13 @@
 package com.citi.euces.pronosticos.infra.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class CtasVirtualesDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private Integer numCliente;
 	private Integer numCuenta;
-	private Date fecAlta;
+	private String fecAlta;
 	private Integer cuentasX;
 	private String nombre;
 	private Integer id;
@@ -25,10 +24,10 @@ public class CtasVirtualesDTO implements Serializable{
 	public void setNumCuenta(Integer numCuenta) {
 		this.numCuenta = numCuenta;
 	}
-	public Date getFecAlta() {
+	public String getFecAlta() {
 		return fecAlta;
 	}
-	public void setFecAlta(Date fecAlta) {
+	public void setFecAlta(String fecAlta) {
 		this.fecAlta = fecAlta;
 	}
 	public Integer getCuentasX() {

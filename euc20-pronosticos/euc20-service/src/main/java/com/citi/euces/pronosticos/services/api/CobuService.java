@@ -10,7 +10,7 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
 public interface CobuService {
 
-	public CobuDTO limpiarCobu() throws GenericException;
+	public CobuDTO limpiarCobu() throws GenericException, SQLGrammarException;
 	
 	public CobuDTO cargaCtasCobu(String file) throws GenericException, IOException, ParseException;
 	
@@ -20,9 +20,9 @@ public interface CobuService {
 	
 	public CobuDTO cargaTarEspCobu(String file) throws GenericException, IOException, ParseException;
 	
-	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException;
+	/*public CobuDTO procesoCobu() throws GenericException;
 	
-	/*public CobuDTO reporte() throws GenericException;
+	public CobuDTO reporte() throws GenericException;
 	
 	public CobuDTO cifrasControl() throws GenericException;**/
 }
