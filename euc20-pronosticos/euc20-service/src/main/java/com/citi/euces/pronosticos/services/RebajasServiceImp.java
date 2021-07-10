@@ -26,8 +26,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -105,10 +107,44 @@ public class RebajasServiceImp implements RebajasService {
     }
 
     @Override
+    public List<ReporteCuadreDTO> reporteCuadre() throws GenericException, IOException, ParseException {
+        Integer mes1 = FormatUtils.obtenerMes(3);
+        Integer mes2 = FormatUtils.obtenerMes(2);
+        Integer mes3 = FormatUtils.obtenerMes(1);
+        Integer anio1 = FormatUtils.obtenerYear(3);
+        Integer anio2 = FormatUtils.obtenerYear(2);
+        Integer anio3 = FormatUtils.obtenerYear(1);
+        LocalDate now = LocalDate.now();
+        Integer mesActual = now.getYear();
+        List<ReporteCuadreDTO> responseQuery1 = new ArrayList<>();
+        List<ReporteCuadreDTO> responseQuery2 = new ArrayList<>();
+        List<ReporteCuadreDTO> responseQuery3 = new ArrayList<>();
+        List<ReporteCuadreDTO> responseQuery4 = new ArrayList<>();
+        try {
+            responseQuery1 = maestroDeComisionesRepository.getFunctionRepCuadre1(mes1, mes2, mes3, anio1);
+            responseQuery2 = maestroDeComisionesRepository.getFunctionRepCuadre2(mes1, mes2, mes3, anio1, anio2, anio3);
+            responseQuery3 = maestroDeComisionesRepository.getFunctionRepCuadre3(mesActual);
+            responseQuery4 = maestroDeComisionesRepository.getFunctionRepCuadre4(mesActual);
+
+        } catch (Exception e) {
+            throw new GenericException(
+                    "Error al llamar Funciones :: ", HttpStatus.NOT_FOUND.toString());
+        }
+        log.info("responseQuery1 :: " + responseQuery1.size() + "  responseQuery2 :: " + responseQuery2.size());
+        log.info("responseQuery3 :: " + responseQuery3.size() + "  responseQuery4 :: " + responseQuery4.size());
+        List<ReporteCuadreDTO> response = new ArrayList<>();
+        response = Stream.of(responseQuery1, responseQuery2, responseQuery3, responseQuery4)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        log.info("response  :: " + response.size());
+        return response;
+    }
+
+    @Override
     public ReporteRebajaDTO reporteRebaja(String fechaMovimiento, Integer page) throws GenericException, IOException {
         Pageable pageable = PageRequest.of(page, 50);
-        Page<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByFechaMovimeiento(fechaMovimiento,pageable);
-        List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>() ;
+        Page<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByFechaMovimeiento(fechaMovimiento, pageable);
+        List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>();
         List<CuentasContablesDTO> listaCuentasContables = cuentasContablesJDBCRepository.findAll();
         log.info("cuentasContables size :: " + listaCuentasContables.size());
         List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
@@ -126,10 +162,10 @@ public class RebajasServiceImp implements RebajasService {
             reporteRebaja.setCobrado(validaChequera(reporteRebaja.getChequera(), reporteRebaja.getChequeraCargo()));//ValidaChequera
             reporteRebaja.setmTotal(lr.getId().getmTotal().toString());
             reporteRebaja.setpIva(lr.getpIva().toString());
-            reporteRebaja.setCausaRechazo(getRechazo(lr.getIdCausaRechazo(),listaRechazos)); //GetRechazo
+            reporteRebaja.setCausaRechazo(getRechazo(lr.getIdCausaRechazo(), listaRechazos)); //GetRechazo
             reporteRebaja.setMes(FormatUtils.validFechaMes(lr.getId().getMes()));//RetornaMes
             reporteRebaja.setAnio(lr.getId().getAnio().toString());
-            reporteRebaja.setServicio(getServicio(lr.getId().getIdServicio(), lr.getId().getIdOndemand(),listaCatServicios));
+            reporteRebaja.setServicio(getServicio(lr.getId().getIdServicio(), lr.getId().getIdOndemand(), listaCatServicios));
             reporteRebaja.setCsi(lr.getCsi().toString());
             reporteRebaja.setComEc(lr.getComEc().toString());
             reporteRebaja.setmComision(lr.getmComision().toString());
@@ -142,16 +178,16 @@ public class RebajasServiceImp implements RebajasService {
             reporteRebaja.setCatalogadaGc(FormatUtils.validCatalogadaGc(Integer.valueOf(lr.getId().getCatalogadaGc())));//GetCatalogadaGc
             reporteRebaja.setfMovimiento(FormatUtils.formatDatedmy(lr.getFechaMovimiento()));
             reporteRebaja.setFecha(lr.getFechaRegistroContable());//f_registro_contable
-            reporteRebaja.setCuentaContable(getCuentaContable(listaCuentasContables,lr.getId().getIdServicio(), lr.getId().getIdOndemand() ));
+            reporteRebaja.setCuentaContable(getCuentaContable(listaCuentasContables, lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
             reporteRebaja.setContrato(lr.getContrato());
             reporteRebaja.setOpenItem(lr.getOpenItem());
             listReporteRebaja.add(reporteRebaja);
         });
-        log.info("listReporteRebaja :: > "+listReporteRebaja.size());
+        log.info("listReporteRebaja :: > " + listReporteRebaja.size());
         Page<ReporteRebajaPageDTO> pageResponse = new PageImpl<>(listReporteRebaja, pageable, listaReb.getTotalPages());
-        String file ="";
+        String file = "";
         //if(listaReb.getTotalPages() <= 1200) {
-            file = createFileRepRebaja(listReporteRebaja);
+        file = createFileRepRebaja(listReporteRebaja);
         //}
         ReporteRebajaDTO response = new ReporteRebajaDTO();
         response.setReporteRebajaPageDTO(pageResponse);
@@ -215,7 +251,7 @@ public class RebajasServiceImp implements RebajasService {
 
     private String getRechazo(Integer idRechazo, List<CatCausaRechazo> listaRechazos) {
         String resp = "";
-        if(!listaRechazos.isEmpty()){
+        if (!listaRechazos.isEmpty()) {
             List<CatCausaRechazo> validRechazos = listaRechazos.stream().filter(lr -> lr.getIdCausaRechazo().intValue() == idRechazo).collect(Collectors.toList());
             resp = validRechazos.get(validRechazos.size() - 1).getCausa();
         }
@@ -224,30 +260,31 @@ public class RebajasServiceImp implements RebajasService {
 
     private String getServicio(Long idServicio, Long idOndemand, List<CatServiciosPronosticosDTO> listaCatServicios) {
         String resp = "";
-        if(!listaCatServicios.isEmpty()){
-            List<CatServiciosPronosticosDTO> servicios = listaCatServicios.stream().filter(l-> l.getIdServicio() == idServicio.longValue()
+        if (!listaCatServicios.isEmpty()) {
+            List<CatServiciosPronosticosDTO> servicios = listaCatServicios.stream().filter(l -> l.getIdServicio() == idServicio.longValue()
                     && l.getIdOndemand() == idOndemand.longValue()).collect(Collectors.toList());
             resp = servicios.get(servicios.size() - 1).getServicio();
         }
         return resp;
     }
 
-    private String validFranquicia(Integer idFranquicia){
+    private String validFranquicia(Integer idFranquicia) {
         String valid = "";
-        if(!idFranquicia.equals("")) {
+        if (!idFranquicia.equals("")) {
             valid = FormatUtils.getCatFranquicias().get(idFranquicia) != null ? FormatUtils.getCatFranquicias().get(idFranquicia) : "";
         }
         return valid;
     }
 
-    private String getCuentaContable(List<CuentasContablesDTO> listaCuentasContables,Long idServicio, Long idOndemand) {
+    private String getCuentaContable(List<CuentasContablesDTO> listaCuentasContables, Long idServicio, Long idOndemand) {
         String resp = "";
-        if(!listaCuentasContables.isEmpty()){
+        if (!listaCuentasContables.isEmpty()) {
             List<CuentasContablesDTO> ctaContables = listaCuentasContables.stream().filter(c -> c.getIdServicio() == idServicio.longValue()
                     && c.getIdOndemand() == idOndemand.longValue()).collect(Collectors.toList());
-            for(CuentasContablesDTO cc  : ctaContables){
-                 resp = (cc.getProducto() == null || cc.getProducto().equalsIgnoreCase("")) ? cc.getCuenta().toString() : cc.getCuenta().toString().concat("-").concat(cc.getProducto());
-            };
+            for (CuentasContablesDTO cc : ctaContables) {
+                resp = (cc.getProducto() == null || cc.getProducto().equalsIgnoreCase("")) ? cc.getCuenta().toString() : cc.getCuenta().toString().concat("-").concat(cc.getProducto());
+            }
+            ;
         }
         return resp;
     }
@@ -258,7 +295,7 @@ public class RebajasServiceImp implements RebajasService {
         FileOutputStream test = new FileOutputStream(fileReporteRebaja.toFile());
         String content = "";
         test.write(ConstantUtils.ENCABEZADO_REP_REBAJA.getBytes(StandardCharsets.UTF_8));
-        for(ReporteRebajaPageDTO str: listReporteRebaja) {
+        for (ReporteRebajaPageDTO str : listReporteRebaja) {
             content = "";
             content += str.getNumeroCliente().concat("\t").concat(str.getBlanco()).concat("\t").concat(str.getChequera()).concat("\t");
             content += str.getChequeraCargo().concat("\t").concat(str.getCobrado()).concat("\t").concat(str.getmTotal()).concat("\t");
@@ -273,10 +310,9 @@ public class RebajasServiceImp implements RebajasService {
         }
         Path fileReporteRebajaZip = FormatUtils.convertZip(fileReporteRebaja);
         String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileReporteRebajaZip.toFile()));
-        log.info("File Encoder ReporteRebaja.zip :: "+ ecoder);
+        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
         return ecoder;
     }
-
 
 
 }

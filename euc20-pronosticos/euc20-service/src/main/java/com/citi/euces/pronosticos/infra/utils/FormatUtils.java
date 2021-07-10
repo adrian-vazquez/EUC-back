@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
@@ -55,18 +56,24 @@ public class FormatUtils {
         String valid = "00";
         if (mes != null) {
             Map<Integer, String> malidMes = new TreeMap<Integer, String>();
-            malidMes.put(1, "ENE");malidMes.put(2, "FEB");
-            malidMes.put(3, "MAR");malidMes.put(4, "ABR");
-            malidMes.put(5, "MAY");malidMes.put(6, "JUN");
-            malidMes.put(7, "JUL");malidMes.put(8, "AGO");
-            malidMes.put(9, "SEP");malidMes.put(10, "OCT");
-            malidMes.put(11, "NOV");malidMes.put(12, "DIC");
+            malidMes.put(1, "ENE");
+            malidMes.put(2, "FEB");
+            malidMes.put(3, "MAR");
+            malidMes.put(4, "ABR");
+            malidMes.put(5, "MAY");
+            malidMes.put(6, "JUN");
+            malidMes.put(7, "JUL");
+            malidMes.put(8, "AGO");
+            malidMes.put(9, "SEP");
+            malidMes.put(10, "OCT");
+            malidMes.put(11, "NOV");
+            malidMes.put(12, "DIC");
             valid = malidMes.get(mes) == null ? "00" : malidMes.get(mes);
         }
         return valid;
     }
 
-    public static Map<Integer, String> getCatFranquicias(){
+    public static Map<Integer, String> getCatFranquicias() {
         Map<Integer, String> listaFranquicias = new TreeMap<Integer, String>();
         listaFranquicias.put(1, ConstantUtils.FRANQUICIA_COMERCIAL);
         listaFranquicias.put(2, ConstantUtils.FRANQUICIA_CORPORATIVA);
@@ -113,6 +120,17 @@ public class FormatUtils {
         return fileZip;
     }
 
+    public static Integer obtenerMes(Integer mes) throws ParseException {
+        LocalDate now = LocalDate.now();
+        Integer month = now.minusMonths(mes).getMonth().getValue();
+        return month;
+    }
+
+    public static Integer obtenerYear(Integer year) throws ParseException {
+        LocalDate now = LocalDate.now();
+        Integer anio = now.minusMonths(year).getYear();
+        return anio;
+    }
 
 
 }
