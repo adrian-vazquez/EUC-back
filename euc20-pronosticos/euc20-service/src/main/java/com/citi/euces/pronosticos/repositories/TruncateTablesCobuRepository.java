@@ -27,17 +27,17 @@ public class TruncateTablesCobuRepository {
     }
     
     public void deleteCtosUnico() {
-        String query = "DELETE FROM PPC_PCB_CTOS_UNICOS";
+        String query = "DELETE FROM  PPC_PCB_CTOS_UNICOS";
         delete.execute(query);
     }
     
     public void deleteLayoutBe() {
-        String query = "DELETE FROM PPC_PCB_LAYOUT_BE";
+        String query = "DELETE FROM  PPC_PCB_LAYOUT_BE";
         delete.execute(query);
     }
     
     public void deleteLayoutMens() {
-        String query = "DELETE FROM PPC_PCB_LAYOUT_MENS";
+        String query = "DELETE FROM  PPC_PCB_LAYOUT_MENS";
         delete.execute(query);
     }
     
@@ -62,7 +62,7 @@ public class TruncateTablesCobuRepository {
     }
     
     public void deleteQueryCtosDuplicados() {
-        String query = "DELETE FROM PPC_PCB_QUERY_CTOS_DUPLICADOS";
+        String query = "DELETE FROM  PPC_PCB_QUERY_CTOS_DUPLICADOS";
         delete.execute(query);
     }
     

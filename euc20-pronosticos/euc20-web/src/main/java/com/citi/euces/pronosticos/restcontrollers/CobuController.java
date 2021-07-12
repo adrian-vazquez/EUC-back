@@ -161,13 +161,13 @@ public class CobuController {
         }
 	}
 	
-	@GetMapping(path = "/procesoCobu")
-	public ResponseEntity<?> procesoCobu() throws GenericException{
+	@PostMapping(path = "/procesoCobu")
+	public ResponseEntity<?>procesoCobu(@RequestBody final String request) {
 		try {
             CobuResponse response = new CobuResponse(
             	cobuService.procesoCobu(),
                 HttpStatus.OK.toString());
-            return new ResponseEntity<CobuResponse>(response, HttpStatus.OK);
+            	return new ResponseEntity<CobuResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
             error.setCode(ex.getCodeError());

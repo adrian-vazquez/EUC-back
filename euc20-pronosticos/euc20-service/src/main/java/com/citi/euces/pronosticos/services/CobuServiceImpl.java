@@ -39,7 +39,6 @@ import com.citi.euces.pronosticos.infra.dto.ProcesadoDTO;
 import com.citi.euces.pronosticos.infra.dto.QueryCtosAgrupadoDTO;
 import com.citi.euces.pronosticos.infra.dto.TxsCtasVirtDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
-import com.citi.euces.pronosticos.infra.utils.FormatUtils;
 import com.citi.euces.pronosticos.repositories.*;
 import com.citi.euces.pronosticos.services.api.CobuService;
 
@@ -212,6 +211,7 @@ public class CobuServiceImpl implements CobuService{
 	       CobuDTO response = new CobuDTO();
 	       response.setMensajeConfirm("Proceso completado");
 	       response.setProcesoResultado(procesados);
+
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
@@ -240,7 +240,7 @@ public class CobuServiceImpl implements CobuService{
 			 
 			data2.setNumCliente((int) fila2.getCell(0).getNumericCellValue());
 			data2.setNumCuenta((int) fila2.getCell(1).getNumericCellValue());
-			data2.setFecAlta(FormatUtils.stringToDate(fila2.getCell(2).getStringCellValue()));////////////////////////////////////////////////
+			data2.setFecAlta(fila2.getCell(2).getStringCellValue());
 			data2.setCuentasX((int) fila2.getCell(3).getNumericCellValue());
 			data2.setNombre(fila2.getCell(5).getStringCellValue());
             data2.setId(i);
@@ -300,6 +300,7 @@ public class CobuServiceImpl implements CobuService{
 	       CobuDTO response = new CobuDTO();
 	       response.setMensajeConfirm("Proceso completado");
 	       response.setProcesoResultado(procesados);
+
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
@@ -352,6 +353,7 @@ public class CobuServiceImpl implements CobuService{
         	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
         	        }
             }*/
+
            
 		}
 		workbook3.close();
@@ -405,6 +407,7 @@ public class CobuServiceImpl implements CobuService{
 	       CobuDTO response = new CobuDTO();
 	       response.setMensajeConfirm("Proceso completado");
 	       response.setProcesoResultado(procesados);
+	       
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
@@ -418,12 +421,14 @@ public class CobuServiceImpl implements CobuService{
 		XSSFWorkbook workbook4 = new XSSFWorkbook(new FileInputStream(tempFile.toFile()));
 		XSSFSheet sheet4 = workbook4.getSheetAt(0);
 		
-		int noColumns = sheet4.getRow(0).getLastCellNum();
+
 		int numFilas4 = sheet4.getLastRowNum();
+		int noColumns = sheet4.getRow(0).getLastCellNum();
 		
 		if(noColumns != 4) {
 			throw new GenericException("Layout invalido. Favor de verificar", HttpStatus.BAD_REQUEST.toString());
 		}
+
 		for(int i = 1; i <= numFilas4; i++) {
 			XSSFRow fila4 = sheet4.getRow(i);		
 			ProcesadoDTO data4 = new ProcesadoDTO();
@@ -436,7 +441,6 @@ public class CobuServiceImpl implements CobuService{
 			
 			contenido4.add(data4);
 		}
-		
 		workbook4.close();
 		Integer contentInint = contenido4.size();	
 		
@@ -457,7 +461,9 @@ public class CobuServiceImpl implements CobuService{
 	 * @throws SQLException **********************************************************************************************/
 
 	@Override
-	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException{	
+	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException{
+	    
+        CobuDTO response = new CobuDTO();
 	    try {
 			 int[] cifras = new int[22];
 	         String[] consultas = new String[22];
@@ -529,15 +535,11 @@ public class CobuServiceImpl implements CobuService{
 	            consultas[21] = "inserta en Layout_Txns_Con_Importe";
    
 	            procesarlistas(cifras, consultas);
-	    
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
-		}
-		log.info("procesoCobu ::  init");
-		CobuDTO response = new CobuDTO();
-		 response.setMensajeConfirm("Proceso Cpmpletado");
-        response.setProcesoResultado("Insert en cifras control");
-        return response;
+
+	            response.setMensajeConfirm("Proceso Cpmpletado");
+	            response.setProcesoResultado("Insert en cifras control");
+	            
+	            return response;
 	}
 	
 	public String procesarlistas(int[] cifras, String[] consultas) throws GenericException, FileNotFoundException, IOException, ParseException, OfficeXmlFileException{
@@ -777,8 +779,6 @@ public class CobuServiceImpl implements CobuService{
         return response;
 	}*/
 
-	/************************************************************************************************/
-	/************************************************************************************************/
 
 	/*@Override
 	public CobuDTO cifrasControl() throws GenericException {
