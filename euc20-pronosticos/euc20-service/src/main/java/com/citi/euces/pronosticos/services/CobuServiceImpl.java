@@ -45,7 +45,6 @@ import com.citi.euces.pronosticos.services.api.CobuService;
 
 
 @Service
-@Transactional
 public class CobuServiceImpl implements CobuService{
 	static final Logger log = LoggerFactory.getLogger(RebajasServiceImp.class);
 
@@ -530,15 +529,9 @@ public class CobuServiceImpl implements CobuService{
 
 	            cifras[21] = procesoCobuRepository.insertaEnLayoutTxnsConImporte();
 	            consultas[21] = "inserta en Layout_Txns_Con_Importe";
-	            	
-	       
-	            try {
+	
 	            procesarlistas(cifras, consultas);
-	            }catch(Exception e) {
-	            	 throw new GenericException(
-	 	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
-	            }
-	    
+
 	            CobuDTO response = new CobuDTO();
 	            response.setMensajeConfirm("Proceso Cpmpletado");
 	            response.setProcesoResultado("Insert en cifras control");
