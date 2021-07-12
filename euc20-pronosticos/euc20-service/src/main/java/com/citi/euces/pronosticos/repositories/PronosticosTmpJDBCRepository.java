@@ -4,19 +4,27 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 import com.citi.euces.pronosticos.infra.dto.RechazosFileDTO;
+import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
 @Repository
 public class PronosticosTmpJDBCRepository {
 
 	private final JdbcTemplate jdbcTemplate;
-
+	private SimpleJdbcCall simpleJdbcCallRefCursor;
+	static final Logger log = LoggerFactory.getLogger(PronosticosTmpJDBCRepository.class);
+	
 	public PronosticosTmpJDBCRepository(JdbcTemplate jdbcTemplate) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
@@ -58,8 +66,8 @@ public class PronosticosTmpJDBCRepository {
                     	ps.setString(22, content.getConcepto());
                     	ps.setString(23, content.getLeyenda());
                     	ps.setInt(24, content.getDias());
-                    	ps.setInt(25, content.getIdServicio());
-                    	ps.setInt(26, content.getIdOndemand());
+                    	ps.setLong(25, content.getIdServicio());
+                    	ps.setLong(26, content.getIdOndemand());
                     	ps.setInt(27, content.getEvaluacionVirtual());
                     	ps.setString(28, content.getOpenItem());
                     }
@@ -71,5 +79,23 @@ public class PronosticosTmpJDBCRepository {
 	public void BorrarDLDatosPronosticosTmp() {
         String query = "DELETE FROM PPC_MIS_PRONOSTICOS_TMP";
         jdbcTemplate.execute(query);
+    }
+	
+	@Transactional
+    public void updateCobrosEsp() throws GenericException{
+		try {
+	        jdbcTemplate.update("call PPC_MIS_SP_UPDATE_COBRO_ESP");
+		} catch (Exception e) {
+            throw new GenericException( "Error al actualizar cobro especial:: " , HttpStatus.NOT_FOUND.toString());
+        }
+    }
+	
+	@Transactional
+    public void updateExtraCont() throws GenericException{
+		try {
+	        jdbcTemplate.update("call PPC_MIS_SP_UPDATE_EXTRA_CONT");
+		} catch (Exception e) {
+            throw new GenericException( "Error al actualizar extra contable:: " , HttpStatus.NOT_FOUND.toString());
+        }
     }
 }

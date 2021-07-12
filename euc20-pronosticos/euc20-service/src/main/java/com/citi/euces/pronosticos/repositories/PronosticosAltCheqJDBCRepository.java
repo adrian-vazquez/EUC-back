@@ -58,17 +58,17 @@ public class PronosticosAltCheqJDBCRepository {
                     	ps.setString(22, content.getConcepto());
                     	ps.setString(23, content.getLeyenda());
                     	ps.setInt(24, content.getDias());
-                    	ps.setInt(25, content.getIdServicio());
-                    	ps.setInt(26, content.getIdOndemand());
+                    	ps.setLong(25, content.getIdServicio());
+                    	ps.setLong(26, content.getIdOndemand());
                     	ps.setInt(27, content.getEvaluacionVirtual());
                     }
                 });
         return updateCounts;
 	}
 	
-	@Transactional
-	public void BorrarTCDatosPronosticosAltCheq() {
-        String query = "Truncate table PPC_MIS_PRONOSTICOS_ALT_CHEQ";
+
+	public void BorrarDLDatosPronosticosAltCheq() {
+		String query = "DELETE FROM PPC_MIS_PRONOSTICOS_ALT_CHEQ";
         jdbcTemplate.execute(query);
     }
 	

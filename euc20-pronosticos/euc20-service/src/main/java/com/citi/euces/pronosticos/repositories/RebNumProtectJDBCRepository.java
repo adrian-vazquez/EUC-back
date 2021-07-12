@@ -47,13 +47,14 @@ public class RebNumProtectJDBCRepository {
         return updateCounts;
     }
 
-    @Transactional
+
     public String updateMaestoComisionesSp(){
         jdbcTemplate.setResultsMapCaseInsensitive(true);
         simpleJdbcCallRefCursor = new SimpleJdbcCall(jdbcTemplate)
-                .withProcedureName("PPC_MIS_SP_REBAJA_MAESTRO_COMISIONES")
-                .declareParameters(new SqlParameter("p_numRegCargados", Types.INTEGER),
-                new SqlOutParameter("p_numRegCargados", Types.INTEGER));
+                .withProcedureName("PRUEBA_SP")
+                .declareParameters(
+                        new SqlParameter("p_numRegCargados", Types.INTEGER),
+                        new SqlOutParameter("p_numRegCargados", Types.INTEGER));
         Map<String, Object> out = simpleJdbcCallRefCursor.execute(new MapSqlParameterSource("p_numRegCargados", 0));
         log.info("updateMaestoComisionesSp p_numRegCargados :: >> " +  out.get("p_numRegCargados"));
         return out.get("p_numRegCargados").toString();

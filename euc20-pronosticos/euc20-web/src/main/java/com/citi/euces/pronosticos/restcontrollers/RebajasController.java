@@ -79,7 +79,7 @@ public class RebajasController {
             if (request.getFecha().isEmpty() || request.getPage() == null) {
                 throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
             }
-            ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteRebaja(request.getFecha()), "200");
+            ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteRebaja(request.getFecha(),request.getPage()), "200");
             return new ResponseEntity<ReporteRebajaResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
