@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -16,19 +17,20 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.exception.SQLGrammarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
@@ -59,83 +61,24 @@ public class CobuServiceImpl implements CobuService{
 	public CobuDTO limpiarCobu() throws GenericException{
 		log.info("limpiarCobu ::  init");
 		try {
-			deleteTables.deleteCifrasControl();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteCifrasControl", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
+			deleteTables.deleteCifrasControl();		
 			deleteTables.deleteCtasVirtualesGpos();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteCtasVirtualesGpos", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteCtasVirtuales();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteCtasVirtuales", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteCtosUnico();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteCtosUnico", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteLayoutBe();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteLayoutBe", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteLayoutMens();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteLayoutMens", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteLayoutVent();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteLayoutVent", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteProcesado();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteProcesado", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteQueryCtosAgrupado();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteQueryCtosAgrupado", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteQueryCtosCobu();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteQueryCtosCobu", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteQueryCtosDuplicados();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteQueryCtosDuplicados", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteTarifas();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteTarifas", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteTxnsImporte();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteTxnsImporte", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteTxnsXTipo();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteTxnsXTipo", HttpStatus.BAD_REQUEST.toString());
-		}
-			try {
 			deleteTables.deleteCtasVirt();
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error en deleteCtasVirt", HttpStatus.BAD_REQUEST.toString());
-		}catch(SQLGrammarException ex) {
-			throw new GenericException("Error", HttpStatus.BAD_REQUEST.toString());
+		}catch(Exception ex) {
+			throw new GenericException("Error al borrar tablas", HttpStatus.BAD_REQUEST.toString());
 		}
-		
 		log.info("limpiarCobu ::  init");
 		CobuDTO response = new CobuDTO();
 		response.setMensajeConfirm("Tablas COBU sin datos");
@@ -177,8 +120,8 @@ public class CobuServiceImpl implements CobuService{
 	            }
 	            zipFile.close();
 	       CobuDTO response = new CobuDTO();
-	       response.setMensajeConfirm(procesados);
-	       response.setProcesoResultado("Proceso completado");
+	       response.setMensajeConfirm("Proceso completado");
+	       response.setProcesoResultado(procesados);
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
@@ -194,6 +137,12 @@ public class CobuServiceImpl implements CobuService{
 		XSSFSheet sheet1 = workbook1.getSheetAt(0);
 		
 		int numFilas1 = sheet1.getLastRowNum();	
+		int noColumns = sheet1.getRow(0).getLastCellNum();
+		
+		if(noColumns != 11) {
+			throw new GenericException("Layout invalido. Favor de verificar", HttpStatus.BAD_REQUEST.toString());
+		}
+		
 		for(int i = 1; i <= numFilas1; i++) {
 			XSSFRow fila1 = sheet1.getRow(i);		
 			QueryCtosAgrupadoDTO data1 = new QueryCtosAgrupadoDTO();
@@ -224,7 +173,7 @@ public class CobuServiceImpl implements CobuService{
 	        }
 		
 	  
-	   responseMessage = "Carga de registros completa. Se han cargado un total de: " + contentInint + " elemento";
+	   responseMessage = "Se han cargado un total de: " + contentInint + " elementos";
        return responseMessage;
 	}
 	
@@ -261,8 +210,8 @@ public class CobuServiceImpl implements CobuService{
 	            }
 	            zipFile.close();
 	       CobuDTO response = new CobuDTO();
-	       response.setMensajeConfirm(procesados);
-	       response.setProcesoResultado("Proceso completado");
+	       response.setMensajeConfirm("Proceso completado");
+	       response.setProcesoResultado(procesados);
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
@@ -279,6 +228,12 @@ public class CobuServiceImpl implements CobuService{
 		
 		
 		int numFilas2 = sheet2.getLastRowNum();
+		int noColumns = sheet2.getRow(0).getLastCellNum();
+		
+		if(noColumns != 6) {
+			throw new GenericException("Layout invalido. Favor de verificar", HttpStatus.BAD_REQUEST.toString());
+		}
+		
 		for(int i = 1; i <= numFilas2; i++) {
 			XSSFRow fila2 = sheet2.getRow(i);		
 			CtasVirtualesDTO data2 = new CtasVirtualesDTO();
@@ -303,7 +258,7 @@ public class CobuServiceImpl implements CobuService{
 	        }
 		
 	  
-	   responseMessage = "Carga de registros completa. Se han cargado un total de: " + contentInint + " elemento";
+	   responseMessage = "Se han cargado un total de: " + contentInint + " elementos";
        return responseMessage;
    }
 
@@ -332,38 +287,49 @@ public class CobuServiceImpl implements CobuService{
 	                InputStream is = zipFile.getInputStream(zipEntry);
 	                Path tempFile = Files.createTempFile("Obtiene_TXS_CTAS", ".xls");
 	                tempFile.toFile().deleteOnExit();
+	                log.info("empieza ioutils :: init");
 	                try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
 	                    IOUtils.copy(is, fos);
+	                    log.info("termina:: init");
 	                    procesados = leerExcelTxsCtas(tempFile);
 	                 
 	                }
+	                log.info("termina:: init");
 	            }
 	            zipFile.close();
 	       CobuDTO response = new CobuDTO();
-	       response.setMensajeConfirm(procesados);
-	       response.setProcesoResultado("Proceso completado");
+	       response.setMensajeConfirm("Proceso completado");
+	       response.setProcesoResultado(procesados);
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
 		}
 	}
 
+	
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerExcelTxsCtas(Path tempFile) throws GenericException, FileNotFoundException, IOException, ParseException, OfficeXmlFileException{
 		String responseMessage = "";
 		List<TxsCtasVirtDTO> contenido3 = new ArrayList<TxsCtasVirtDTO>();
-		
+		log.info("inicia ecel:: init");
 		XSSFWorkbook workbook3 = new XSSFWorkbook(new FileInputStream(tempFile.toFile()));
 		XSSFSheet sheet3 = workbook3.getSheetAt(0);
-		
-		
+		 
 		int numFilas3 = sheet3.getLastRowNum();
+		int noColumns = sheet3.getRow(0).getLastCellNum();
+		
+		if(noColumns != 13) {
+			throw new GenericException("Layout invalido. Favor de verificar", HttpStatus.BAD_REQUEST.toString());
+		}
+		
 		for(int i = 1; i <= numFilas3; i++) {
-			XSSFRow fila3 = sheet3.getRow(i);		
+			XSSFRow fila3 = sheet3.getRow(i);	
 			TxsCtasVirtDTO data3 = new TxsCtasVirtDTO();
-			 
+			DataFormatter formatter = new DataFormatter();
+			
 			data3.setNumCliente((long) fila3.getCell(0).getNumericCellValue());
 			data3.setNumCta((long) fila3.getCell(1).getNumericCellValue());
-			data3.setCteAlias(String.valueOf(fila3.getCell(2)));///////////////////////////////////////////////////////
+			data3.setCteAlias(formatter.formatCellValue(fila3.getCell(2)));
 			data3.setNombre(fila3.getCell(3).getStringCellValue());
 			data3.setCveMonSstema((int) fila3.getCell(4).getNumericCellValue());
 			data3.setFecInformacion(fila3.getCell(5).getDateCellValue());
@@ -377,12 +343,21 @@ public class CobuServiceImpl implements CobuService{
 			data3.setId(i);
 			
             contenido3.add(data3);
+            
+            /*if() {
+            	try {
+        			insertsCobuRepository.insertTxsCtas(contenido3, 500);
+        	        } catch (Exception e) {
+        	            throw new GenericException(
+        	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+        	        }
+            }*/
            
 		}
 		workbook3.close();
 		Integer contentInint = contenido3.size();	
-		
-		 try {
+		log.info("termina excel:: init");
+		try {
 			insertsCobuRepository.insertTxsCtas(contenido3, 500);
 	        } catch (Exception e) {
 	            throw new GenericException(
@@ -390,7 +365,7 @@ public class CobuServiceImpl implements CobuService{
 	        }
 		
 	  
-	   responseMessage = "Carga de registros completa. Se han cargado un total de: " + contentInint + " elemento";
+	   responseMessage = "Se han cargado un total de: " + contentInint + " elementos";
        return responseMessage;
    }
 	
@@ -428,8 +403,8 @@ public class CobuServiceImpl implements CobuService{
 	            }
 	            zipFile.close();
 	       CobuDTO response = new CobuDTO();
-	       response.setMensajeConfirm(procesados);
-	       response.setProcesoResultado("Proceso completado");
+	       response.setMensajeConfirm("Proceso completado");
+	       response.setProcesoResultado(procesados);
 	        return response;
 		}catch(EntityNotFoundException ex) {
 			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
@@ -447,8 +422,7 @@ public class CobuServiceImpl implements CobuService{
 		int numFilas4 = sheet4.getLastRowNum();
 		
 		if(noColumns != 4) {
-			responseMessage = "Layout invalido. Favor de verificar";
-		    return responseMessage;
+			throw new GenericException("Layout invalido. Favor de verificar", HttpStatus.BAD_REQUEST.toString());
 		}
 		for(int i = 1; i <= numFilas4; i++) {
 			XSSFRow fila4 = sheet4.getRow(i);		
@@ -474,15 +448,16 @@ public class CobuServiceImpl implements CobuService{
 	        }
 		
 	  
-	   responseMessage = "Carga de registros completa. Se han cargado un total de: " + contentInint + " elemento";
+	   responseMessage = "Se han cargado un total de: " + contentInint + " elementos";
        return responseMessage;
 	}
 	
 	/************************************************************************************************/
-	/************************************************************************************************/
+	/**
+	 * @throws SQLException **********************************************************************************************/
 
 	@Override
-	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException{	
+	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException{	
 	    try {
 			 int[] cifras = new int[22];
 	         String[] consultas = new String[22];
@@ -532,7 +507,7 @@ public class CobuServiceImpl implements CobuService{
 	            cifras[14] = procesoCobuRepository.actualizaCtosUnicos();
 	            consultas[14] = "Actualiza Ctos_Unicos";
 
-	            cifras[15] = 0; procesoCobuRepository.actualizaCtosUnicosUso11();
+	            cifras[15] = procesoCobuRepository.actualizaCtosUnicosUso11();
 	            consultas[15] = "Actualiza Ctos_Unicos USO11";
 
 	            cifras[16] = procesoCobuRepository.actualizaCtasVirtualesGposComTotal();
@@ -560,24 +535,25 @@ public class CobuServiceImpl implements CobuService{
 		}
 		log.info("procesoCobu ::  init");
 		CobuDTO response = new CobuDTO();
-        response.setProcesoResultado("Proceso Completo");
+		 response.setMensajeConfirm("Proceso Cpmpletado");
+        response.setProcesoResultado("Insert en cifras control");
         return response;
 	}
 	
 	public String procesarlistas(int[] cifras, String[] consultas) throws GenericException, FileNotFoundException, IOException, ParseException, OfficeXmlFileException{
 		String responseMessage = "";
 		List<CifrasControlDTO> lista = new ArrayList<CifrasControlDTO>();
-		CifrasControlDTO datos = new CifrasControlDTO();
 		
-		for(int i = 0; i <= cifras.length; i++) {		
-			datos.setCifra(cifras.toString());
-		}
-		for(int i = 0; i <= consultas.length; i++) {			
-			datos.setConsulta(consultas.toString());
+		for(int i = 0; i <= 21; i ++) {
+			CifrasControlDTO datos = new CifrasControlDTO();
+			
+			datos.setCifra(cifras[i]);
+			datos.setConsulta(consultas[i]);
+			datos.setProceso("COBU");
 			datos.setId(i);
+			
+			lista.add(datos);
 		}
-		
-		lista.add(datos);
 		
 		 try {
 			 procesoCobuRepository.insertCifrasControl(lista, 500);
@@ -585,8 +561,7 @@ public class CobuServiceImpl implements CobuService{
 		            throw new GenericException(
 		                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
 		        }
-			
-		  
+			  
 		   responseMessage = "Proceso Completado";
 	       return responseMessage;
 	}

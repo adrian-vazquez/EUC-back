@@ -16,120 +16,128 @@ import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
 public class ProcesoCobuRepository{
 
 	 private final JdbcTemplate procesos;
+	
 
 	    public ProcesoCobuRepository(JdbcTemplate procesos) {
 	    this.procesos = procesos;
 	    }
-	    
-	    public int insertaTarifas() {
-	    	int resultado = 0;
-	    	return resultado;
-	    }
-	    
-	    public int insertaQueryCtosDuplicado() {
-	    	int resultado = 0;
-	    	return resultado;
+	   
+		public int insertaTarifas() throws SQLException{  
+			int contador = 0;
+			String query = "INSERT INTO PPC_PCB_TARIFAS(NUM_CLIENTE, TARIFA_TX_BE, TARIFA_TX_SUC, TARIFA_MENSUAL, ID)SELECT NO_CLIENTE, BE, VENTANILLA, MENSUALIDAD, ID FROM PPC_PCB_PROCESADO";
+			contador = procesos.update(query);
+	    	return contador;
+	    	
+	    } 
+	   
+
+		public int insertaQueryCtosDuplicado() {
+	    	int transacciones = 0;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaQueryCtosDuplicados() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 2;
+	    	return transacciones;
 	    }
 	    
 	    public int insertaCtosUnicos() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 3;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtalesMesyAnio() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 4;
+	    	return transacciones;
 	    }
 	   
 	    public int insertaCtasVirtualesGpos() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 5;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaTxsCtasVirtNunSucOperadora() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 6;
+	    	return transacciones;
 	    }
 	    
 	    public int insertaTxnsXTipo() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 7;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtualesGposTxnsBe() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 8;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtualesGposTxnsVent() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 9;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaANull() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 10;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtualesGposconTablaTarifas() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 11;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaAUnaTarifaPredefinida() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 12;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtualesGposBeVentMens(){
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 13;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtosUnicos() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 14;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtosUnicosUso11() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 15;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtualesGposComTotal() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 16;
+	    	return transacciones;
 	    }
 	    
 	    public int actualizaCtasVirtualesGposIva() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 17;
+	    	return transacciones;
 	    }
 	    
 	    public int insertaEnLayoutBe() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 18;
+	    	return transacciones;
 	    }
 	    
 	    public int insertaEnLayoutVent() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 19;
+	    	return transacciones;
 	    }
 	    
 	    public int insertaEnLayoutMens() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 20;
+	    	return transacciones;
 	    }
 	    
 	    public int insertaEnLayoutTxnsConImporte() {
-	    	int resultado = 0;
-	    	return resultado;
+	    	int transacciones = 21;
+	    	return transacciones;
 	    }
+	    
+	    /************************************************************************************************/
+		/************************************************************************************************/
 	    
 	    @Transactional
 	    public int[][] insertCifrasControl(List<CifrasControlDTO> books, int batchSize) {
@@ -141,7 +149,7 @@ public class ProcesoCobuRepository{
 	                    public void setValues(PreparedStatement ps, CifrasControlDTO argument) throws SQLException {
 	                    	
 	                        ps.setString(1, argument.getConsulta().toString());
-	                        ps.setString(2, argument.getCifra().toString());
+	                        ps.setInt(2, argument.getCifra());
 	                        ps.setString(3, argument.getProceso());
 	                        ps.setInt(4, argument.getId());
 	                        

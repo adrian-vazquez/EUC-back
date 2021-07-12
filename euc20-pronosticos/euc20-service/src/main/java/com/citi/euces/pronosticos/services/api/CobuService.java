@@ -1,6 +1,7 @@
 package com.citi.euces.pronosticos.services.api;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 
 import org.hibernate.exception.SQLGrammarException;
@@ -20,7 +21,7 @@ public interface CobuService {
 	
 	public CobuDTO cargaTarEspCobu(String file) throws GenericException, IOException, ParseException;
 	
-	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException;
+	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException,SQLException;
 	
 	/*public CobuDTO reporte() throws GenericException;
 	

@@ -57,7 +57,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaCtasCobu(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty()) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaCtasCobu(request.getFile()),
@@ -84,7 +84,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaCtasVirt(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaCtasVirt(request.getFile()),
@@ -111,7 +111,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaTxsCtas(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaTxsCtas(request.getFile()),
@@ -138,7 +138,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaTarEspCobu(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaTarEspCobu(request.getFile()),

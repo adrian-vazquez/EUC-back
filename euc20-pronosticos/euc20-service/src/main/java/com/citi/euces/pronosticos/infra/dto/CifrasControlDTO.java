@@ -5,8 +5,8 @@ import java.io.Serializable;
 public class CifrasControlDTO implements Serializable{
 
 	private String consulta;
-	private String cifra;
-	private final String proceso = "COBU";
+	private int cifra;
+	private String proceso = "COBU";
 	private Integer id;
 	
 	public String getConsulta() {
@@ -15,14 +15,18 @@ public class CifrasControlDTO implements Serializable{
 	public void setConsulta(String consultas) {
 		this.consulta = consultas;
 	}
-	public String getCifra() {
+	public int getCifra() {
 		return cifra;
 	}
-	public void setCifra(String cifras) {
+	public void setCifra(int cifras) {
 		this.cifra = cifras;
 	}
 	public String getProceso() {
 		return proceso;
+	}
+	
+	public void setProceso(String proceso) {
+		this.proceso = proceso;
 	}
 	
 	public Integer getId() {
