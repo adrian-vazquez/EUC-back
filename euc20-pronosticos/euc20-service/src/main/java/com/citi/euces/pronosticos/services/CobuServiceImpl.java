@@ -462,9 +462,6 @@ public class CobuServiceImpl implements CobuService{
 
 	@Override
 	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException{
-	    
-        CobuDTO response = new CobuDTO();
-	    try {
 			 int[] cifras = new int[22];
 	         String[] consultas = new String[22];
 
@@ -533,13 +530,20 @@ public class CobuServiceImpl implements CobuService{
 
 	            cifras[21] = procesoCobuRepository.insertaEnLayoutTxnsConImporte();
 	            consultas[21] = "inserta en Layout_Txns_Con_Importe";
-   
+	            	
+	       
+	            try {
 	            procesarlistas(cifras, consultas);
-
+	            }catch(Exception e) {
+	            	 throw new GenericException(
+	 	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            }
+	    
+	            CobuDTO response = new CobuDTO();
 	            response.setMensajeConfirm("Proceso Cpmpletado");
 	            response.setProcesoResultado("Insert en cifras control");
+				return response;
 	            
-	            return response;
 	}
 	
 	public String procesarlistas(int[] cifras, String[] consultas) throws GenericException, FileNotFoundException, IOException, ParseException, OfficeXmlFileException{
