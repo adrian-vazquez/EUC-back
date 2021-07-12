@@ -161,7 +161,7 @@ public class CobuController {
         }
 	}
 	
-	@PostMapping(path = "/procesoCobu")
+	@GetMapping(path = "/procesoCobu")
 	public ResponseEntity<?>procesoCobu() throws GenericException {
 		try {
             CobuResponse response = new CobuResponse(
