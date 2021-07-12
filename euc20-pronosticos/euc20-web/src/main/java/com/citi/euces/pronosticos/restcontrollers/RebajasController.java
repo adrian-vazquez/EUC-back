@@ -73,6 +73,28 @@ public class RebajasController {
         }
     }
 
+    @PostMapping(path = "/reporteCuadre")
+    public ResponseEntity<?> reporteCuadre() {
+        try {
+            ReporteCuadreResponse response = new ReporteCuadreResponse(rebajasService.reporteCuadre(), "200");
+            return new ResponseEntity<ReporteCuadreResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
     @PostMapping(path = "/reporteRebaja")
     public ResponseEntity<?> reporteRebaja(@RequestBody final ReporteRebajaRequest request) {
         try {
