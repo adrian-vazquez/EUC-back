@@ -17,6 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
@@ -29,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
@@ -45,6 +44,7 @@ import com.citi.euces.pronosticos.services.api.CobuService;
 
 
 @Service
+@Transactional
 public class CobuServiceImpl implements CobuService{
 	static final Logger log = LoggerFactory.getLogger(RebajasServiceImp.class);
 
@@ -153,7 +153,6 @@ public class CobuServiceImpl implements CobuService{
 			data1.setUso((int) fila1.getCell(5).getNumericCellValue());
 			data1.setMon((int) fila1.getCell(6).getNumericCellValue());
 			data1.setFranquicia((int) fila1.getCell(7).getNumericCellValue());
-			data1.setDuplicado((int) fila1.getCell(8).getNumericCellValue());
 			data1.setId(i);
             
             contenido1.add(data1);
@@ -307,7 +306,7 @@ public class CobuServiceImpl implements CobuService{
 	}
 
 	
-	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	//@Transactional//(propagation = Propagation.NOT_SUPPORTED)
 	public String leerExcelTxsCtas(Path tempFile) throws GenericException, FileNotFoundException, IOException, ParseException, OfficeXmlFileException{
 		String responseMessage = "";
 		List<TxsCtasVirtDTO> contenido3 = new ArrayList<TxsCtasVirtDTO>();
@@ -321,7 +320,8 @@ public class CobuServiceImpl implements CobuService{
 		if(noColumns != 13) {
 			throw new GenericException("Layout invalido. Favor de verificar", HttpStatus.BAD_REQUEST.toString());
 		}
-		
+		//int j = 1;
+		//int k = 1;
 		for(int i = 1; i <= numFilas3; i++) {
 			XSSFRow fila3 = sheet3.getRow(i);	
 			TxsCtasVirtDTO data3 = new TxsCtasVirtDTO();
@@ -331,7 +331,7 @@ public class CobuServiceImpl implements CobuService{
 			data3.setNumCta((long) fila3.getCell(1).getNumericCellValue());
 			data3.setCteAlias(formatter.formatCellValue(fila3.getCell(2)));
 			data3.setNombre(fila3.getCell(3).getStringCellValue());
-			data3.setCveMonSstema((int) fila3.getCell(4).getNumericCellValue());
+			data3.setCveMonSistema((int) fila3.getCell(4).getNumericCellValue());
 			data3.setFecInformacion(fila3.getCell(5).getDateCellValue());
 			data3.setNumMedAcceso(fila3.getCell(6).getNumericCellValue());
 			data3.setCveTxnSistema((int) fila3.getCell(7).getNumericCellValue());
@@ -342,11 +342,13 @@ public class CobuServiceImpl implements CobuService{
 			data3.setTipo((int) fila3.getCell(12).getNumericCellValue());
 			data3.setId(i);
 			
+			/*j++;
+			k++;*/
             contenido3.add(data3);
-            
-            /*if() {
+            /*if((j - 1000) == 0 && k == i) {
             	try {
         			insertsCobuRepository.insertTxsCtas(contenido3, 500);
+        			j = 1;
         	        } catch (Exception e) {
         	            throw new GenericException(
         	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
