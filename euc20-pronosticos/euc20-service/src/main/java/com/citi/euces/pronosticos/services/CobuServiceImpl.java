@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Propagation;
+//import org.springframework.transaction.annotation.Transactional;
 
 import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
@@ -306,7 +308,7 @@ public class CobuServiceImpl implements CobuService{
 	}
 
 	
-	//@Transactional//(propagation = Propagation.NOT_SUPPORTED)
+	@Transactional//(propagation = Propagation.NOT_SUPPORTED)
 	public String leerExcelTxsCtas(Path tempFile) throws GenericException, FileNotFoundException, IOException, ParseException, OfficeXmlFileException{
 		String responseMessage = "";
 		List<TxsCtasVirtDTO> contenido3 = new ArrayList<TxsCtasVirtDTO>();
@@ -342,8 +344,8 @@ public class CobuServiceImpl implements CobuService{
 			data3.setTipo((int) fila3.getCell(12).getNumericCellValue());
 			data3.setId(i);
 			
-			/*j++;
-			k++;*/
+			//j++;
+			//k++;
             contenido3.add(data3);
             /*if((j - 1000) == 0 && k == i) {
             	try {
@@ -458,8 +460,7 @@ public class CobuServiceImpl implements CobuService{
 	}
 	
 	/************************************************************************************************/
-	/**
-	 * @throws SQLException **********************************************************************************************/
+	/************************************************************************************************/
 
 	@Override
 	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException{
