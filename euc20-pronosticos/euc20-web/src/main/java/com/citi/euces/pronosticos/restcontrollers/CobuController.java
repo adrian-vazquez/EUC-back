@@ -57,7 +57,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaCtasCobu(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty()) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaCtasCobu(request.getFile()),
@@ -84,7 +84,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaCtasVirt(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaCtasVirt(request.getFile()),
@@ -111,7 +111,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaTxsCtas(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaTxsCtas(request.getFile()),
@@ -138,7 +138,7 @@ public class CobuController {
 	public ResponseEntity<?>cargaTarEspCobu(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             CobuResponse response = new CobuResponse(
             	cobuService.cargaTarEspCobu(request.getFile()),
@@ -161,12 +161,9 @@ public class CobuController {
         }
 	}
 	
-	/*@PostMapping(path = "/procesoCobu")
-	public ResponseEntity<?>procesoCobu(@RequestBody final String request) {
+	@GetMapping(path = "/procesoCobu")
+	public ResponseEntity<?>procesoCobu() throws GenericException {
 		try {
-            if (request.isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
-            }
             CobuResponse response = new CobuResponse(
             	cobuService.procesoCobu(),
                 HttpStatus.OK.toString());
@@ -188,7 +185,7 @@ public class CobuController {
         }
 	}
 	
-	@GetMapping(path = "/reporte")
+	/*@GetMapping(path = "/reporte")
 	public ResponseEntity<?>reporte(@RequestBody final String request) {
 		try {
             if (request.isEmpty() ) {

@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
@@ -15,11 +17,12 @@ import com.citi.euces.pronosticos.infra.dto.CtasVirtualesDTO;
 import com.citi.euces.pronosticos.infra.dto.ProcesadoDTO;
 import com.citi.euces.pronosticos.infra.dto.QueryCtosAgrupadoDTO;
 import com.citi.euces.pronosticos.infra.dto.TxsCtasVirtDTO;
+import com.citi.euces.pronosticos.services.RebajasServiceImp;
 
 
 @Repository
 public class InsertsCobuRepository {
-	
+	static final Logger log = LoggerFactory.getLogger(RebajasServiceImp.class);
 	 private final JdbcTemplate inserts;
 
 	    public InsertsCobuRepository(JdbcTemplate inserts) {
@@ -74,8 +77,9 @@ public class InsertsCobuRepository {
 	    
 	    @Transactional
 	    public int[][] insertTxsCtas(List<TxsCtasVirtDTO> books, int batchSize) {
-	        int [][]updateCounts = inserts.batchUpdate(
-	        		"INSERT INTO PPC_PCB_TXS_CTAS_VIRT(NUM_CLIENTE, NUM_CTA, CTE_ALIAS, NOMBRE, CVE_MON_SISTEMA, FEC_INFORMACION, NUM_MED_ACCESO, CVE_TXNSISTEMA, NUM_SUC_PROMTORMDA, IMP_TRANSACCION, NUM_AUT_TRANS, NUM_SUC_OPERADORA, TIPO) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+	    	log.info("empieza insert :: init");
+	        int [][]updateCounts = inserts.batchUpdate(											
+	        		"INSERT INTO PPC_PCB_TXS_CTAS_VIRT(NUM_CLIENTE, NUM_CTA, CTE_ALIAS, NOMBRE, CVE_MON_SISTEMA, FEC_INFORMACION, NUM_MED_ACCESO, CVE_TXNSISTEMA, NUM_SUC_PROMTORMDA, IMP_TRANSACCION, NUM_AUT_TRANS, NUM_SUC_OPERADORA, TIPO, ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 	        		books,
 	                batchSize,
 	                new ParameterizedPreparedStatementSetter<TxsCtasVirtDTO>() {

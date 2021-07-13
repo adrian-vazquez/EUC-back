@@ -5,84 +5,84 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TruncateTablesCobuRepository {
-	private final JdbcTemplate truncate;
+	private final JdbcTemplate delete;
 
-    public TruncateTablesCobuRepository(JdbcTemplate truncate) {
-        this.truncate = truncate;
+    public TruncateTablesCobuRepository(JdbcTemplate delete) {
+        this.delete = delete;
     }
 
-    public void truncateCifrasControl() {
+    public void deleteCifrasControl() {
         String query = "DELETE FROM PPC_PCB_CIFRAS_CONTROL";
-        truncate.execute(query);
+        delete.execute(query);
     }
 
-    public void truncateCtasVirtualesGpos() {
+    public void deleteCtasVirtualesGpos() {
         String query = "DELETE FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateCtasVirtuales() {
+    public void deleteCtasVirtuales() {
         String query = "DELETE FROM PPC_PCB_CTAS_VIRTUALES";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateCtosUnico() {
+    public void deleteCtosUnico() {
         String query = "DELETE FROM  PPC_PCB_CTOS_UNICOS";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateLayoutBe() {
+    public void deleteLayoutBe() {
         String query = "DELETE FROM  PPC_PCB_LAYOUT_BE";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateLayoutMens() {
+    public void deleteLayoutMens() {
         String query = "DELETE FROM  PPC_PCB_LAYOUT_MENS";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateLayoutVent() {
+    public void deleteLayoutVent() {
         String query = "DELETE FROM PPC_PCB_LAYOUT_VENT";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateProcesado() {
+    public void deleteProcesado() {
         String query = "DELETE FROM PPC_PCB_PROCESADO";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateQueryCtosAgrupado() {
+    public void deleteQueryCtosAgrupado() {
         String query = "DELETE FROM PPC_PCB_QUERY_CTOS_AGRUPADO";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateQueryCtosCobu() {
+    public void deleteQueryCtosCobu() {
         String query = "DELETE FROM PPC_PCB_QUERY_CTOS_COBU";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateQueryCtosDuplicados() {
+    public void deleteQueryCtosDuplicados() {
         String query = "DELETE FROM  PPC_PCB_QUERY_CTOS_DUPLICADOS";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateTarifas() {
+    public void deleteTarifas() {
         String query = "DELETE FROM PPC_PCB_TARIFAS";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateTxnsImporte() {
+    public void deleteTxnsImporte() {
         String query = "DELETE FROM PPC_PCB_TXNS_IMPORTE";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void trucateTxnsXTipo() {
+    public void deleteTxnsXTipo() {
         String query = "DELETE FROM PPC_PCB_TXNS_X_TIPO";
-        truncate.execute(query);
+        delete.execute(query);
     }
     
-    public void truncateCtasVirt() {
+    public void deleteCtasVirt() {
         String query = "DELETE FROM PPC_PCB_TXS_CTAS_VIRT";
-        truncate.execute(query);
+        delete.execute(query);
     }
 }
