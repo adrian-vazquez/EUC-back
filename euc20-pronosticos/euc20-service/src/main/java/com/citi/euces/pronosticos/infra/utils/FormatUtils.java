@@ -1,5 +1,11 @@
 package com.citi.euces.pronosticos.infra.utils;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -130,6 +137,45 @@ public class FormatUtils {
         LocalDate now = LocalDate.now();
         Integer anio = now.minusMonths(year).getYear();
         return anio;
+    }
+
+    public static String validaString(String dato) {
+        dato = dato == null ? " " : dato;
+        return dato;
+    }
+
+
+    public static Path createExcel(List<String> titulos, List<List<String>> renglones ) throws IOException {
+        Path testFile = Files.createTempFile("fileExcel", ".xlsx");
+        //testFile.toFile().deleteOnExit();
+        try(XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("ReporteRebajas");
+            int colHeader = 0;
+            Row rowheader = sheet.createRow(colHeader++);
+            int colCell = 0;
+            for (String field : titulos) {
+                Cell cell = rowheader.createCell(colCell++);
+                if (field instanceof String) {
+                    cell.setCellValue((String) field);
+                }
+            }
+            int rowNum = 1;
+            for (List<String> key : renglones) {
+                Row row = sheet.createRow(rowNum++);
+                int colNum = 0;
+                for (String field : key) {
+                    Cell cell = row.createCell(colNum++);
+                    if (field instanceof String) {
+                        cell.setCellValue((String) field);
+                    }
+                }
+            }
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            workbook.write(bos);
+            bos.close();
+            Files.write(testFile, bos.toByteArray());
+        }
+        return testFile;
     }
 
 

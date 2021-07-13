@@ -149,7 +149,7 @@ public class RebajasController {
     @PostMapping(path = "/reporteRebajaFile")
     public ResponseEntity<?> reporteRebajaFile(@RequestBody final ReporteRebajaRequest request) {
         try {
-            if (request.getFecha().isEmpty() || request.getPage() == null) {
+            if (request.getFecha().isEmpty()) {
                 throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
             }
             ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteRebajaFile(request.getFecha()), "200");

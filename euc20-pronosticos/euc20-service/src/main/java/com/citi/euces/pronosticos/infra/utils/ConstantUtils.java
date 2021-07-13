@@ -17,12 +17,44 @@ public class ConstantUtils {
     final public static String CAT_GC_COBRO_ESPECIAL = "COBRO ESPECIAL";
     final public static String CAT_GC_COBRO_MANUAL = "COBRO MANUAL";
 
-    //ReporteRebaja encabezado
-    final public static String ENCABEZADO_REP_REBAJA = "Número Cliente" + "\t" + "Blanco" + "\t" + "Cuenta" + "\t" + "Cuenta Cobro" + "\t"
-            + "Estatus Cuenta Cobro" + "\t" + "Importe" + "\t" + "IVA" + "\t" + "Causa del Rechazo" + "\t" + "Mes" + "\t"
-            + "Año" + "\t" + "Servicio" + "\t" + "CSI" + "\t" + "COM" + "\t" + "Comision Sin IVA" + "\t" + "IVAA" + "\t"
-            + "Total" + "\t" + "COM(p)" + "\t" + "Llave" + "\t" + "Número de Protección" + "\t" + "Franquicia" + "\t"
-            + "Catalogada" + "\t" + "Fecha Real" + "\t" + "Fecha Contable" + "\t" + "Cuenta Producto" + "\t" + "Contrato"+ "\n";
+    //Titles ReporteRebaja
+    final public static String NUM_CLIENTE = "Número Cliente";
+    final public static String BLANCO = "Blanco";
+    final public static String CUENTA = "Cuenta";
+    final public static String CUENTA_COBRO = "Cuenta Cobro";
+    final public static String ESTATUS = "Estatus Cuenta Cobro";
+    final public static String IMPORTE = "Importe";
+    final public static String IVA = "IVA";
+    final public static String CAUSA_RECHAZO = "Causa del Rechazo";
+    final public static String MES = "Mes";
+    final public static String ANIO = "Año";
+    final public static String SERVICIO = "Servicio";
+    final public static String CSI = "CSI";
+    final public static String COM = "COM";
+    final public static String COMISION_SIN_IVA = "Comision Sin IVA";
+    final public static String IVAA = "IVAA";
+    final public static String TOTAL = "Total";
+    final public static String COM_P = "COM(p)";
+    final public static String LLAVE = "Llave";
+    final public static String NUM_PROTECCION = "Número de Protección";
+    final public static String FRANQUICIA = "Franquicia";
+    final public static String CATALOGADA = "Catalogada";
+    final public static String FECH_REAL = "Fecha Real";
+    final public static String FECH_CONTABLE = "Fecha Contable";
+    final public static String CUENTA_PRODUCTO = "Cuenta Producto";
+    final public static String CONTRATO = "Contrato";
+    final public static String OPEN_ITEM = "OPEN_ITEM";
 
+    //ReporteRebaja encabezado txt
+    final public static String ENCABEZADO_REP_REBAJA = NUM_CLIENTE + "\t" + BLANCO + "\t" + CUENTA + "\t"
+            + CUENTA_COBRO + "\t" + ESTATUS + "\t" + IMPORTE + "\t" + IVA + "\t" + CAUSA_RECHAZO + "\t" + MES + "\t"
+            + ANIO + "\t" + SERVICIO + "\t" + CSI + "\t" + COM + "\t" + COMISION_SIN_IVA + "\t" + IVAA + "\t"
+            + TOTAL + "\t" + COM_P + "\t" + LLAVE + "\t" + NUM_PROTECCION + "\t" + FRANQUICIA + "\t"
+            + CATALOGADA + "\t" + FECH_REAL + "\t" + FECH_CONTABLE + "\t" + CUENTA_PRODUCTO + "\t" + CONTRATO + "\n";
+
+    //ReporteRebaja encabezado EXCEL
+    final public static String[] TITLE_REP_REBAJA_EXCEL = {NUM_CLIENTE,BLANCO,CUENTA,CUENTA_COBRO,ESTATUS,IMPORTE,IVA,
+            CAUSA_RECHAZO,MES,ANIO,SERVICIO,CSI,COM,COMISION_SIN_IVA,IVAA,TOTAL,COM_P,LLAVE,NUM_PROTECCION,FRANQUICIA,
+            CATALOGADA,FECH_REAL,OPEN_ITEM,FECH_CONTABLE,CUENTA_PRODUCTO,CONTRATO};
 
 }
