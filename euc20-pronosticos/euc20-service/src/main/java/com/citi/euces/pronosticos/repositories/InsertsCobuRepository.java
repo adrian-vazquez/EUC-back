@@ -5,13 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.transaction.Transactional;
+//import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.citi.euces.pronosticos.infra.dto.CtasVirtualesDTO;
 import com.citi.euces.pronosticos.infra.dto.ProcesadoDTO;
@@ -29,10 +31,35 @@ public class InsertsCobuRepository {
 	    this.inserts = inserts;
 	    }
 	    
-	    @Transactional
+	    
+	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	    public int[][] insertCtasCobu(List<QueryCtosAgrupadoDTO> books, int batchSize) {
+	        int [][]updateCounts = inserts.batchUpdate(
+	        		"INSERT INTO PPC_PCB_QUERY_CTOS_AGRUPADO(CUENTA, PREFMDA, CUENTAMDA, CVE_ESTATUS, NOMBRE, USO, MON, FRANQUICIA, ID) VALUES(?,?,?,?,?,?,?,?,?)",
+	        		books,
+	                batchSize,
+	                new ParameterizedPreparedStatementSetter<QueryCtosAgrupadoDTO>() {
+	                    public void setValues(PreparedStatement ps, QueryCtosAgrupadoDTO argument) throws SQLException {
+	                    	
+	                        ps.setLong(1, argument.getCuenta());
+	                        ps.setInt(2, argument.getPrefmda());
+	                        ps.setInt(3, argument.getCuentamda());
+	                        ps.setInt(4, argument.getCveEstatus());
+	                        ps.setString(5, argument.getNombre());
+	                        ps.setInt(6, argument.getUso());
+	                        ps.setInt(7, argument.getMon());
+	                        ps.setInt(8, argument.getFranquicia());
+	                        ps.setInt(9, argument.getId());
+	                        
+	                    }
+	                });
+	        return updateCounts;
+	    }
+	    
+	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertCtasVirtuales(List<CtasVirtualesDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
-	        		"INSERT INTO PPC_PCB_CTAS_VIRTUALES( NUM_CLIENTE, NUM_CUENTA, FEC_ALTA, CUENTAS_X, NOMBRE) VALUES(?,?,?,?,?)",
+	        		"INSERT INTO PPC_PCB_CTAS_VIRTUALES( NUM_CLIENTE, NUM_CUENTA, FEC_ALTA, CUENTAS_X, NOMBRE, ID) VALUES(?,?,?,?,?,?)",
 	        		books,
 	                batchSize,
 	                new ParameterizedPreparedStatementSetter<CtasVirtualesDTO>() {
@@ -49,33 +76,9 @@ public class InsertsCobuRepository {
 	                });
 	        return updateCounts;
 	    }
+	
 	    
-	    @Transactional
-	    public int[][] insertCtasCobu(List<QueryCtosAgrupadoDTO> books, int batchSize) {
-	        int [][]updateCounts = inserts.batchUpdate(
-	        		"INSERT INTO PPC_PCB_QUERY_CTOS_AGRUPADO(CUENTA, PREFMDA, CUENTAMDA, CVE_ESTATUS, NOMBRE, USO, MON, FRANQUICIA, DUPLICADO, ID) VALUES(?,?,?,?,?,?,?,?,?,?)",
-	        		books,
-	                batchSize,
-	                new ParameterizedPreparedStatementSetter<QueryCtosAgrupadoDTO>() {
-	                    public void setValues(PreparedStatement ps, QueryCtosAgrupadoDTO argument) throws SQLException {
-	                    	
-	                        ps.setLong(1, argument.getCuenta());
-	                        ps.setInt(2, argument.getPrefmda());
-	                        ps.setInt(3, argument.getCuentamda());
-	                        ps.setInt(4, argument.getCveEstatus());
-	                        ps.setString(5, argument.getNombre());
-	                        ps.setInt(6, argument.getUso());
-	                        ps.setInt(7, argument.getMon());
-	                        ps.setInt(8, argument.getFranquicia());
-	                        ps.setInt(9, argument.getDuplicado());
-	                        ps.setInt(10, argument.getId());
-	                        
-	                    }
-	                });
-	        return updateCounts;
-	    }
-	    
-	    @Transactional
+	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertTxsCtas(List<TxsCtasVirtDTO> books, int batchSize) {
 	    	log.info("empieza insert :: init");
 	        int [][]updateCounts = inserts.batchUpdate(											
@@ -89,8 +92,8 @@ public class InsertsCobuRepository {
 	                        ps.setLong(2, argument.getNumCta());
 	                        ps.setString(3, argument.getCteAlias());
 	                        ps.setString(4, argument.getNombre());
-	                        ps.setInt(5, argument.getCveMonSstema());
-	                        ps.setDate(6, (Date) argument.getFecInformacion());
+	                        ps.setInt(5, argument.getCveMonSistema());
+	                        ps.setDate(6, new Date(argument.getFecInformacion().getTime()));
 	                        ps.setDouble(7, argument.getNumMedAcceso());
 	                        ps.setInt(8, argument.getCveTxnSistema());
 	                        ps.setInt(9, argument.getNumSucPromtormda());
@@ -105,7 +108,7 @@ public class InsertsCobuRepository {
 	        return updateCounts;
 	    }
 	    
-	    @Transactional
+	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertTarEspCobu(List<ProcesadoDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_PROCESADO( NO_CLIENTE, BE, VENTANILLA, MENSUALIDAD, ID) VALUES(?,?,?,?,?)",

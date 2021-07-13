@@ -46,11 +46,11 @@ public class TxsCtasVirtDTO implements Serializable{
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public Integer getCveMonSstema() {
+	public Integer getCveMonSistema() {
 		return cveMonSistema;
 	}
-	public void setCveMonSstema(Integer cveMonSstema) {
-		this.cveMonSistema = cveMonSstema;
+	public void setCveMonSistema(Integer cveMonSistema) {
+		this.cveMonSistema = cveMonSistema;
 	}
 	public Date getFecInformacion() {
 		return fecInformacion;

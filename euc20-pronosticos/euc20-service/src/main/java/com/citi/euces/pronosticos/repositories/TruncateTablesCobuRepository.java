@@ -81,7 +81,7 @@ public class TruncateTablesCobuRepository {
         delete.execute(query);
     }
     
-    public void deleteCtasVirt() {
+    public void deleteTxsCtasVirt() {
         String query = "DELETE FROM PPC_PCB_TXS_CTAS_VIRT";
         delete.execute(query);
     }
