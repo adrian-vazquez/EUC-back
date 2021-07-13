@@ -17,6 +17,9 @@ public interface MaestroDeComisionesRepository extends JpaRepository<MaestroDeCo
     @Query("SELECT m FROM MaestroDeComisiones m  WHERE TO_CHAR(m.fechaMovimiento, 'dd/MM/yy') = :fecha")
     Page<MaestroDeComisiones> findByFechaMovimeiento(@Param("fecha") String fecha, Pageable pageable);
 
+    @Query("SELECT m FROM MaestroDeComisiones m  WHERE TO_CHAR(m.fechaMovimiento, 'dd/MM/yy') = :fecha")
+    List<MaestroDeComisiones> findByAllFechaMovimeiento(@Param("fecha") String fecha);
+
     @Query(nativeQuery = true, value = "SELECT 'Cobro Especial' as tipo, " +
             "PPC_MIS_FN_CUENTA_CLIENTE_MC_CUADRE(1, :mes1 , :anio1 , :mes2, 0 , :mes3 ,0) as noCliente," +
             "PPC_MIS_FN_SUMA_COMISION_MC_CUADRE(1, :mes1 , :anio1 , :mes2, 0 , :mes3 ,0) as comision," +

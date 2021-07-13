@@ -2,6 +2,7 @@ package com.citi.euces.pronosticos.services;
 
 import com.citi.euces.pronosticos.entities.CatCausaRechazo;
 import com.citi.euces.pronosticos.entities.MaestroDeComisiones;
+import com.citi.euces.pronosticos.entities.MaestroDeComisionesView;
 import com.citi.euces.pronosticos.infra.dto.*;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.ConstantUtils;
@@ -55,6 +56,8 @@ public class RebajasServiceImp implements RebajasService {
     private CatServiciosPronosticoJDBCRepository catServiciosPronosticoRepository;
     @Autowired
     private SpRebajaMaestroDeComusionesRepository spRebajaMaestroDeComusionesRepository;
+    @Autowired
+    private  MaestroDeComisionesViewRepository maestroDeComisionesViewRepository;
 
     @Override
     public MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws
@@ -144,6 +147,10 @@ public class RebajasServiceImp implements RebajasService {
     public ReporteRebajaDTO reporteRebaja(String fechaMovimiento, Integer page) throws GenericException, IOException {
         Pageable pageable = PageRequest.of(page, 50);
         Page<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByFechaMovimeiento(fechaMovimiento, pageable);
+        if(listaReb.isEmpty()){
+            throw new GenericException(
+                    "No hay registros que coincidan con fecha Movimiento   :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+        }
         List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>();
         List<CuentasContablesDTO> listaCuentasContables = cuentasContablesJDBCRepository.findAll();
         log.info("cuentasContables size :: " + listaCuentasContables.size());
@@ -193,6 +200,74 @@ public class RebajasServiceImp implements RebajasService {
         response.setReporteRebajaPageDTO(pageResponse);
         response.setFile(file);
         return response;
+    }
+
+    @Override
+    public ReporteRebajaDTO reporteRebajaSearch(String fechaMovimiento, Integer page, String search) throws GenericException, IOException {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<MaestroDeComisionesView> listaReb = maestroDeComisionesViewRepository.searchData(fechaMovimiento, search, pageable);
+        log.info("listaRebSize:: > " + listaReb.getSize());
+        if(listaReb.isEmpty()){
+            throw new GenericException(
+                    "No hay registros que coincidan con fecha  :: " + fechaMovimiento + " y busqueda  :: " + search, HttpStatus.NOT_FOUND.toString());
+        }
+        List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>();
+        List<CuentasContablesDTO> listaCuentasContables = cuentasContablesJDBCRepository.findAll();
+        log.info("cuentasContables size :: " + listaCuentasContables.size());
+        List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
+        log.info("listaRechazos size :: " + listaRechazos.size());
+        List<CatServiciosPronosticosDTO> listaCatServicios = catServiciosPronosticoRepository.findAll();
+        log.info("listaCatServicios size :: " + listaCatServicios.size());
+
+        listaReb.forEach(lr -> {
+            log.info("requestData listaReb ::> " + lr.getId().getmTotal());
+            ReporteRebajaPageDTO reporteRebaja = new ReporteRebajaPageDTO();
+            reporteRebaja.setNumeroCliente(lr.getId().getNoCliente().toString());
+            reporteRebaja.setBlanco("");
+            reporteRebaja.setChequera(lr.getId().getChequera());
+            reporteRebaja.setChequeraCargo(lr.getChequeraCargo());
+            reporteRebaja.setCobrado(validaChequera(reporteRebaja.getChequera(), reporteRebaja.getChequeraCargo()));//ValidaChequera
+            reporteRebaja.setmTotal(lr.getId().getmTotal().toString());
+            reporteRebaja.setpIva(lr.getpIva().toString());
+            reporteRebaja.setCausaRechazo(getRechazo(lr.getIdCausaRechazo(), listaRechazos)); //GetRechazo
+            reporteRebaja.setMes(FormatUtils.validFechaMes(lr.getId().getMes()));//RetornaMes
+            reporteRebaja.setAnio(lr.getId().getAnio().toString());
+            reporteRebaja.setServicio(getServicio(lr.getId().getIdServicio(), lr.getId().getIdOndemand(), listaCatServicios));
+            reporteRebaja.setCsi(lr.getCsi().toString());
+            reporteRebaja.setComEc(lr.getComEc().toString());
+            reporteRebaja.setmComision(lr.getmComision().toString());
+            reporteRebaja.setmIva(lr.getmIva().toString());
+            reporteRebaja.setTotal(lr.getId().getmTotal().toString());
+            reporteRebaja.setComP(lr.getComP().toString());
+            reporteRebaja.setLlave(lr.getId().getLlave().toString());
+            reporteRebaja.setNoProteccion(lr.getNoProteccion());
+            reporteRebaja.setFranquicia(validFranquicia(lr.getIdFranquicia()));//getNombreFranquicia
+            reporteRebaja.setCatalogadaGc(FormatUtils.validCatalogadaGc(Integer.valueOf(lr.getId().getCatalogadaGc())));//GetCatalogadaGc
+            reporteRebaja.setfMovimiento(FormatUtils.formatDatedmy(lr.getFechaMovimiento()));
+            reporteRebaja.setFecha(lr.getFechaRegistroContable());//f_registro_contable
+            reporteRebaja.setCuentaContable(getCuentaContable(listaCuentasContables, lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
+            reporteRebaja.setContrato(lr.getContrato());
+            reporteRebaja.setOpenItem(lr.getOpenItem());
+            listReporteRebaja.add(reporteRebaja);
+        });
+        log.info("listReporteRebajaSearch:: > " + listReporteRebaja.size());
+        Page<ReporteRebajaPageDTO> pageResponse = new PageImpl<>(listReporteRebaja, pageable, listaReb.getTotalPages());
+        String file = "";
+        ReporteRebajaDTO response = new ReporteRebajaDTO();
+        response.setReporteRebajaPageDTO(pageResponse);
+        return response;
+    }
+
+    @Override
+    public ReporteRebajaDTO reporteRebajaFile(String fechaMovimiento) throws GenericException, IOException {
+        List<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByAllFechaMovimeiento(fechaMovimiento);
+        if(listaReb.isEmpty()){
+            throw new GenericException(
+                    "No hay registros que coincidan con fecha Movimiento   :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+        }
+
+
+        return null;
     }
 
     public String leerArchivo(Path tempFile, String fechaContable, String fechaMovimiento) throws IOException, GenericException, ParseException {
