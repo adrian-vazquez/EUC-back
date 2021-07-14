@@ -9,7 +9,7 @@ public class RechazosFileDTO implements Serializable {
 	private Integer id;
 	private Integer cliente;
 	private String blanco;
-	private Integer cuenta;
+	private Long cuenta;
 	private Double importe;
 	private Integer iva;
 	private String status; 
@@ -17,7 +17,7 @@ public class RechazosFileDTO implements Serializable {
 	private Integer anio;
 	private String servicio;
 	private String csi;
-	private Double com;
+	private String com;
 	private Double comSinIva;
 	private Double ivaa;
 	private Double total;
@@ -95,10 +95,10 @@ public class RechazosFileDTO implements Serializable {
 	public void setCsi(String csi) {
 		this.csi = csi;
 	}
-	public Double getCom() {
+	public String getCom() {
 		return com;
 	}
-	public void setCom(Double com) {
+	public void setCom(String com) {
 		this.com = com;
 	}
 	public Double getComSinIva() {
@@ -191,10 +191,10 @@ public class RechazosFileDTO implements Serializable {
 	public void setOpenItem(String openItem) {
 		this.openItem = openItem;
 	}
-	public Integer getCuenta() {
+	public Long getCuenta() {
 		return cuenta;
 	}
-	public void setCuenta(Integer cuenta) {
+	public void setCuenta(Long cuenta) {
 		this.cuenta = cuenta;
 	}
 	public Integer getDias() {

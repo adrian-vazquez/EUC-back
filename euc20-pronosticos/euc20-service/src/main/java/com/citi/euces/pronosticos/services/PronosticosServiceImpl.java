@@ -44,8 +44,11 @@ import com.citi.euces.pronosticos.repositories.BancaJDBCRepository;
 import com.citi.euces.pronosticos.repositories.CatServiciosPronosticoJDBCRepository;
 import com.citi.euces.pronosticos.repositories.PronosticosAltCheqJDBCRepository;
 import com.citi.euces.pronosticos.repositories.PronosticosTmpJDBCRepository;
+import com.citi.euces.pronosticos.repositories.RebajaPronosticoJDBCRepository;
 import com.citi.euces.pronosticos.repositories.RespPronosticosTmpJDBCRepository;
 import com.citi.euces.pronosticos.services.api.PronosticosService;
+
+import jdk.internal.org.jline.utils.Log;
 
 @Service
 @Transactional
@@ -63,6 +66,8 @@ public class PronosticosServiceImpl implements PronosticosService {
 	private BancaJDBCRepository bancaJDBCRepository;
 	@Autowired
 	private RespPronosticosTmpJDBCRepository respPronosticosTmpJDBCRepository;
+	@Autowired
+	RebajaPronosticoJDBCRepository rebajaPronosticoJDBCRepository;
 	
 	/**********************************************************************LIMPIAR PRONOSTICOS******************************************************************/
 	@Override
@@ -112,39 +117,29 @@ public class PronosticosServiceImpl implements PronosticosService {
 			return msg;
 		}
 		
-		log.info("cargaRechazos ::  init");
-        log.info("File :: " + file);
-        Path testFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasZIP"), "rechazosZip", ".zip");
+        Path testFile = Files.createTempFile("rechazosZip", ".zip");
         testFile.toFile().deleteOnExit();
         byte[] decoder = Base64.getDecoder().decode(file);
         Files.write(testFile, decoder);
-        System.out.println(testFile.toFile().getAbsoluteFile());
-        System.out.println("ZIP File Saved");
-        
         ZipFile zipFile = new ZipFile(testFile.toFile());
         Enumeration<?> enu = zipFile.entries();
-        
-        try {
-        	while (enu.hasMoreElements()) {
-                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-
-                String name = zipEntry.getName();
-                long size = zipEntry.getSize();
-                long compressedSize = zipEntry.getCompressedSize();
-
-                System.out.printf("name: %-20s | size: %6d | compressed size: %6d\n", name, size, compressedSize);
-                InputStream is = zipFile.getInputStream(zipEntry);
-                Path tempFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasTXT"), "rechazosTXT", ".txt");
-                tempFile.toFile().deleteOnExit();
-                try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
-                    IOUtils.copy(is, fos);
-                    message = leerArchivoRechazos(tempFile, diasProteccion);
-                }
+        while (enu.hasMoreElements()) {
+            ZipEntry zipEntry = (ZipEntry) enu.nextElement();
+            String name = zipEntry.getName();
+            if (name.endsWith("/") || name.startsWith("__MACOSX")) {
+                continue;
             }
-            zipFile.close();
-        } catch (IOException  e) {
-            e.printStackTrace();
+            InputStream is = zipFile.getInputStream(zipEntry);
+            Path tempFile = Files.createTempFile("rechazosTXT", ".txt");
+            tempFile.toFile().deleteOnExit();
+            try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
+                IOUtils.copy(is, fos);
+                //Lectura TXT
+                message = leerArchivoRechazos(tempFile, diasProteccion);
+            }
         }
+        zipFile.close();
+    
         
         if(extraCont == true) {
         	try {
@@ -170,7 +165,7 @@ public class PronosticosServiceImpl implements PronosticosService {
 	{
 		Date fecha = new Date();
 		String fecha2 = new SimpleDateFormat("dd-mm-yyyy").format(fecha);
-		int max = 0;
+		int max = 1;
 		String mes = null, anio = null;
 		String linea;
 		String[] valores;
@@ -181,33 +176,47 @@ public class PronosticosServiceImpl implements PronosticosService {
         
         while ((linea= b.readLine()) != null) {
         	max++;
-            log.info(linea);
             valores = linea.split("\t");
+            Long cuenta = Long.parseLong(valores[3].replace(" ", ""));
+            String concepto;
+            mes = valores[7];
+            anio = valores[8];
+            String valorDefault = "00";
+            
+            if(valores.length > 20) {
+        		concepto = valores[21];
+            }else {
+            	concepto = "";
+            }
+            
             RechazosFileDTO data = new RechazosFileDTO(); 
             data.setId(Integer.parseInt(valores[0]));
             data.setCliente(Integer.parseInt(valores[1]));
-            data.setBlanco(valores[2]);
-            data.setCuenta(Integer.parseInt(valores[3]));
-            data.setImporte(Double.parseDouble(valores[4]));
-            data.setIva(Integer.parseInt(valores[5]));
+            data.setBlanco(valores[2].equals("") ? "" : valores[2]);
+            data.setCuenta(cuenta);
+            data.setImporte(Double.parseDouble(validaComas(valores[4])));
+            data.setIva(valores[5].equals("") ? 16: Integer.parseInt(valores[5]));
             data.setStatus(valores[6]);
             data.setMes(valores[7]);
             data.setAnio(Integer.parseInt(valores[8]));
             data.setServicio(valores[9]);
             data.setCsi(valores[10]);
-            data.setCom(Double.parseDouble(valores[11]));
-            data.setComSinIva(Double.parseDouble(valores[12]));
-            data.setIvaa(Double.parseDouble(valores[13]));
-            data.setTotal(Double.parseDouble(valores[14]));
-            data.setTipoComision(Integer.parseInt(valores[15]));
-            data.setLlave(fecha2.replace("-", "") + max);
-            data.setEje(valores[16]);
-            data.setCatalogada(valores[17]);
+            data.setCom(valores[11]);
+            data.setComSinIva(Double.parseDouble(validaComas(valores[12])));
+            data.setIvaa(valores[13].equals("") ? 16 : Double.parseDouble(validaComas(valores[13])));
+            data.setTotal(Double.parseDouble(validaComas(valores[14])));
+            data.setTipoComision(valores[15].equals("") ? 0 : Integer.parseInt(valores[15]));
+            data.setLlave(fecha2.replace("-", "") + "-"+ valores[0]);
+            data.setEje(valores[17]);
+            data.setCatalogada(valores[9].equals("Pago Interbancario Personas Fisicas") || valores[9].equals("TASA CERO") ? "Cobro Especial" : "REINTENTOS");
             data.setSecuencial(fecha2);
             data.setFecha(fecha);
-            data.setConcepto(valores[18]);
-            data.setLeyenda(valores[19]);
-            data.setDias(Integer.parseInt(valores[20]));
+            data.setConcepto(concepto);
+            data.setLeyenda(valores[9].equals("Pago Interbancario Personas Fisicas") || valores[9].equals("TASA CERO") ? "Cobro Especial" : "Extra Contable");
+            data.setOpenItem(valores[23]);
+            data.setDias(diasProteccion);
+            data.setIdServicio(Long.parseLong(valorDefault));
+    		data.setIdOndemand(Long.parseLong(valorDefault));
             for(CatServiciosPronosticosDTO s:serviciosPronostico) 
             {
             	if(s.getServicio() == valores[9]) 
@@ -216,35 +225,24 @@ public class PronosticosServiceImpl implements PronosticosService {
             		data.setIdOndemand(s.getIdOndemand());
             	}
             }
-            mes = valores[7];
-            anio = valores[8];
-            data.setEvaluacionVirtual(Integer.parseInt(valores[21]));
-            data.setOpenItem(valores[22]);
             fileRechazos.add(data);
         }
         b.close();
-        log.info("RechazosFileDTO content init  ::  " + fileRechazos.size());
-        
         try {
-        	pronosticosAltCheqJDBCRepository.BorrarDLDatosPronosticosAltCheq();	
-        } catch (Exception e) {
-            throw new GenericException( "Error al limpiar la tabla Pronosticos Alt Cheq :: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-        try {
+        	pronosticosAltCheqJDBCRepository.BorrarDLDatosPronosticosAltCheq();
         	pronosticosTmpJDBCRepository.batchInsert(fileRechazos, 500);
+            pronosticosAltCheqJDBCRepository.batchInsert(fileRechazos, 500);
         } catch (Exception e) {
-            throw new GenericException( "Error al guardar en PronosticosTmp :: " , HttpStatus.NOT_FOUND.toString());
+            throw new GenericException( "Ocurrió un error durante el proceso de guardado :: " , HttpStatus.NOT_FOUND.toString());
         }
         
-        try {
-        	pronosticosAltCheqJDBCRepository.batchInsert(fileRechazos, 500);
-        } catch (Exception e) {
-            throw new GenericException( "Error al guardar en Pronosticos Alt Cheq:: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-		return "Esta cargando información correspondientes al mes" + mes + " y Año" + anio;
-		
+		return "Esta cargando información correspondientes al mes " + mes + " y Año " + anio;
+	}
+	
+	public String validaComas(String valor) {
+		valor = valor.replace(",", "");
+		valor = valor.replace(".", "");
+		return valor;
 	}
 
 	/************************************************************CARGA RESPUESTA PRONOSTICOS********************************************************************/
@@ -423,6 +421,7 @@ public class PronosticosServiceImpl implements PronosticosService {
 		FileReader f = new FileReader(tempFile.toFile());
         BufferedReader b = new BufferedReader(f);
         List<RebajaFileOndemandDTO> listaRebaja = new ArrayList<RebajaFileOndemandDTO>();
+        Double suma = null;
         
         while ((linea= b.readLine()) != null) {
         	log.info(linea);
@@ -438,7 +437,21 @@ public class PronosticosServiceImpl implements PronosticosService {
         b.close();
         log.info("RebajasFileDTO content init  ::  " + listaRebaja.size());
         listaRebaja = listaRebaja.stream().distinct().collect(Collectors.toList());
-        //List<RebajaFileOndemandDTO> listaRebajaGroup = listaRebaja.stream().collect(Collectors.groupingBy(RebajaFileOndemandDTO -> RebajaFileOndemandDTO.getNumProteccion()));
+        Map<Long, List<RebajaFileOndemandDTO>> listaRebajaGroup = listaRebaja.stream().collect(Collectors.groupingBy(RebajaFileOndemandDTO -> RebajaFileOndemandDTO.getNumProteccion()));
+        
+        for(Map.Entry<Long, List<RebajaFileOndemandDTO>> valores: listaRebajaGroup.entrySet()) {
+        	for(RebajaFileOndemandDTO value: valores.getValue()) {
+        		suma += value.getImporte();
+        	}
+        }
+        
+        try {
+        	rebajaPronosticoJDBCRepository.truncateTable();
+        	
+        } catch (Exception e) {
+            throw new GenericException( "Error al limpiar rebaja pronósticos:: " , HttpStatus.NOT_FOUND.toString());
+        }
+        
         
         
         return "";

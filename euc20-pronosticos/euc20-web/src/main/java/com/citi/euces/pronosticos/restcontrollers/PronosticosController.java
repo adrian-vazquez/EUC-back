@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.ArchivoRechazos;
+import com.citi.euces.pronosticos.models.ArchivoRespuestaRequest;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
 import com.citi.euces.pronosticos.models.MensajeResponse;
 import com.citi.euces.pronosticos.services.api.PronosticosService;
@@ -89,7 +90,7 @@ public class PronosticosController {
         }
 	}
 	
-	public ResponseEntity<?> cargarRespuestas (@RequestBody final ArchivoRechazos request){
+	public ResponseEntity<?> cargarRespuestas (@RequestBody final ArchivoRespuestaRequest request){
 		try {
 			if (request.getFile().isEmpty()) 
 			{
