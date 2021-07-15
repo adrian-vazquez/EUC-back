@@ -1,8 +1,11 @@
 package com.citi.euces.pronosticos.services.api;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.hibernate.exception.SQLGrammarException;
 
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
@@ -19,10 +22,10 @@ public interface CobuService {
 	public CobuDTO cargaTxsCtas(String file) throws GenericException, IOException, ParseException;
 	
 	public CobuDTO cargaTarEspCobu(String file) throws GenericException, IOException, ParseException;
+
+	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException;
 	
-	/*public CobuDTO procesoCobu() throws GenericException;
-	
-	public CobuDTO reporte() throws GenericException;
+	/*public CobuDTO reporte() throws GenericException;
 	
 	public CobuDTO cifrasControl() throws GenericException;**/
 }

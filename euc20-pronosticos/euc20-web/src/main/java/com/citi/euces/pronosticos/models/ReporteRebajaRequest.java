@@ -8,7 +8,7 @@ public class ReporteRebajaRequest implements Serializable {
 
     private String fecha;
     private Integer page;
-    private String serch;
+    private String search;
 
     public String getFecha() {
         return fecha;
@@ -26,11 +26,11 @@ public class ReporteRebajaRequest implements Serializable {
         this.page = page;
     }
 
-    public String getSerch() {
-        return serch;
+    public String getSearch() {
+        return search;
     }
 
-    public void setSerch(String serch) {
-        this.serch = serch;
+    public void setSearch(String search) {
+        this.search = search;
     }
 }
