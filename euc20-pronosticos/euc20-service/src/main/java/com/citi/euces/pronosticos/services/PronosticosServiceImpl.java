@@ -49,8 +49,6 @@ import com.citi.euces.pronosticos.repositories.RebajaPronosticoJDBCRepository;
 import com.citi.euces.pronosticos.repositories.RespPronosticosTmpJDBCRepository;
 import com.citi.euces.pronosticos.services.api.PronosticosService;
 
-import jdk.internal.org.jline.utils.Log;
-
 @Service
 @Transactional
 public class PronosticosServiceImpl implements PronosticosService {
