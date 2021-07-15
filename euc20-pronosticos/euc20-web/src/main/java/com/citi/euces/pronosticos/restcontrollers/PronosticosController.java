@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
+import com.citi.euces.pronosticos.models.ArchivoProteccion;
 import com.citi.euces.pronosticos.models.ArchivoRechazos;
 import com.citi.euces.pronosticos.models.ArchivoRespuestaRequest;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
@@ -90,6 +91,7 @@ public class PronosticosController {
         }
 	}
 	
+	@PostMapping(path = "/cargaRespuestas")
 	public ResponseEntity<?> cargarRespuestas (@RequestBody final ArchivoRespuestaRequest request){
 		try {
 			if (request.getFile().isEmpty()) 
@@ -118,7 +120,8 @@ public class PronosticosController {
         }
 	}
 	
-	public ResponseEntity<?> generarArchivoProteccion (){
+	@PostMapping(path = "/generaArchivoProteccion")
+	public ResponseEntity<?> generarArchivoProteccion (@RequestBody final ArchivoProteccion request){
 
 		try {
 			MensajeResponse response = new MensajeResponse(pronosticosService.limpiarPronosticos(),HttpStatus.OK.toString());
@@ -142,6 +145,31 @@ public class PronosticosController {
         }
 	}
 	
+	@GetMapping(path = "/borrarArchivoProteccion")
+	public ResponseEntity<?> borrarArchivoProteccion(){
+		try {
+			MensajeResponse response = new MensajeResponse(pronosticosService.borrarArchivoProteccion(),HttpStatus.OK.toString());
+			return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+		}catch (GenericException ex) 
+		{
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) 
+		{
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+	}
+	
+	@PostMapping(path = "/cargaArchivoRebaja")
 	public ResponseEntity<?> cargaArchivoRebaja(@RequestBody final ArchivoRechazos request){
 		try {
 			if (request.getFile().isEmpty()) 

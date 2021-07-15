@@ -1,6 +1,7 @@
 package com.citi.euces.pronosticos.services;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -165,7 +166,6 @@ public class PronosticosServiceImpl implements PronosticosService {
 	{
 		Date fecha = new Date();
 		String fecha2 = new SimpleDateFormat("dd-mm-yyyy").format(fecha);
-		int max = 1;
 		String mes = null, anio = null;
 		String linea;
 		String[] valores;
@@ -175,7 +175,6 @@ public class PronosticosServiceImpl implements PronosticosService {
         List<CatServiciosPronosticosDTO> serviciosPronostico = catServiciosPronosticoJDBCRepository.findAll();
         
         while ((linea= b.readLine()) != null) {
-        	max++;
             valores = linea.split("\t");
             Long cuenta = Long.parseLong(valores[3].replace(" ", ""));
             String concepto;
@@ -245,6 +244,34 @@ public class PronosticosServiceImpl implements PronosticosService {
 		return valor;
 	}
 
+	/********************************************GENERAR/BORRAR ARCHIVO PROTECCION****************************************************/
+	@Override
+	public MensajeDTO generaArchivoProteccion(Integer secuArch, Date fechaCarga, Integer cuentaAlterna, String posNopos) {
+		MensajeDTO msg = new MensajeDTO();
+		return msg;
+	}
+	
+	@Override
+	public MensajeDTO borrarArchivoProteccion() throws GenericException {
+		try {
+			MensajeDTO msg = new MensajeDTO();
+			
+			File folder = new File("../ArchivosPronosticos");
+			File[] listOfFiles = folder.listFiles(); 
+			for(File archivos: listOfFiles) {
+				System.out.print("Archivos prueba:" + archivos.getAbsolutePath());
+				//archivos.delete();
+			}
+			
+			msg.setMensajeInfo("Confirmación");
+			msg.setMensajeConfirm("Archivos borrados correctamente");
+			return msg;
+		}catch (Exception e) {
+			e.printStackTrace();
+            throw new GenericException( "Error al borrar los Archivos Proteccion :: " , HttpStatus.NOT_FOUND.toString());
+        }	
+	}
+	
 	/************************************************************CARGA RESPUESTA PRONOSTICOS********************************************************************/
 	@Override
 	public MensajeDTO cargarRespuestas(String file) throws GenericException, IOException, ParseException 
@@ -252,39 +279,27 @@ public class PronosticosServiceImpl implements PronosticosService {
 		MensajeDTO msg = new MensajeDTO();
 		String message = null;
 		
-		log.info("cargaRespuestas ::  init");
-        log.info("File :: " + file);
-        Path testFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasZIP"), "respuestasZip", ".zip");
-        testFile.toFile().deleteOnExit();
-        byte[] decoder = Base64.getDecoder().decode(file);
-        Files.write(testFile, decoder);
-        System.out.println(testFile.toFile().getAbsoluteFile());
-        System.out.println("ZIP File Saved");
-        
-        ZipFile zipFile = new ZipFile(testFile.toFile());
-        Enumeration<?> enu = zipFile.entries();
-        
-        try {
-        	while (enu.hasMoreElements()) {
-                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-
-                String name = zipEntry.getName();
-                long size = zipEntry.getSize();
-                long compressedSize = zipEntry.getCompressedSize();
-
-                System.out.printf("name: %-20s | size: %6d | compressed size: %6d\n", name, size, compressedSize);
-                InputStream is = zipFile.getInputStream(zipEntry);
-                Path tempFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasTXT"), "respuestasTXT", ".txt");
-                tempFile.toFile().deleteOnExit();
-                try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
-                    IOUtils.copy(is, fos);
-                    message = leerArchivoRespuestas(tempFile);
-                }
-            }
-            zipFile.close();
-        } catch (IOException  e) {
-            e.printStackTrace();
-        }
+		 Path testFile = Files.createTempFile("respuestaPronosticosZip", ".zip");
+	        testFile.toFile().deleteOnExit();
+	        byte[] decoder = Base64.getDecoder().decode(file);
+	        Files.write(testFile, decoder);
+	        ZipFile zipFile = new ZipFile(testFile.toFile());
+	        Enumeration<?> enu = zipFile.entries();
+	        while (enu.hasMoreElements()) {
+	            ZipEntry zipEntry = (ZipEntry) enu.nextElement();
+	            String name = zipEntry.getName();
+	            if (name.endsWith("/") || name.startsWith("__MACOSX")) {
+	                continue;
+	            }
+	            InputStream is = zipFile.getInputStream(zipEntry);
+	            Path tempFile = Files.createTempFile("respuestaPronosticosTXT", ".txt");
+	            tempFile.toFile().deleteOnExit();
+	            try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
+	                IOUtils.copy(is, fos);
+	                message = leerArchivoRespuestas(tempFile);
+	            }
+	        }
+	        zipFile.close();
 
         msg.setMensajeInfo("Aviso");
         msg.setMensajeConfirm(message);
@@ -323,30 +338,14 @@ public class PronosticosServiceImpl implements PronosticosService {
         	listaRespuesta.add(data);
         }
         b.close();
-        log.info("RechazosFileDTO content init  ::  " + listaRespuesta.size());
         
         try {
-        	respPronosticosTmpJDBCRepository.TCBorrarRespPronosticos();
-        } catch (Exception e) {
-            throw new GenericException( "Error al limpiar la tabla respuestas pronosticos:: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-        try {
+        	respPronosticosTmpJDBCRepository.DLBorrarRespPronosticos();
         	respPronosticosTmpJDBCRepository.batchInsert(listaRespuesta, 500);
-        } catch (Exception e) {
-            throw new GenericException( "Error al guardar en Respuestas Pronosticos :: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-        try {
         	n = respPronosticosTmpJDBCRepository.updatePronosticosRespuesta();
-        } catch (Exception e) {
-            throw new GenericException( "Error al actualizar las respuestas pronosticos :: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-        try {
         	respPronosticosTmpJDBCRepository.updateCobrosResp();
         } catch (Exception e) {
-            throw new GenericException( "Error al actualizar cobros respuestas :: " , HttpStatus.NOT_FOUND.toString());
+            throw new GenericException( "Ocurrió un problema durante el proceso de respuesta pronosticos :: " , HttpStatus.NOT_FOUND.toString());
         }
         
 		return "Se importaron existosamente: " + n + "respuestas.";
@@ -456,5 +455,6 @@ public class PronosticosServiceImpl implements PronosticosService {
         
         return "";
 	}
+
 	
 }
