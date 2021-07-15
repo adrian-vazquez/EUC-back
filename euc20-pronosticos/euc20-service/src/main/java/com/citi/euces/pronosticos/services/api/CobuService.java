@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.hibernate.exception.SQLGrammarException;
 
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
