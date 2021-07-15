@@ -24,5 +24,10 @@ public class ConstantUtils {
             + "Total" + "\t" + "COM(p)" + "\t" + "Llave" + "\t" + "Número de Protección" + "\t" + "Franquicia" + "\t"
             + "Catalogada" + "\t" + "Fecha Real" + "\t" + "Fecha Contable" + "\t" + "Cuenta Producto" + "\t" + "Contrato"+ "\n";
 
+    
+    //LayoutPrevio
+    final public static String ENCABEZADO_LAYOUT_PREVIO ="Fec_Carga"+"\t"+"Ctrato_Tel_Cta"+"\t"+"Cta_Origen"+"\t"
+    		+"Cantidad"+"\t"+"Emisor"+"\t"+"Dias"+"\t"+"Cta_Abono"+"\t"+"Concepto"+"\t"+"Ref_Emisor"+"\t"+"Leyenda"+"\n";
+    		
 
 }

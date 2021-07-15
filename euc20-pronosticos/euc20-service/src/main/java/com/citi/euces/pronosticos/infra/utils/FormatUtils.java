@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,7 +29,6 @@ public class FormatUtils {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String formatFecha = simpleDateFormat.format(fecha);
         return formatFecha;
-
     }
 
     public static String formatDateSinEspacios(Date fecha) {
@@ -49,6 +49,28 @@ public class FormatUtils {
         String pattern = "dd/MM/yyyy";
         Date formatFecha = new SimpleDateFormat(pattern).parse(fecha);
         return formatFecha;
+    }
+    
+    public static String formatFecActual () {
+    	String pattern = "dd/MM/yyyy";
+    	Date fecha = new Date();
+    	SimpleDateFormat anio = new SimpleDateFormat(pattern);
+    	return anio.format(fecha);
+    }
+
+    public static String formatMes(Date fecha) {
+    	SimpleDateFormat formatFecha = new SimpleDateFormat("MMM");
+    	return formatFecha.format(fecha);
+    }
+    
+    public static String formatAnio(Date fecha) {
+    	SimpleDateFormat formatFecha = new SimpleDateFormat("yyyy");
+    	return formatFecha.format(fecha);
+    }
+    
+    public static String formatFecFin(Date fecha) {
+    	SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
+    	return formatoSalida.format(fecha);
     }
 
     public static String validFechaMes(Integer mes) {
@@ -113,6 +135,25 @@ public class FormatUtils {
         return fileZip;
     }
 
-
-
+    public static Path convertLayoutZip(Path fileLayoutPrevio) throws IOException {
+        Path fileZip = Files.createTempFile(Paths.get("C:/"),"FileZip", ".zip");
+        //fileZip.toFile().deleteOnExit();
+        byte[] buffer = new byte[1024];
+        try {
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip.toFile()));
+            ZipEntry ze = new ZipEntry(fileLayoutPrevio.toFile().getName());
+            zos.putNextEntry(ze);
+            FileInputStream in = new FileInputStream(fileLayoutPrevio.toFile());
+            int len;
+            while ((len = in.read(buffer)) > 0) {
+                zos.write(buffer, 0, len);
+            }
+            in.close();
+            zos.closeEntry();
+            zos.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return fileZip;
+    }
 }
