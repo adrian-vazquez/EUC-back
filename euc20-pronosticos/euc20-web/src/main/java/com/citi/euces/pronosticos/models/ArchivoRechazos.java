@@ -1,19 +1,15 @@
 package com.citi.euces.pronosticos.models;
 
-public class ArchivoRechazos {
+import java.io.Serializable;
 
+public class ArchivoRechazos implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private String file;
 	private Integer diasProteccion;
 	private boolean extraCont;
 	private boolean cobEspe;
-	
-	public ArchivoRechazos(String file, Integer diasProteccion, boolean extraCont, boolean cobEspe) {
-		super();
-		this.file = file;
-		this.diasProteccion = diasProteccion;
-		this.extraCont = extraCont;
-		this.cobEspe = cobEspe;
-	}
 
 	public String getFile() {
 		return file;

@@ -5,6 +5,7 @@ import com.citi.euces.pronosticos.infra.dto.ReporteCuadreDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,13 @@ public interface MaestroDeComisionesRepository extends JpaRepository<MaestroDeCo
 
     @Query("SELECT m FROM MaestroDeComisiones m  WHERE TO_CHAR(m.fechaMovimiento, 'dd/MM/yy') = :fecha")
     Page<MaestroDeComisiones> findByFechaMovimeiento(@Param("fecha") String fecha, Pageable pageable);
+
+    @Query("SELECT m FROM MaestroDeComisiones m  WHERE TO_CHAR(m.fechaMovimiento, 'dd/MM/yy') = :fecha")
+    List<MaestroDeComisiones> findByAllFechaMovimeiento(@Param("fecha") String fecha);
+
+    @Modifying
+    @Query("UPDATE MaestroDeComisiones m SET m.id.catalogadaGc = 2 WHERE m.id.catalogadaGc = 1 AND m.id.idEstatusComision = 3 AND m.id.anio = :anio AND m.id.mes = :mes ")
+    int updateCatalogadaGc(@Param("anio") Integer anio,@Param("mes") Integer mes);
 
     @Query(nativeQuery = true, value = "SELECT 'Cobro Especial' as tipo, " +
             "PPC_MIS_FN_CUENTA_CLIENTE_MC_CUADRE(1, :mes1 , :anio1 , :mes2, 0 , :mes3 ,0) as noCliente," +

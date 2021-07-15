@@ -120,6 +120,82 @@ public class RebajasController {
         }
     }
 
+    @PostMapping(path = "/reporteRebajaSearch")
+    public ResponseEntity<?> reporteRebajaSearch(@RequestBody final ReporteRebajaRequest request) {
+        try {
+            if (request.getFecha().isEmpty() || request.getPage() == null) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+            }
+            ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteRebajaSearch(request.getFecha(),
+                    request.getPage(), request.getSearch()), "200");
+            return new ResponseEntity<ReporteRebajaResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
+    @PostMapping(path = "/reporteRebajaFile")
+    public ResponseEntity<?> reporteRebajaFile(@RequestBody final ReporteRebajaRequest request) {
+        try {
+            if (request.getFecha().isEmpty()) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+            }
+            ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteRebajaFile(request.getFecha()), "200");
+            return new ResponseEntity<ReporteRebajaResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
+    @PostMapping(path = "/addMora")
+    public ResponseEntity<?> addMora(@RequestBody final ReporteRebajaRequest request) {
+        try {
+            if (request.getFecha().isEmpty()) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+            }
+            MensajeResponse response = new MensajeResponse(rebajasService.addMora(request.getFecha()), "200");
+            return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
 
 
 }

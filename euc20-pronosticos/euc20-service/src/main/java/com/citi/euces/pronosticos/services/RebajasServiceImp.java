@@ -2,6 +2,7 @@ package com.citi.euces.pronosticos.services;
 
 import com.citi.euces.pronosticos.entities.CatCausaRechazo;
 import com.citi.euces.pronosticos.entities.MaestroDeComisiones;
+import com.citi.euces.pronosticos.entities.MaestroDeComisionesView;
 import com.citi.euces.pronosticos.infra.dto.*;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.ConstantUtils;
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,6 +57,8 @@ public class RebajasServiceImp implements RebajasService {
     private CatServiciosPronosticoJDBCRepository catServiciosPronosticoRepository;
     @Autowired
     private SpRebajaMaestroDeComusionesRepository spRebajaMaestroDeComusionesRepository;
+    @Autowired
+    private MaestroDeComisionesViewRepository maestroDeComisionesViewRepository;
 
     @Override
     public MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws
@@ -144,14 +148,11 @@ public class RebajasServiceImp implements RebajasService {
     public ReporteRebajaDTO reporteRebaja(String fechaMovimiento, Integer page) throws GenericException, IOException {
         Pageable pageable = PageRequest.of(page, 50);
         Page<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByFechaMovimeiento(fechaMovimiento, pageable);
+        if (listaReb.isEmpty()) {
+            throw new GenericException(
+                    "No hay registros que coincidan con fecha Movimiento   :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+        }
         List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>();
-        List<CuentasContablesDTO> listaCuentasContables = cuentasContablesJDBCRepository.findAll();
-        log.info("cuentasContables size :: " + listaCuentasContables.size());
-        List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
-        log.info("listaRechazos size :: " + listaRechazos.size());
-        List<CatServiciosPronosticosDTO> listaCatServicios = catServiciosPronosticoRepository.findAll();
-        log.info("listaCatServicios size :: " + listaCatServicios.size());
-
         listaReb.forEach(lr -> {
             log.info("requestData listaReb ::> " + lr.getId().getmTotal());
             ReporteRebajaPageDTO reporteRebaja = new ReporteRebajaPageDTO();
@@ -162,10 +163,10 @@ public class RebajasServiceImp implements RebajasService {
             reporteRebaja.setCobrado(validaChequera(reporteRebaja.getChequera(), reporteRebaja.getChequeraCargo()));//ValidaChequera
             reporteRebaja.setmTotal(lr.getId().getmTotal().toString());
             reporteRebaja.setpIva(lr.getpIva().toString());
-            reporteRebaja.setCausaRechazo(getRechazo(lr.getIdCausaRechazo(), listaRechazos)); //GetRechazo
+            reporteRebaja.setCausaRechazo(getRechazo(lr.getIdCausaRechazo())); //GetRechazo
             reporteRebaja.setMes(FormatUtils.validFechaMes(lr.getId().getMes()));//RetornaMes
             reporteRebaja.setAnio(lr.getId().getAnio().toString());
-            reporteRebaja.setServicio(getServicio(lr.getId().getIdServicio(), lr.getId().getIdOndemand(), listaCatServicios));
+            reporteRebaja.setServicio(getServicio(lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
             reporteRebaja.setCsi(lr.getCsi().toString());
             reporteRebaja.setComEc(lr.getComEc().toString());
             reporteRebaja.setmComision(lr.getmComision().toString());
@@ -178,7 +179,7 @@ public class RebajasServiceImp implements RebajasService {
             reporteRebaja.setCatalogadaGc(FormatUtils.validCatalogadaGc(Integer.valueOf(lr.getId().getCatalogadaGc())));//GetCatalogadaGc
             reporteRebaja.setfMovimiento(FormatUtils.formatDatedmy(lr.getFechaMovimiento()));
             reporteRebaja.setFecha(lr.getFechaRegistroContable());//f_registro_contable
-            reporteRebaja.setCuentaContable(getCuentaContable(listaCuentasContables, lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
+            reporteRebaja.setCuentaContable(getCuentaContable(lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
             reporteRebaja.setContrato(lr.getContrato());
             reporteRebaja.setOpenItem(lr.getOpenItem());
             listReporteRebaja.add(reporteRebaja);
@@ -186,12 +187,127 @@ public class RebajasServiceImp implements RebajasService {
         log.info("listReporteRebaja :: > " + listReporteRebaja.size());
         Page<ReporteRebajaPageDTO> pageResponse = new PageImpl<>(listReporteRebaja, pageable, listaReb.getTotalPages());
         String file = "";
-        //if(listaReb.getTotalPages() <= 1200) {
-        file = createFileRepRebaja(listReporteRebaja);
-        //}
+        if (listaReb.getTotalPages() <= 1200 && page == 0) {
+            file = createFileTXTRepRebaja(listReporteRebaja);
+        }
         ReporteRebajaDTO response = new ReporteRebajaDTO();
         response.setReporteRebajaPageDTO(pageResponse);
         response.setFile(file);
+        return response;
+    }
+
+    @Override
+    public ReporteRebajaDTO reporteRebajaSearch(String fechaMovimiento, Integer page, String search) throws GenericException, IOException {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<MaestroDeComisionesView> listaReb = maestroDeComisionesViewRepository.searchData(fechaMovimiento, search, pageable);
+        log.info("listaRebSize:: > " + listaReb.getSize());
+        if (listaReb.isEmpty()) {
+            throw new GenericException(
+                    "No hay registros que coincidan con fecha  :: " + fechaMovimiento + " y busqueda  :: " + search, HttpStatus.NOT_FOUND.toString());
+        }
+        List<ReporteRebajaPageDTO> listReporteRebaja = new ArrayList<>();
+        listaReb.forEach(lr -> {
+            log.info("requestData listaReb ::> " + lr.getId().getmTotal());
+            ReporteRebajaPageDTO reporteRebaja = new ReporteRebajaPageDTO();
+            reporteRebaja.setNumeroCliente(lr.getId().getNoCliente().toString());
+            reporteRebaja.setBlanco("");
+            reporteRebaja.setChequera(lr.getId().getChequera());
+            reporteRebaja.setChequeraCargo(lr.getChequeraCargo());
+            reporteRebaja.setCobrado(validaChequera(reporteRebaja.getChequera(), reporteRebaja.getChequeraCargo()));//ValidaChequera
+            reporteRebaja.setmTotal(lr.getId().getmTotal().toString());
+            reporteRebaja.setpIva(lr.getpIva().toString());
+            reporteRebaja.setCausaRechazo(getRechazo(lr.getIdCausaRechazo())); //GetRechazo
+            reporteRebaja.setMes(FormatUtils.validFechaMes(lr.getId().getMes()));//RetornaMes
+            reporteRebaja.setAnio(lr.getId().getAnio().toString());
+            reporteRebaja.setServicio(getServicio(lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
+            reporteRebaja.setCsi(lr.getCsi().toString());
+            reporteRebaja.setComEc(lr.getComEc().toString());
+            reporteRebaja.setmComision(lr.getmComision().toString());
+            reporteRebaja.setmIva(lr.getmIva().toString());
+            reporteRebaja.setTotal(lr.getId().getmTotal().toString());
+            reporteRebaja.setComP(lr.getComP().toString());
+            reporteRebaja.setLlave(lr.getId().getLlave().toString());
+            reporteRebaja.setNoProteccion(lr.getNoProteccion());
+            reporteRebaja.setFranquicia(validFranquicia(lr.getIdFranquicia()));//getNombreFranquicia
+            reporteRebaja.setCatalogadaGc(FormatUtils.validCatalogadaGc(Integer.valueOf(lr.getId().getCatalogadaGc())));//GetCatalogadaGc
+            reporteRebaja.setfMovimiento(FormatUtils.formatDatedmy(lr.getFechaMovimiento()));
+            reporteRebaja.setFecha(lr.getFechaRegistroContable());//f_registro_contable
+            reporteRebaja.setCuentaContable(getCuentaContable(lr.getId().getIdServicio(), lr.getId().getIdOndemand()));
+            reporteRebaja.setContrato(lr.getContrato());
+            reporteRebaja.setOpenItem(lr.getOpenItem());
+            listReporteRebaja.add(reporteRebaja);
+        });
+        log.info("listReporteRebajaSearch:: > " + listReporteRebaja.size());
+        Page<ReporteRebajaPageDTO> pageResponse = new PageImpl<>(listReporteRebaja, pageable, listaReb.getTotalPages());
+        ReporteRebajaDTO response = new ReporteRebajaDTO();
+        response.setReporteRebajaPageDTO(pageResponse);
+        return response;
+    }
+
+    @Override
+    public ReporteRebajaDTO reporteRebajaFile(String fechaMovimiento) throws GenericException, IOException {
+        List<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByAllFechaMovimeiento(fechaMovimiento);
+        if (listaReb.isEmpty()) {
+            throw new GenericException(
+                    "No hay registros que coincidan con fecha Movimiento   :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+        }
+
+        List<List<String>> renglones = new ArrayList<>();
+        listaReb.forEach(ld -> {
+            List<String> renglon = new ArrayList<String>();
+            renglon.add(FormatUtils.validaString(ld.getId().getNoCliente().toString()));
+            renglon.add("");
+            renglon.add(FormatUtils.validaString(ld.getId().getChequera())); //chequera
+            renglon.add(FormatUtils.validaString(ld.getChequeraCargo())); //chequera_cargo
+            renglon.add(validaChequera(ld.getId().getChequera(), ld.getChequeraCargo())); //ValidaChequera
+            renglon.add(FormatUtils.validaString(ld.getId().getmTotal().toString()));
+            renglon.add(FormatUtils.validaString(ld.getpIva().toString()));
+            renglon.add(getRechazo(ld.getIdCausaRechazo())); //GetRechazo
+            renglon.add(FormatUtils.validFechaMes(ld.getId().getMes()));//RetornaMes
+            renglon.add(FormatUtils.validaString(ld.getId().getAnio().toString()));
+            renglon.add(getServicio(ld.getId().getIdServicio(), ld.getId().getIdOndemand()));//servicio
+            renglon.add(FormatUtils.validaString(ld.getCsi().toString()));
+            renglon.add(FormatUtils.validaString(ld.getComEc().toString()));
+            renglon.add(FormatUtils.validaString(ld.getmComision().toString()));
+            renglon.add(FormatUtils.validaString(ld.getmIva().toString()));
+            renglon.add(FormatUtils.validaString(ld.getId().getmTotal().toString()));
+            renglon.add(FormatUtils.validaString(ld.getComP().toString()));
+            renglon.add(FormatUtils.validaString(ld.getId().getLlave().toString()));
+            renglon.add(FormatUtils.validaString(ld.getNoProteccion()));
+            renglon.add(validFranquicia(ld.getIdFranquicia()));//getNombreFranquicia
+            renglon.add(FormatUtils.validCatalogadaGc(Integer.valueOf(ld.getId().getCatalogadaGc())));//GetCatalogadaGc
+            renglon.add(FormatUtils.formatDatedmy(ld.getFechaMovimiento()));
+            renglon.add(ld.getFechaRegistroContable());//f_registro_contable
+            renglon.add(getCuentaContable(ld.getId().getIdServicio(), ld.getId().getIdOndemand()));
+            renglon.add(FormatUtils.validaString(ld.getContrato()));
+            renglon.add(FormatUtils.validaString(ld.getOpenItem()));
+            renglones.add(renglon);
+        });
+        List<String> titles = Arrays.asList(ConstantUtils.TITLE_REP_REBAJA_EXCEL);
+        Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles, renglones));
+        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileReporteRebajaZip.toFile()));
+        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+        ReporteRebajaDTO response = new ReporteRebajaDTO();
+        response.setFile(ecoder);
+        return response;
+    }
+
+    @Override
+    public MensajeDTO addMora(String fechaMovimiento) throws GenericException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localFecha = LocalDate.parse(fechaMovimiento, formatter);
+        Integer mes = new Integer(localFecha.getMonth().getValue());
+        Integer anio = new Integer(localFecha.getYear());
+        int updateMaestroComisiones = 0;
+        try {
+            updateMaestroComisiones = maestroDeComisionesRepository.updateCatalogadaGc(anio, mes);
+
+        } catch (Exception e) {
+            throw new GenericException(
+                    "Error al Actualizar Maestro de Comisiones  addMora :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+        }
+        MensajeDTO response = new MensajeDTO();
+        response.setMensajeConfirm("Confirmando, Actualizando maestro de comisiones: " + updateMaestroComisiones + " rebajados");
         return response;
     }
 
@@ -249,8 +365,10 @@ public class RebajasServiceImp implements RebajasService {
         return validString;
     }
 
-    private String getRechazo(Integer idRechazo, List<CatCausaRechazo> listaRechazos) {
+    private String getRechazo(Integer idRechazo) {
         String resp = "";
+        List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
+        log.info("listaRechazos size :: " + listaRechazos.size());
         if (!listaRechazos.isEmpty()) {
             List<CatCausaRechazo> validRechazos = listaRechazos.stream().filter(lr -> lr.getIdCausaRechazo().intValue() == idRechazo).collect(Collectors.toList());
             resp = validRechazos.get(validRechazos.size() - 1).getCausa();
@@ -258,8 +376,10 @@ public class RebajasServiceImp implements RebajasService {
         return resp;
     }
 
-    private String getServicio(Long idServicio, Long idOndemand, List<CatServiciosPronosticosDTO> listaCatServicios) {
+    private String getServicio(Long idServicio, Long idOndemand) {
         String resp = "";
+        List<CatServiciosPronosticosDTO> listaCatServicios = catServiciosPronosticoRepository.findAll();
+        log.info("listaCatServicios size :: " + listaCatServicios.size());
         if (!listaCatServicios.isEmpty()) {
             List<CatServiciosPronosticosDTO> servicios = listaCatServicios.stream().filter(l -> l.getIdServicio() == idServicio.longValue()
                     && l.getIdOndemand() == idOndemand.longValue()).collect(Collectors.toList());
@@ -276,8 +396,10 @@ public class RebajasServiceImp implements RebajasService {
         return valid;
     }
 
-    private String getCuentaContable(List<CuentasContablesDTO> listaCuentasContables, Long idServicio, Long idOndemand) {
+    private String getCuentaContable(Long idServicio, Long idOndemand) {
         String resp = "";
+        List<CuentasContablesDTO> listaCuentasContables = cuentasContablesJDBCRepository.findAll();
+        log.info("cuentasContables size :: " + listaCuentasContables.size());
         if (!listaCuentasContables.isEmpty()) {
             List<CuentasContablesDTO> ctaContables = listaCuentasContables.stream().filter(c -> c.getIdServicio() == idServicio.longValue()
                     && c.getIdOndemand() == idOndemand.longValue()).collect(Collectors.toList());
@@ -289,7 +411,7 @@ public class RebajasServiceImp implements RebajasService {
         return resp;
     }
 
-    private String createFileRepRebaja(List<ReporteRebajaPageDTO> listReporteRebaja) throws IOException {
+    private String createFileTXTRepRebaja(List<ReporteRebajaPageDTO> listReporteRebaja) throws IOException {
         Path fileReporteRebaja = Files.createTempFile("Reporterebaja", ".txt");
         fileReporteRebaja.toFile().deleteOnExit();
         FileOutputStream test = new FileOutputStream(fileReporteRebaja.toFile());
