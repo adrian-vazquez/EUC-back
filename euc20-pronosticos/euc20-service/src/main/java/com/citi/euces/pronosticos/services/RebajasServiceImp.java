@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,7 +58,7 @@ public class RebajasServiceImp implements RebajasService {
     @Autowired
     private SpRebajaMaestroDeComusionesRepository spRebajaMaestroDeComusionesRepository;
     @Autowired
-    private  MaestroDeComisionesViewRepository maestroDeComisionesViewRepository;
+    private MaestroDeComisionesViewRepository maestroDeComisionesViewRepository;
 
     @Override
     public MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws
@@ -147,7 +148,7 @@ public class RebajasServiceImp implements RebajasService {
     public ReporteRebajaDTO reporteRebaja(String fechaMovimiento, Integer page) throws GenericException, IOException {
         Pageable pageable = PageRequest.of(page, 50);
         Page<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByFechaMovimeiento(fechaMovimiento, pageable);
-        if(listaReb.isEmpty()){
+        if (listaReb.isEmpty()) {
             throw new GenericException(
                     "No hay registros que coincidan con fecha Movimiento   :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
         }
@@ -186,8 +187,8 @@ public class RebajasServiceImp implements RebajasService {
         log.info("listReporteRebaja :: > " + listReporteRebaja.size());
         Page<ReporteRebajaPageDTO> pageResponse = new PageImpl<>(listReporteRebaja, pageable, listaReb.getTotalPages());
         String file = "";
-        if(listaReb.getTotalPages() <= 1200 && page == 0) {
-        file = createFileTXTRepRebaja(listReporteRebaja);
+        if (listaReb.getTotalPages() <= 1200 && page == 0) {
+            file = createFileTXTRepRebaja(listReporteRebaja);
         }
         ReporteRebajaDTO response = new ReporteRebajaDTO();
         response.setReporteRebajaPageDTO(pageResponse);
@@ -200,7 +201,7 @@ public class RebajasServiceImp implements RebajasService {
         Pageable pageable = PageRequest.of(page, 50);
         Page<MaestroDeComisionesView> listaReb = maestroDeComisionesViewRepository.searchData(fechaMovimiento, search, pageable);
         log.info("listaRebSize:: > " + listaReb.getSize());
-        if(listaReb.isEmpty()){
+        if (listaReb.isEmpty()) {
             throw new GenericException(
                     "No hay registros que coincidan con fecha  :: " + fechaMovimiento + " y busqueda  :: " + search, HttpStatus.NOT_FOUND.toString());
         }
@@ -246,7 +247,7 @@ public class RebajasServiceImp implements RebajasService {
     @Override
     public ReporteRebajaDTO reporteRebajaFile(String fechaMovimiento) throws GenericException, IOException {
         List<MaestroDeComisiones> listaReb = maestroDeComisionesRepository.findByAllFechaMovimeiento(fechaMovimiento);
-        if(listaReb.isEmpty()){
+        if (listaReb.isEmpty()) {
             throw new GenericException(
                     "No hay registros que coincidan con fecha Movimiento   :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
         }
@@ -283,11 +284,30 @@ public class RebajasServiceImp implements RebajasService {
             renglones.add(renglon);
         });
         List<String> titles = Arrays.asList(ConstantUtils.TITLE_REP_REBAJA_EXCEL);
-        Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles,renglones));
+        Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles, renglones));
         String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileReporteRebajaZip.toFile()));
         log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
         ReporteRebajaDTO response = new ReporteRebajaDTO();
         response.setFile(ecoder);
+        return response;
+    }
+
+    @Override
+    public MensajeDTO addMora(String fechaMovimiento) throws GenericException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localFecha = LocalDate.parse(fechaMovimiento, formatter);
+        Integer mes = new Integer(localFecha.getMonth().getValue());
+        Integer anio = new Integer(localFecha.getYear());
+        int updateMaestroComisiones = 0;
+        try {
+            updateMaestroComisiones = maestroDeComisionesRepository.updateCatalogadaGc(anio, mes);
+
+        } catch (Exception e) {
+            throw new GenericException(
+                    "Error al Actualizar Maestro de Comisiones  addMora :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+        }
+        MensajeDTO response = new MensajeDTO();
+        response.setMensajeConfirm("Confirmando, Actualizando maestro de comisiones: " + updateMaestroComisiones + " rebajados");
         return response;
     }
 

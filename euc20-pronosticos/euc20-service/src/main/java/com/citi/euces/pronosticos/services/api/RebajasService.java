@@ -23,4 +23,6 @@ public interface RebajasService {
 
     ReporteRebajaDTO reporteRebajaFile(String fechaMovimiento) throws GenericException, IOException;
 
+    MensajeDTO addMora(String fechaMovimiento) throws GenericException;
+
 }
