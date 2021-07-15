@@ -1,8 +1,6 @@
 package com.citi.euces.pronosticos.services;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -25,7 +23,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.IOUtils;
-import org.apache.poi.hpsf.Date;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 
 import org.slf4j.Logger;
