@@ -36,6 +36,7 @@ public class CtasVirtualesDTO implements Serializable{
 	public void setCuentasX(Integer cuentasX) {
 		this.cuentasX = cuentasX;
 	}
+	
 	public String getNombre() {
 		return nombre;
 	}
