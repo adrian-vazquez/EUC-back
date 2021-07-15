@@ -1,7 +1,6 @@
 package com.citi.euces.pronosticos.repositories;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,12 +16,9 @@ import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 //import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.citi.euces.pronosticos.infra.dto.CatServiciosPronosticosDTO;
 import com.citi.euces.pronosticos.infra.dto.RechazosFileDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
-import com.citi.euces.pronosticos.services.PronosticosServiceImpl;
 
-import jdk.internal.org.jline.utils.Log;
 
 @Repository
 public class PronosticosTmpJDBCRepository {
