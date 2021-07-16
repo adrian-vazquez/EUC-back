@@ -87,6 +87,13 @@
 		    <version>${log4j.version}</version>
 		</dependency>
 		
+		<!-- leer csv -->
+		<dependency>
+   		 	<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-csv</artifactId>
+    		<version>1.8</version>
+		</dependency>
+		
 		<!-- Generar Excel -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>

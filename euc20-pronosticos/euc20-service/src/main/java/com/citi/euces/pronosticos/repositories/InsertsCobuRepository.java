@@ -65,9 +65,9 @@ public class InsertsCobuRepository {
 	                new ParameterizedPreparedStatementSetter<CtasVirtualesDTO>() {
 	                    public void setValues(PreparedStatement ps, CtasVirtualesDTO argument) throws SQLException {
 	                    	
-	                        ps.setInt(1, argument.getNumCliente());
-	                        ps.setInt(2, argument.getNumCuenta());
-	                        ps.setString(3, argument.getFecAlta());
+	                        ps.setLong(1, argument.getNumCliente());
+	                        ps.setLong(2, argument.getNumCuenta());
+	                        ps.setDate(3, new Date(argument.getFecAlta().getTime()));
 	                        ps.setInt(4, argument.getCuentasX());
 	                        ps.setString(5, argument.getNombre());
 	                        ps.setInt(6, argument.getId());
