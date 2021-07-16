@@ -45,6 +45,11 @@ public class ConstantUtils {
     final public static String CONTRATO = "Contrato";
     final public static String OPEN_ITEM = "OPEN_ITEM";
 
+    final public static String NO_CLIENTES = "No_Clientes";
+    final public static String CUENTA_CONTABLE = "Cuenta contable";
+
+
+
     //ReporteRebaja encabezado txt
     final public static String ENCABEZADO_REP_REBAJA = NUM_CLIENTE + "\t" + BLANCO + "\t" + CUENTA + "\t"
             + CUENTA_COBRO + "\t" + ESTATUS + "\t" + IMPORTE + "\t" + IVA + "\t" + CAUSA_RECHAZO + "\t" + MES + "\t"
@@ -56,5 +61,9 @@ public class ConstantUtils {
     final public static String[] TITLE_REP_REBAJA_EXCEL = {NUM_CLIENTE,BLANCO,CUENTA,CUENTA_COBRO,ESTATUS,IMPORTE,IVA,
             CAUSA_RECHAZO,MES,ANIO,SERVICIO,CSI,COM,COMISION_SIN_IVA,IVAA,TOTAL,COM_P,LLAVE,NUM_PROTECCION,FRANQUICIA,
             CATALOGADA,FECH_REAL,OPEN_ITEM,FECH_CONTABLE,CUENTA_PRODUCTO,CONTRATO};
+
+    //ReporteMora encabezado EXCEL
+    final public static String[] TITLE_REP_MORA_EXCEL = {NO_CLIENTES,CUENTA.toUpperCase(),MES.toUpperCase(),ANIO.toUpperCase(),SERVICIO.toUpperCase(),
+            COMISION_SIN_IVA.toUpperCase(),IVAA.toUpperCase(),TOTAL.toUpperCase(), LLAVE.toUpperCase(), FRANQUICIA, CUENTA_CONTABLE,OPEN_ITEM.toLowerCase()};
 
 }

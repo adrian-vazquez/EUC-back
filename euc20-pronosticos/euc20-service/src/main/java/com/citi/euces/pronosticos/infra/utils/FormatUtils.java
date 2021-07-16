@@ -14,10 +14,7 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -57,6 +54,14 @@ public class FormatUtils {
         String pattern = "dd/MM/yyyy";
         Date formatFecha = new SimpleDateFormat(pattern).parse(fecha);
         return formatFecha;
+    }
+
+
+    public static String formatFateFileExcel(){
+        SimpleDateFormat df = new SimpleDateFormat("dd_MM_yyyy hh_mm_ss a");
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
+        calendar.setTime(new Date());
+        return df.format(calendar.getTime());
     }
 
     public static String validFechaMes(Integer mes) {
@@ -145,11 +150,11 @@ public class FormatUtils {
     }
 
 
-    public static Path createExcel(List<String> titulos, List<List<String>> renglones ) throws IOException {
+    public static Path createExcel(List<String> titulos, List<List<String>> renglones, String nameFile ) throws IOException {
         Path testFile = Files.createTempFile("fileExcel", ".xlsx");
-        //testFile.toFile().deleteOnExit();
+        testFile.toFile().deleteOnExit();
         try(XSSFWorkbook workbook = new XSSFWorkbook()) {
-            XSSFSheet sheet = workbook.createSheet("ReporteRebajas");
+            XSSFSheet sheet = workbook.createSheet(nameFile);
             int colHeader = 0;
             Row rowheader = sheet.createRow(colHeader++);
             int colCell = 0;
