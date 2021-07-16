@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +61,9 @@ public class RebajasServiceImp implements RebajasService {
     private SpRebajaMaestroDeComusionesRepository spRebajaMaestroDeComusionesRepository;
     @Autowired
     private MaestroDeComisionesViewRepository maestroDeComisionesViewRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     @Override
     public MensajeDTO aplicarRebajaloadFile(String file, String fechaContable, String fechaMovimiento) throws
@@ -103,7 +108,7 @@ public class RebajasServiceImp implements RebajasService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new GenericException(
-                    "Error al llamar SP :: ", HttpStatus.NOT_FOUND.toString());
+                    "Error al llamar SP :: ", HttpStatus.INTERNAL_SERVER_ERROR.toString());
         }
         MensajeDTO mensjageResponse = new MensajeDTO();
         mensjageResponse.setMensajeInfo("Confirmando, Actualizando maestro de comisiones: ".concat(numRegCargados.toString()).concat(" rebajados"));
@@ -132,7 +137,7 @@ public class RebajasServiceImp implements RebajasService {
 
         } catch (Exception e) {
             throw new GenericException(
-                    "Error al llamar Funciones :: ", HttpStatus.NOT_FOUND.toString());
+                    "Error al llamar Funciones :: ", HttpStatus.INTERNAL_SERVER_ERROR.toString());
         }
         log.info("responseQuery1 :: " + responseQuery1.size() + "  responseQuery2 :: " + responseQuery2.size());
         log.info("responseQuery3 :: " + responseQuery3.size() + "  responseQuery4 :: " + responseQuery4.size());
@@ -284,7 +289,7 @@ public class RebajasServiceImp implements RebajasService {
             renglones.add(renglon);
         });
         List<String> titles = Arrays.asList(ConstantUtils.TITLE_REP_REBAJA_EXCEL);
-        Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles, renglones));
+        Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles, renglones,"ReporteRebajas"));
         String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileReporteRebajaZip.toFile()));
         log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
         ReporteRebajaDTO response = new ReporteRebajaDTO();
@@ -304,10 +309,41 @@ public class RebajasServiceImp implements RebajasService {
 
         } catch (Exception e) {
             throw new GenericException(
-                    "Error al Actualizar Maestro de Comisiones  addMora :: " + fechaMovimiento, HttpStatus.NOT_FOUND.toString());
+                    "Error al Actualizar Maestro de Comisiones  addMora :: " + fechaMovimiento, HttpStatus.INTERNAL_SERVER_ERROR.toString());
         }
         MensajeDTO response = new MensajeDTO();
         response.setMensajeConfirm("Confirmando, Actualizando maestro de comisiones: " + updateMaestroComisiones + " rebajados");
+        return response;
+    }
+
+    @Override
+    public ReporteRebajaDTO reporteMoraFile(String fechaMovimiento) throws GenericException, IOException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localFecha = LocalDate.parse(fechaMovimiento, formatter);
+        Integer mes = new Integer(localFecha.getMonth().getValue());
+        Integer anio = new Integer(localFecha.getYear());
+        String query = "SELECT mc.no_cliente, mc.chequera_cargo , TO_CHAR(TO_DATE(mc.mes, 'MM'), 'MON','NLS_DATE_LANGUAGE=english') , mc.anio, cs.NOM_PRODUCTO, mc.m_comision, mc.m_iva , mc.m_total , ";
+        query += "mc.llave , fr.franquicia, (cc.cuenta || '-' || cc.producto) , mc.open_item from PPC_MIS_MAESTRO_COMISIONES mc ";
+        query += "inner join ppc_mis_catalogo_servicios cs on mc.id_ondemand = cs.clave_804_274_15 and mc.id_servicio = cs.clave_mis ";
+        query += "inner join ppc_mis_catalogo_franquicias fr on mc.id_franquicia = fr.id_franquicia ";
+        query += "inner join ppc_mis_cuentas_contables cc on mc.id_servicio = cc.id_servicio and mc.id_ondemand = cc.id_ondemand ";
+        query += " where mc.catalogada_gc = 2 and mc.mes = " + mes  + " and  mc.anio = " + anio;
+        log.info("QUERY reporteMoraFile :::> ");
+        log.info(query);
+
+        List<Object[]> reporteMora = entityManager.createNativeQuery(query).getResultList();
+        if(reporteMora.isEmpty()){
+            throw new GenericException(
+                    "No se encontraron Datos  :: ", HttpStatus.NOT_FOUND.toString());
+        }
+
+        List<List<String>> renglones = reporteMora.stream().map(x -> Arrays.asList(x).stream().map(Objects::toString).collect(Collectors.toList())).collect(Collectors.toList());
+        List<String> titles = Arrays.asList(ConstantUtils.TITLE_REP_MORA_EXCEL);
+        Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles, renglones,"Repmora".concat(FormatUtils.formatFateFileExcel())));
+        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileReporteRebajaZip.toFile()));
+        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+        ReporteRebajaDTO response = new ReporteRebajaDTO();
+        response.setFile(ecoder);
         return response;
     }
 
@@ -345,7 +381,7 @@ public class RebajasServiceImp implements RebajasService {
             rebNumProtectJDBCRepository.batchInsert(content, 500);
         } catch (Exception e) {
             throw new GenericException(
-                    "Error al guardar datos :: ", HttpStatus.NOT_FOUND.toString());
+                    "Error al guardar datos :: ", HttpStatus.INTERNAL_SERVER_ERROR.toString());
         }
         responseMessage = " Abono Total: " + sumaImporte.toString() + " Elementos totales a cargar:" + content.size() + " de un total de:"
                 + contentInint + " elementos.";

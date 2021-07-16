@@ -196,6 +196,31 @@ public class RebajasController {
         }
     }
 
+    @PostMapping(path = "/reporteMora")
+    public ResponseEntity<?> reporteMora(@RequestBody final ReporteRebajaRequest request) {
+        try {
+            if (request.getFecha().isEmpty()) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+            }
+            ReporteRebajaResponse response = new ReporteRebajaResponse(rebajasService.reporteMoraFile(request.getFecha()), "200");
+            return new ResponseEntity<ReporteRebajaResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
 
 
 }
