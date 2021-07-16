@@ -154,8 +154,8 @@ public class FormatUtils {
     }
 
     public static Path convertLayoutZip(Path fileLayoutPrevio) throws IOException {
-        Path fileZip = Files.createTempFile(Paths.get("C:/"),"FileZip", ".zip");
-        //fileZip.toFile().deleteOnExit();
+        Path fileZip = Files.createTempFile(/*Paths.get("C:/"),*/"FileZip", ".zip");
+        fileZip.toFile().deleteOnExit();
         byte[] buffer = new byte[1024];
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip.toFile()));
