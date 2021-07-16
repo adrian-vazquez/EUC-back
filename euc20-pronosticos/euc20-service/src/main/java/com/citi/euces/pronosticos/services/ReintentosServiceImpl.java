@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
@@ -66,8 +67,7 @@ public class ReintentosServiceImpl implements ReintentosService {
 
 		log.info("cuentasAltloadFile ::  init");
 		log.info("File :: " + file);
-		Path testFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasZIP"), "cuantasAltZip",
-				".zip");
+		Path testFile = Files.createTempFile("cuantasAltZip",".zip");
 		testFile.toFile().deleteOnExit();
 		byte[] decoder = Base64.getDecoder().decode(file);
 		Files.write(testFile, decoder);
@@ -87,8 +87,7 @@ public class ReintentosServiceImpl implements ReintentosService {
 
 				System.out.printf("name: %-20s | size: %6d | compressed size: %6d\n", name, size, compressedSize);
 				InputStream is = zipFile.getInputStream(zipEntry);
-				Path tempFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasTXT"),
-						"cuentasAltTXT", ".txt");
+				Path tempFile = Files.createTempFile("cuentasAltTXT", ".txt");
 				tempFile.toFile().deleteOnExit();
 				try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
 					IOUtils.copy(is, fos);
@@ -119,15 +118,20 @@ public class ReintentosServiceImpl implements ReintentosService {
 			if (ini != 1) {
 				if (!linea.equals("") && !linea.equals("\t\t\t\t\t\t\t\t")) {
 					ArrayAux = linea.split("\t");
+					log.info(ArrayAux.toString());
+					log.info(ArrayAux.length+"");
+					log.info(Arrays.toString(ArrayAux));
+					log.info(ArrayAux[6].equals(null) || ArrayAux[6].equals("") ? "0" : ArrayAux[6]);
+					
 					CuentasAlternasDTO data = new CuentasAlternasDTO();
-					data.setNum_Cliente(Long.parseLong(validaNull(ArrayAux[0])));
-					data.setNum_Producto(Long.parseLong(validaNull(ArrayAux[1])));
-					data.setCve_Instrumento(Long.parseLong(validaNull(ArrayAux[2])));
-					data.setNum_Contrato(Long.parseLong(validaNull(ArrayAux[3])));
-					data.setCve_Estatus(Long.parseLong(validaNull(ArrayAux[4])));
-					data.setSdo_Actual(Long.parseLong(validaNull(ArrayAux[5])));
-					data.setPrefmda(Long.parseLong(validaNull(ArrayAux[6])));
-					data.setCuentamda(Long.parseLong(validaNull(ArrayAux[7])));
+					data.setNum_Cliente(Long.parseLong(ArrayAux[0].equals(null) || ArrayAux[0].equals("") ? "0" : ArrayAux[0]));
+					data.setNum_Producto(Long.parseLong(ArrayAux[1].equals(null) || ArrayAux[1].equals("") ? "0" : ArrayAux[1]));
+					data.setCve_Instrumento(Long.parseLong(ArrayAux[2].equals(null) || ArrayAux[2].equals("") ? "0" : ArrayAux[2]));
+					data.setNum_Contrato(Long.parseLong(ArrayAux[3].equals(null) || ArrayAux[3].equals("") ? "0" : ArrayAux[3]));
+					data.setCve_Estatus(Long.parseLong(ArrayAux[4].equals(null) || ArrayAux[4].equals("") ? "0" : ArrayAux[4]));
+					data.setSdo_Actual(Double.parseDouble(ArrayAux[5].equals(null) || ArrayAux[5].equals("") ? "0" : ArrayAux[5]));
+					data.setPrefmda(Long.parseLong(ArrayAux[6].equals(null) || ArrayAux[6].equals("") ? "0" : ArrayAux[6]));
+					data.setCuentamda(Long.parseLong(ArrayAux[7].equals(null) || ArrayAux[7].equals("") ? "0" : ArrayAux[7]));
 					listaRespuesta.add(data);
 				}
 			}

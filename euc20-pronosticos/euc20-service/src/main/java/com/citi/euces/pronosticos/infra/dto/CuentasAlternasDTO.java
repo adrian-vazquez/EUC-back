@@ -15,7 +15,7 @@ public class CuentasAlternasDTO implements Serializable {
     public Long cve_Instrumento;
     public Long num_Contrato;
     public Long cve_Estatus;
-    public float sdo_Actual;
+    public Double sdo_Actual;
     public Long prefmda;
     public Long cuentamda;
     public String cuantaAlterna;
@@ -24,7 +24,7 @@ public class CuentasAlternasDTO implements Serializable {
 	}
 	
 	public CuentasAlternasDTO(Long num_Cliente, Long num_Producto, Long cve_Instrumento, Long num_Contrato,
-			Long cve_Estatus, float sdo_Actual, Long prefmda, Long cuentamda) {
+			Long cve_Estatus, Double sdo_Actual, Long prefmda, Long cuentamda) {
 		super();
 		this.num_Cliente = num_Cliente;
 		this.num_Producto = num_Producto;
@@ -98,13 +98,13 @@ public class CuentasAlternasDTO implements Serializable {
 	/**
 	 * @return the sdo_Actual
 	 */
-	public float getSdo_Actual() {
+	public Double getSdo_Actual() {
 		return sdo_Actual;
 	}
 	/**
 	 * @param sdo_Actual the sdo_Actual to set
 	 */
-	public void setSdo_Actual(float sdo_Actual) {
+	public void setSdo_Actual(Double sdo_Actual) {
 		this.sdo_Actual = sdo_Actual;
 	}
 	/**

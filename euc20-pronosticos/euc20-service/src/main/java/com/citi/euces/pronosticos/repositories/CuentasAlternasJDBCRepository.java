@@ -44,7 +44,7 @@ public class CuentasAlternasJDBCRepository {
                     	ps.setLong(3, content.getCve_Instrumento());
                     	ps.setLong(4, content.getNum_Contrato());
                     	ps.setLong(5, content.getCve_Estatus());
-                    	ps.setFloat(6, content.getSdo_Actual());
+                    	ps.setDouble(6, content.getSdo_Actual());
                     	ps.setLong(7, content.getPrefmda());
                     	ps.setLong(8, content.getCuentamda());
                     }
