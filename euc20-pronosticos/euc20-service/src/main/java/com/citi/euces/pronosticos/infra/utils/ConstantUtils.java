@@ -44,7 +44,11 @@ public class ConstantUtils {
     final public static String CUENTA_PRODUCTO = "Cuenta Producto";
     final public static String CONTRATO = "Contrato";
     final public static String OPEN_ITEM = "OPEN_ITEM";
-
+    
+    //LayoutPrevio
+    final public static String ENCABEZADO_LAYOUT_PREVIO ="Fec_Carga"+"\t"+"Ctrato_Tel_Cta"+"\t"+"Cta_Origen"+"\t"
+    		+"Cantidad"+"\t"+"Emisor"+"\t"+"Dias"+"\t"+"Cta_Abono"+"\t"+"Concepto"+"\t"+"Ref_Emisor"+"\t"+"Leyenda"+"\n";
+    		
     //ReporteRebaja encabezado txt
     final public static String ENCABEZADO_REP_REBAJA = NUM_CLIENTE + "\t" + BLANCO + "\t" + CUENTA + "\t"
             + CUENTA_COBRO + "\t" + ESTATUS + "\t" + IMPORTE + "\t" + IVA + "\t" + CAUSA_RECHAZO + "\t" + MES + "\t"
