@@ -154,7 +154,7 @@ public class ReintentosServiceImpl implements ReintentosService {
 					HttpStatus.NOT_FOUND.toString());
 		}
 
-		return "Se importaron existosamente: " + n + "respuestas.";
+		return "Se importaron existosamente: " + listaRespuesta.size() + " registros de cuentas alternas.";
 	}
 	
 	 private String validaNull(String cad){
