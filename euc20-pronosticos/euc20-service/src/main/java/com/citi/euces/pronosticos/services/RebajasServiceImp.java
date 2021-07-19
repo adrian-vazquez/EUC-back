@@ -102,9 +102,10 @@ public class RebajasServiceImp implements RebajasService {
 
     @Override
     public MensajeDTO aplicarRebaja() throws GenericException {
-        Integer numRegCargados;
+        Integer numRegCargados = 0;
         try {
             numRegCargados = spRebajaMaestroDeComusionesRepository.spRebajaMaestroComisiones();
+            log.info("numRegCargados:: " +  numRegCargados);
         } catch (Exception e) {
             e.printStackTrace();
             throw new GenericException(
