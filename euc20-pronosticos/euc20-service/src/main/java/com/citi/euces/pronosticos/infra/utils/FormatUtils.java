@@ -64,7 +64,7 @@ public class FormatUtils {
 
     public static String formatMes(Date fecha) {
     	SimpleDateFormat formatFecha = new SimpleDateFormat("MMM");
-    	return formatFecha.format(fecha);
+    	return formatFecha.format(fecha).toUpperCase();
     }
     
     public static String formatAnio(Date fecha) {

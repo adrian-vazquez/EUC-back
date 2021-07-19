@@ -40,7 +40,9 @@ public class MapfreController {
 			}else if(request.getDias()==null) {
 				throw new GenericException("Campo dias es incorrecto. ", HttpStatus.BAD_REQUEST.toString());
 			}
-			LayoutPrevioResponse response = new LayoutPrevioResponse(mapfreService.ObtenerLayout(request.getFecCarga(),request.getDias()), "200");
+			LayoutPrevioResponse response = new LayoutPrevioResponse(
+					mapfreService.ObtenerLayout(request.getFecCarga(),request.getDias()),
+					HttpStatus.OK.toString());
 	        return new ResponseEntity<LayoutPrevioResponse>(response, HttpStatus.OK);
 	        
         } catch (GenericException ex) {
@@ -64,8 +66,11 @@ public class MapfreController {
 	@PostMapping(path ="/CrearLayout")
 	public ResponseEntity<?> TasaCero(@RequestBody TasaCeroRequest request){
 		try {
-			if(request.getFile().isEmpty() || request.getFecha().isEmpty()) {
-				throw new GenericException("Request incompleto :: Verifica los valores de entrada.",
+			if(request.getFile().isEmpty()) {
+				throw new GenericException("El archivo que intenta subir no es .ZIP.",
+						HttpStatus.BAD_REQUEST.toString());
+			}else if (request.getFecha().isEmpty()) {
+				throw new GenericException("Favor de verificar la fecha de movimiento",
 						HttpStatus.BAD_REQUEST.toString());
 			}
 			MensajeResponse response = new MensajeResponse(
