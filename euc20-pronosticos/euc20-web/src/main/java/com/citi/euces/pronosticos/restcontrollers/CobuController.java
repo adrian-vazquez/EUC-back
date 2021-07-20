@@ -16,6 +16,8 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.CobuRequest;
 import com.citi.euces.pronosticos.models.CobuResponse;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
+import com.citi.euces.pronosticos.models.LayoutPrevioRequest;
+import com.citi.euces.pronosticos.models.ReportesCobuResponse;
 import com.citi.euces.pronosticos.services.api.CobuService;
 
 @RestController
@@ -210,18 +212,13 @@ public class CobuController {
             log.info(error.getException());
             return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
         }
-	}
+	}*/
 	
 	@GetMapping(path = "/cifrasControl")
-	public ResponseEntity<?>cifrasControl(@RequestBody final String request) {
+	public ResponseEntity<?>cifrasControl() {
 		try {
-            if (request.isEmpty() ) {
-                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
-            }
-            CobuResponse response = new CobuResponse(
-            	cobuService.cifrasControl(),
-                HttpStatus.OK.toString());
-            	return new ResponseEntity<CobuResponse>(response, HttpStatus.OK);
+			ReportesCobuResponse response = new ReportesCobuResponse(cobuService.cifrasControl(),HttpStatus.OK.toString());
+            	return new ResponseEntity<ReportesCobuResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
             error.setCode(ex.getCodeError());
@@ -237,5 +234,5 @@ public class CobuController {
             log.info(error.getException());
             return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
         }
-	}*/
+	}
 }

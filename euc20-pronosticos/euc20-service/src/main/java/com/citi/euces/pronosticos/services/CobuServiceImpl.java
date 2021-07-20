@@ -1,13 +1,16 @@
 package com.citi.euces.pronosticos.services;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -22,15 +25,24 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
-
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
@@ -38,6 +50,8 @@ import com.citi.euces.pronosticos.infra.dto.CobuDTO;
 import com.citi.euces.pronosticos.infra.dto.CtasVirtualesDTO;
 import com.citi.euces.pronosticos.infra.dto.ProcesadoDTO;
 import com.citi.euces.pronosticos.infra.dto.QueryCtosAgrupadoDTO;
+import com.citi.euces.pronosticos.infra.dto.ReporteRebajaDTO;
+import com.citi.euces.pronosticos.infra.dto.ReportesCobuDTO;
 import com.citi.euces.pronosticos.infra.dto.TxsCtasVirtDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
@@ -47,7 +61,7 @@ import com.citi.euces.pronosticos.services.api.CobuService;
 
 
 @Service
-//@Transactional
+@Transactional
 public class CobuServiceImpl implements CobuService{
 	static final Logger log = LoggerFactory.getLogger(RebajasServiceImp.class);
 
@@ -57,6 +71,8 @@ public class CobuServiceImpl implements CobuService{
 	private InsertsCobuRepository insertsCobuRepository;
 	@Autowired
 	private ProcesoCobuRepository procesoCobuRepository;
+	@Autowired
+	private ConsultasCobuRepository consultasCobuRepository;
 	
 	@Override	
 	public CobuDTO limpiarCobu() throws GenericException{
@@ -130,7 +146,7 @@ public class CobuServiceImpl implements CobuService{
 		
 	}
 	
-	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvCtasCobu(Path tempFile) throws GenericException, IOException, ParseException {
 		log.info("inicia ecel:: init");
 		List<QueryCtosAgrupadoDTO> contenido1 = new ArrayList<QueryCtosAgrupadoDTO>();
@@ -217,7 +233,7 @@ public class CobuServiceImpl implements CobuService{
 		
 	}
 	
-	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvCtasVirt(Path tempFile) throws GenericException, IOException, ParseException {
 		log.info("inicia ecel:: init");
 		List<CtasVirtualesDTO> contenido2 = new ArrayList<CtasVirtualesDTO>();
@@ -305,7 +321,7 @@ public class CobuServiceImpl implements CobuService{
 		}
 	}
 	
-	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvTxsCtas(Path tempFile) throws GenericException, IOException, ParseException {
 		log.info("inicia ecel:: init");
 		List<TxsCtasVirtDTO> contenido3 = new ArrayList<TxsCtasVirtDTO>();
@@ -397,7 +413,7 @@ public class CobuServiceImpl implements CobuService{
 		}
 	}
 	
-	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvTarEspCobu(Path tempFile) throws GenericException, IOException, ParseException {
 		log.info("inicia ecel:: init");
 		String responseMessage = "";
@@ -758,46 +774,59 @@ public class CobuServiceImpl implements CobuService{
 	}*/
 
 
-	/*@Override
-	public CobuDTO cifrasControl() throws GenericException {
-		try {
-			List<CifrasControl> consultaCifras = cifrasControl.getCifrasControl();
+	@Override
+	public ReportesCobuDTO cifrasControl() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException {
+			List<CifrasControlDTO> consultaCifras = consultasCobuRepository.cosultaCifras();
+			String encabezadoCifras[] = new String[] {"Consulta", "Cifra"};			
+			if (consultaCifras.isEmpty()) {
+	            throw new GenericException("No hay registros en Cifras Control",HttpStatus.NOT_FOUND.toString());
+	        }
 			
-			HSSFWorkbook cifras = new HSSFWorkbook();
-		
-			HSSFSheet sheet = cifras.createSheet();
-			cifras.setSheetName(0, "Resumen");
-			
-			HSSFRow filaCifras = sheet.createRow(0);
-			String encabezadoCifras[] = new String[] {"Consulta", "Cifra"};
-			
-			for(int i = 0; i < encabezadoCifras.length; i++) {
-				Cell celdaEncabezadoCifras = filaCifras.createCell(i);
-				celdaEncabezadoCifras.setCellValue(encabezadoCifras[i]);
-			}
-			
-			int numFilaCifras = 1;
-			for(CifrasControl listaCifras:consultaCifras) {
-				filaCifras = sheet.createRow(numFilaCifras);
-				
-				filaCifras.createCell(0).setCellValue(listaCifras.getConsulta());
-				filaCifras.createCell(1).setCellValue(listaCifras.getCifra());
-				
-				numFilaCifras++;
-			}
-			
-			//////////////
-			//aqui me quede
-			//////////////
-			
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error al generar cifras control", HttpStatus.BAD_REQUEST.toString());
-		}
-		log.info("reporte ::  init");
-		CobuDTO response = new CobuDTO();
-        response.setProcesoCompletado("Proceso Completo");
-        return response;
-	}*/
+			List<List<String>> filas = new ArrayList<>();
+			consultaCifras.forEach(ld -> {
+		            List<String> celdas = new ArrayList<String>();
+		            celdas.add(ld.getConsulta().toString());
+		            celdas.add(String.valueOf(ld.getCifra()));
+		            filas.add(celdas);          
+			});
+			 Path testFile = Files.createTempFile("CifrasControl", ".xlsx");
+		        //testFile.toFile().deleteOnExit();
+		        try(XSSFWorkbook workbook = new XSSFWorkbook()) {
+		            XSSFSheet sheet = workbook.createSheet("Resumen");
+		            int colHeader = 0;
+		            Row rowheader = sheet.createRow(colHeader++);
+		            int colCell = 0;
+		            for (String field : encabezadoCifras) {
+		                Cell cell = rowheader.createCell(colCell++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            int rowNum = 1;
+		            for (List<String> key : filas) {
+		                Row row = sheet.createRow(rowNum++);
+		                int colNum = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNum++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }
+		            }
+		            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		            workbook.write(bos);
+		            bos.close();
+		            Files.write(testFile, bos.toByteArray());
+		        }
+		        Path cifrasZip = FormatUtils.convertZip(testFile);
+		        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(cifrasZip.toFile()));
+
+		        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+		        ReportesCobuDTO response = new ReportesCobuDTO();
+		        response.setFile(ecoder);
+		        return response;
+	
+	}
 
 
 	

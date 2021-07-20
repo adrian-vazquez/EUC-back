@@ -35,32 +35,36 @@ public class ProcesoCobuRepository{
 		public int insertaQueryCtosDuplicado() {
 	    	int contador = 1;
 	    	String query = "INSERT INTO PPC_PCB_QUERY_CTOS_DUPLICADOS(CUENTA, CTA_CUENTA,ID) "
-	    			+ "(SELECT CUENTA, Count(CUENTA) AS CTA_CUENTA, ID "
+	    			+ "(SELECT CUENTA, COUNT(CUENTA) AS CTA_CUENTA, '1' AS ID "
 	    			+ "FROM PPC_PCB_QUERY_CTOS_AGRUPADO "
-	    			+ "GROUP BY CUENTA,ID "
-	    			+ "HAVING (((Count(PPC_PCB_QUERY_CTOS_AGRUPADO.CUENTA))>1)))";
+	    			+ "GROUP BY CUENTA, '1' "
+	    			+ "HAVING Count(CUENTA)>1)";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int actualizaQueryCtosDuplicados() {
 	    	int contador = 2;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "UPDATE PPC_PCB_QUERY_CTOS_AGRUPADO SET DUPLICADO = 'SI' "
+	    			+ "WHERE PPC_PCB_QUERY_CTOS_AGRUPADO.CUENTA IN (SELECT DISTINCT(CUENTA) FROM PPC_PCB_QUERY_CTOS_DUPLICADOS)";
+	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int insertaCtosUnicos() {
 	    	int contador = 3;
-	    	String query = "INSERT INTO PPC_PCB_CTOS_UNICOS( NUM_CUENTA, SUC, CTA,USO, MON, FRANQUICIA, ID) SELECT CUENTA, PREFMDA, CUENTAMDA, USO, MON, FRANQUICIA,ID FROM PPC_PCB_QUERY_CTOS_AGRUPADO";
+	    	String query = "INSERT INTO PPC_PCB_CTOS_UNICOS( NUM_CUENTA, SUC, CTA,USO, MON, FRANQUICIA, ID) "
+	    			+ "SELECT CUENTA, PREFMDA, CUENTAMDA, USO, MON, FRANQUICIA,ID "
+	    			+ "FROM PPC_PCB_QUERY_CTOS_AGRUPADO";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int actualizaCtasVirtalesMesyAnio() {
 	    	int contador = 4;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "UPDATE  PPC_PCB_CTAS_VIRTUALES SET MES = extract(month from FEC_ALTA), "
+	    			+ "ANIO = extract(year from FEC_ALTA)";
+	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	   
@@ -68,7 +72,7 @@ public class ProcesoCobuRepository{
 	    	int contador = 5;
 	    	String query = "INSERT INTO PPC_PCB_CTAS_VIRTUALES_GPOS(NUM_CLIENTE, NUM_CUENTA, NOMBRE, CTAS_V, TXNS_BE, TXNS_VENT, "
 	    			+ "TARIFA_BE,TARIFA_VENT,TARIFA_MENS, COM_BE,COM_VENT,COM_MENS, USO_11,COM_TOTAL, SUC, CUENTA, FRANQUICIA, MONEDA, IVA, ID) "
-	    			+ "SELECT NUM_CLIENTE, NUM_CUENTA, NOMBRE, SUM(PPC_PCB_CTAS_VIRTUALES.CUENTAS_X) AS CTAS_V, 0 AS TXNS_BE, 0 AS TXNS_VENT, "
+	    			+ "SELECT NUM_CLIENTE, NUM_CUENTA, NOMBRE, SUM(CUENTAS_X) AS CTAS_V, 0 AS TXNS_BE, 0 AS TXNS_VENT, "
 	    			+ "0 AS TARIFA_BE,  0 AS TARIFA_VENT, 0 AS TARIFA_MENS, 0 AS COM_BE, 0 AS COM_VENT, 0 AS COM_MENS, NULL AS USO_11, "
 	    			+ "0 AS COM_TOTAL, 0 AS SUC, 0 AS CTA, 0 AS FRANQUICIA, 0 AS MONEDA, 0 AS IVA, ID "
 	    			+ "FROM PPC_PCB_CTAS_VIRTUALES "
@@ -86,17 +90,16 @@ public class ProcesoCobuRepository{
 	    			+ "when 519 then 'BE' "
 	    			+ "when 859 then 'BE' "
 	    			+ "else 'VENT' "
-	    			+ "end;";
+	    			+ "end";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int insertaTxnsXTipo() {
 	    	int contador = 7;
-	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
-	    			+ "SET PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_BE = Null, "
-	    			+ "PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_VENT = Null, "
-	    			+ "PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_MENS = Null;";
+	    	String query = "INSERT INTO PPC_PCB_TXNS_X_TIPO(NUM_CLIENTE, NUM_CUENTA,TIPO, CTA_NUM_AUT_TRANS, ID) "
+	    			+ "SELECT NUM_CLIENTE, NUM_CTA,TIPO, COUNT(NUM_AUT_TRANS) AS CTA_NUM_AUT_TRANS, ID "
+	    			+ "FROM PPC_PCB_TXS_CTAS_VIRT GROUP BY NUM_CLIENTE, NUM_CTA, TIPO, ID";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
@@ -104,7 +107,7 @@ public class ProcesoCobuRepository{
 	    public int actualizaCtasVirtualesGposTxnsBe() {
 	    	int contador = 8;
 	    	String query = "";
-	    	contador = procesos.update(query);
+	    	//contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
@@ -118,9 +121,10 @@ public class ProcesoCobuRepository{
 	    public int actualizaANull() {
 	    	int contador = 10;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
-	    			+ "SET PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_BE = Null, "
-	    			+ "PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_VENT = Null, "
-	    			+ "PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_MENS = Null";
+	    			+ "SET "
+	    			+ "TARIFA_BE = Null, "
+	    			+ "TARIFA_VENT = Null, "
+	    			+ "TARIFA_MENS = Null";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
@@ -135,10 +139,10 @@ public class ProcesoCobuRepository{
 	    public int actualizaAUnaTarifaPredefinida() {
 	    	int contador = 12;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
-	    			+ "SET PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_BE = 4, PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_VENT = 14, PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_MENS = 10 "
-	    			+ "WHERE (((PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_BE) is null) "
-	    			+ "AND ((PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_VENT) is null) "
-	    			+ "AND ((PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_MENS) is null))";
+	    			+ "SET TARIFA_BE = 4, TARIFA_VENT = 14, TARIFA_MENS = 10 "
+	    			+ "WHERE (((TARIFA_BE) is null) "
+	    			+ "AND ((TARIFA_VENT) is null) "
+	    			+ "AND ((TARIFA_MENS) is null))";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
@@ -146,9 +150,10 @@ public class ProcesoCobuRepository{
 	    public int actualizaCtasVirtualesGposBeVentMens(){
 	    	int contador = 13;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
-	    			+ "SET PPC_PCB_CTAS_VIRTUALES_GPOS.COM_BE = PPC_PCB_CTAS_VIRTUALES_GPOS.TXNS_BE*PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_BE, "
-	    			+ "PPC_PCB_CTAS_VIRTUALES_GPOS.COM_VENT = PPC_PCB_CTAS_VIRTUALES_GPOS.TXNS_VENT*PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_VENT, "
-	    			+ "PPC_PCB_CTAS_VIRTUALES_GPOS.COM_MENS = PPC_PCB_CTAS_VIRTUALES_GPOS.CTAS_V*PPC_PCB_CTAS_VIRTUALES_GPOS.TARIFA_MENS";
+	    			+ "SET "
+	    			+ "COM_BE = TXNS_BE * TARIFA_BE, "
+	    			+ "COM_VENT = TXNS_VENT * TARIFA_VENT, "
+	    			+ "COM_MENS = CTAS_V * TARIFA_MENS";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
@@ -180,30 +185,55 @@ public class ProcesoCobuRepository{
 	    
 	    public int actualizaCtasVirtualesGposIva() {
 	    	int contador = 17;
-	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS SET PPC_PCB_CTAS_VIRTUALES_GPOS.IVA = 16 "
-	    			+ "WHERE (((PPC_PCB_CTAS_VIRTUALES_GPOS.IVA)=0))";
+	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS SET IVA = 16 "
+	    			+ "WHERE (((IVA)=0))";
 	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int insertaEnLayoutBe() {
 	    	int contador = 18;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "INSERT INTO PPC_PCB_LAYOUT_BE(NUM_CLIENTE, NOMBRE, SUC, CTA, COM_BE, "
+	    			+ "MONTO_IVA, MONTO_TOTAL, ANIO,MES,PRODUCTO,IVA, MONEDA, USO_11, ID) "
+	    			+ "SELECT NUM_CLIENTE, NOMBRE, SUC, CUENTA, COM_BE, "
+	    			+ "COM_BE *(IVA/100) AS MONTO_IVA, "
+	    			+ "COM_BE *(IVA/100) + COM_BE AS MONTO_TOTAL, "
+	    			+ "extract(year from systimestamp) AS ANIO, "
+	    			+ "extract(month from (systimestamp)) AS MES, "
+	    			+ "'Cobranza Universal' AS PRODUCTO, IVA, MONEDA, USO_11,ID "
+	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
+	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int insertaEnLayoutVent() {
 	    	int contador = 19;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "INSERT INTO PPC_PCB_LAYOUT_VENT(NUM_CLIENTE,NOMBRE,SUC,CTA,COM_VENT, "
+	    			+ "MONTO_IVA,MONTO_TOTAL,ANIO,MES,PRODUCTO,IVA,MONEDA,USO_11,ID) "
+	    			+ "SELECT NUM_CLIENTE, NOMBRE,SUC, NUM_CUENTA,COM_VENT, "
+	    			+ "COM_VENT*(IVA/100) AS MONTO_IVA, "
+	    			+ "COM_VENT*(IVA/100) + COM_VENT AS MONTO_TOTAL, "
+	    			+ "extract(year from (systimestamp)) AS ANIO, "
+	    			+ "extract(month from (systimestamp)) AS MES, "
+	    			+ "'Cobranza Universal' AS PRODUCTO, IVA, MONEDA, USO_11,ID "
+	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
+	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
 	    public int insertaEnLayoutMens() {
 	    	int contador = 20;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "INSERT INTO PPC_PCB_LAYOUT_MENS(NUM_CLIENTE,NOMBRE,SUC,CTA, "
+	    			+ "COM_MENS,MONTO_IVA, MONTO_TOTAL,ANIO,MES,PRODUCTO,IVA,MONEDA,ID) "
+	    			+ "SELECT NUM_CLIENTE, NOMBRE, "
+	    			+ "SUC, CUENTA, COM_MENS, "
+	    			+ "COM_MENS*(IVA/100) AS MONTO_IVA, "
+	    			+ "COM_MENS*(IVA/100) + COM_MENS AS MONTO_TOTAL, "
+	    			+ "extract(year from systimestamp) AS ANIO, "
+	    			+ "extract(month from systimestamp) AS MES, "
+	    			+ "'Cobranza Universal' AS PRODUCTO, IVA, MONEDA, ID "
+	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
+	    	contador = procesos.update(query);
 	    	return contador;
 	    }
 	    
