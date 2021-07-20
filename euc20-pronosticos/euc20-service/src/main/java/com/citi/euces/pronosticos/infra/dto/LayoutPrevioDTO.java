@@ -10,7 +10,6 @@ public class LayoutPrevioDTO implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
-	@Temporal(TemporalType.TIMESTAMP)
 	private String fecCarga;
 	private String ctratoTelCta;
 	private String ctaOrigen;
