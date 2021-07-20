@@ -1,16 +1,13 @@
 package com.citi.euces.pronosticos.services;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,14 +25,10 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -48,10 +41,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
 import com.citi.euces.pronosticos.infra.dto.CtasVirtualesDTO;
+import com.citi.euces.pronosticos.infra.dto.CuentasVirtulesGposDTO;
+import com.citi.euces.pronosticos.infra.dto.LayoutBeDTO;
+import com.citi.euces.pronosticos.infra.dto.LayoutMensDTO;
+import com.citi.euces.pronosticos.infra.dto.LayoutVentDTO;
 import com.citi.euces.pronosticos.infra.dto.ProcesadoDTO;
 import com.citi.euces.pronosticos.infra.dto.QueryCtosAgrupadoDTO;
-import com.citi.euces.pronosticos.infra.dto.ReporteRebajaDTO;
 import com.citi.euces.pronosticos.infra.dto.ReportesCobuDTO;
+import com.citi.euces.pronosticos.infra.dto.TarifasDTO;
+import com.citi.euces.pronosticos.infra.dto.TxnsImporteDTO;
 import com.citi.euces.pronosticos.infra.dto.TxsCtasVirtDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
@@ -565,213 +563,287 @@ public class CobuServiceImpl implements CobuService{
 	/************************************************************************************************/
 	/************************************************************************************************/
 
-	/*@Override
-	public CobuDTO reporte() throws GenericException {
-		try {
-			List<LayoutBe>dt1 = layoutBe.getLayoutBe();
-			List<LayoutMens> dt2 = layoutMens.getLayoutmens();
-			List<LayoutVent> dt3 = layoutVent.getlayoutVent();
-			List<Tarifas> dt4 = tarifas.getTarifas();
-			List<CtasVirtualesGpos> dt5 = ctasVirtualesGpos.getCtasVirtualesGpos();
-			List<TxnsImporte> dt6 = txnsImporte.getTxnsImporte();
+	@Override
+	public ReportesCobuDTO reporte() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException {
+			List<LayoutBeDTO> consultaBe = consultasCobuRepository.cosultaLayoutBe();
+			List<LayoutMensDTO> consultaMens = consultasCobuRepository.cosultaLayoutMens();
+			List<LayoutVentDTO> consultaVent = consultasCobuRepository.cosultaLayoutVent();
+			List<TarifasDTO> consultaTarifas = consultasCobuRepository.cosultaTarifas();
+			List<CuentasVirtulesGposDTO> consultaCtasVirtGpos = consultasCobuRepository.cosultaCtasVirtualesGpos();
+			List<TxnsImporteDTO> consultaTxnsImporte = consultasCobuRepository.cosultaTxnsImporte();
+						
+			String encabezadoBe[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_BE", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA", "USO11"};
+			String encabezadoMens[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_MENS", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA"};
+			String encabezadoVent[] = new String[] {"NUM_CLIENTE", "TARIFA_BE", "TAFIRA_VENT", "TARIFA_MENS"};
+			String encabezadoTarifas[] = new String[] {"NUM_CLIENTE", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS"};
+			String encabezadoCtasVirtGpos[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "NOMBRE", "CTAS_V", "TXNS_BE", "TXNS_VENT", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS", "COM_BE", "COM_VENT", "COM_MENS", "USO11", "COM_TOTAL", "SUC", "CTA", "FRANQUICIA", "MONEDA", "IVA"};						
+			String encabezadoTxnsImporte[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "TIPO", "TXNS", "SumaDeIMP_TRANSACCION"};
 			
-			HSSFWorkbook reporteCobu = new HSSFWorkbook();
+			/*if (consultaBe.isEmpty() || consultaMens.isEmpty() || consultaVent.isEmpty() || consultaTarifas.isEmpty() || consultaCtasVirtGpos.isEmpty() || consultaTxnsImporte.isEmpty()) {
+	            throw new GenericException("No hay registros en las tablas solicitadas",HttpStatus.NOT_FOUND.toString());
+	        }*/
 			
-			HSSFSheet sheet1 = reporteCobu.createSheet();
-			reporteCobu.setSheetName(0, "layout_be");
+			List<List<String>> filaBe = new ArrayList<>();
+			consultaBe.forEach(ld -> {
+		            List<String> celdaBe = new ArrayList<String>();
+		            celdaBe.add(ld.getNumCliente().toString());
+		            celdaBe.add(ld.getNombre());
+		            celdaBe.add(String.valueOf(ld.getSuc()));
+		            celdaBe.add(ld.getCta().toString());
+		            celdaBe.add(ld.getComBe().toString());
+		            celdaBe.add(ld.getMontoIva().toString());
+		            celdaBe.add(String.valueOf(ld.getMontoTotal()));
+		            celdaBe.add(String.valueOf(ld.getAnio()));
+		            celdaBe.add(String.valueOf(ld.getMes()));
+		            celdaBe.add(ld.getProducto());
+		            celdaBe.add(ld.getIva().toString());
+		            celdaBe.add(ld.getMoneda().toString());
+		            celdaBe.add(ld.getUso11());		         
+		            filaBe.add(celdaBe);          
+			});
+			
+			List<List<String>> filaMens = new ArrayList<>();
+			consultaMens.forEach(ld -> {
+		            List<String> celdaMens = new ArrayList<String>();
+		            celdaMens.add(ld.getNumCliente().toString());
+		            celdaMens.add(ld.getNombre());
+		            celdaMens.add(String.valueOf(ld.getSuc()));
+		            celdaMens.add(ld.getCta().toString());
+		            celdaMens.add(ld.getComMens().toString());
+		            celdaMens.add(ld.getMontoIva().toString());
+		            celdaMens.add(ld.getMontoTotal().toString());
+		            celdaMens.add(String.valueOf(ld.getAnio()));
+		            celdaMens.add(String.valueOf(ld.getMes()));
+		            celdaMens.add(ld.getProducto());
+		            celdaMens.add(ld.getIva().toString());
+		            celdaMens.add(ld.getMoneda().toString());	         
+		            filaMens.add(celdaMens);          
+			});
+			
+			List<List<String>> filaVent = new ArrayList<>();
+			consultaVent.forEach(ld -> {
+		            List<String> celdaVent = new ArrayList<String>();
+		            celdaVent.add(ld.getNumCliente().toString());
+		            celdaVent.add(ld.getNombre());
+		            celdaVent.add(String.valueOf(ld.getSuc()));
+		            celdaVent.add(ld.getCta().toString());
+		            celdaVent.add(ld.getComVent().toString());
+		            celdaVent.add(ld.getMontoIva().toString());
+		            celdaVent.add(String.valueOf(ld.getMontoTotal()));
+		            celdaVent.add(String.valueOf(ld.getAnio()));
+		            celdaVent.add(String.valueOf(ld.getMes()));
+		            celdaVent.add(ld.getProducto());
+		            celdaVent.add(ld.getIva().toString());
+		            celdaVent.add(ld.getMoneda().toString());
+		            celdaVent.add(ld.getUso11());		         
+		            filaVent.add(celdaVent);          
+			});
+			
+			List<List<String>> filaTarifas = new ArrayList<>();
+			consultaTarifas.forEach(ld -> {
+		            List<String> celdaTarifas = new ArrayList<String>();
+		            celdaTarifas.add(ld.getNumCliente().toString());
+		            celdaTarifas.add(ld.getTarifaTxBe().toString());
+		            celdaTarifas.add(ld.getTarifaTxSuc().toString());
+		            celdaTarifas.add(ld.getTarifaMensual().toString());         
+		            filaTarifas.add(celdaTarifas);          
+			});
+						
+			List<List<String>> filaCtasVirtGpos = new ArrayList<>();
+			consultaCtasVirtGpos.forEach(ld -> {
+		            List<String> celdaCtasVirtGpos = new ArrayList<String>();
+		            celdaCtasVirtGpos.add(ld.getNumCliente().toString());
+		            celdaCtasVirtGpos.add(ld.getNumCuenta().toString());
+		            celdaCtasVirtGpos.add(ld.getNombre());
+		            celdaCtasVirtGpos.add(ld.getCtasV().toString());
+		            celdaCtasVirtGpos.add(ld.getTxnsBe().toString());
+		            celdaCtasVirtGpos.add(ld.getTxnsVent().toString());
+		            celdaCtasVirtGpos.add(ld.getTarifaBe().toString());
+		            celdaCtasVirtGpos.add(ld.getTarifaVent().toString());
+		            celdaCtasVirtGpos.add(ld.getTarifaMens().toString());
+		            celdaCtasVirtGpos.add(ld.getComBe().toString());
+		            celdaCtasVirtGpos.add(ld.getComVent().toString());
+		            celdaCtasVirtGpos.add(ld.getComMens().toString());
+		            celdaCtasVirtGpos.add(ld.getUso11());
+		            celdaCtasVirtGpos.add(ld.getComTotal().toString());
+		            celdaCtasVirtGpos.add(String.valueOf(ld.getSuc()));
+		            celdaCtasVirtGpos.add(ld.getCuenta().toString());
+		            celdaCtasVirtGpos.add(ld.getFranquicia().toString());
+		            celdaCtasVirtGpos.add(String.valueOf(ld.getMoneda()));
+		            celdaCtasVirtGpos.add(ld.getIva().toString());	          
+		            filaCtasVirtGpos.add(celdaCtasVirtGpos);          
+			});
+			
+			List<List<String>> filaTxnsImporte = new ArrayList<>();
+			consultaTxnsImporte.forEach(ld -> {
+		            List<String> celdaTxnsImporte = new ArrayList<String>();
+		            celdaTxnsImporte.add(ld.getNumCliente().toString());
+		            celdaTxnsImporte.add(ld.getNumCuenta().toString());
+		            celdaTxnsImporte.add(ld.getTipo());    
+		            celdaTxnsImporte.add(ld.getSumImpTrans().toString());  
+		            filaTxnsImporte.add(celdaTxnsImporte);          
+			});
+			
+			 Path testFile = Files.createTempFile("Reporte COBU", ".xlsx");
+			 try(XSSFWorkbook workbook = new XSSFWorkbook()) {
+		            XSSFSheet sheetBe = workbook.createSheet();
+		            workbook.setSheetName(0, "Layout_be");
+		            int colHeaderBe = 0;
+		            Row rowheaderBe = sheetBe.createRow(colHeaderBe++);
+		            int colCellBe = 0;
+		            for (String field : encabezadoBe) {
+		                Cell cell = rowheaderBe.createCell(colCellBe++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            
+		            int rowNumBe = 1;
+		            for (List<String> key : filaBe) {
+		                Row row = sheetBe.createRow(rowNumBe++);
+		                int colNum = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNum++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }  
+		            }
+		            
+		            XSSFSheet sheetMens = workbook.createSheet();
+		            workbook.setSheetName(1, "Layout_Mens");
+		            int colHeaderMens = 0;
+		            Row rowheaderMens = sheetMens.createRow(colHeaderMens++);
+		            int colCellMens = 0;
+		            for (String field : encabezadoMens) {
+		                Cell cell = rowheaderMens.createCell(colCellMens++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            
+		            int rowNumMens = 1;
+		            for (List<String> key : filaMens) {
+		                Row row = sheetMens.createRow(rowNumMens++);
+		                int colNumMens = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNumMens++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }  
+		            }
+		            
+		            XSSFSheet sheetVent = workbook.createSheet();
+		            workbook.setSheetName(2, "Layout_Vent");
+		            int colHeaderVent = 0;
+		            Row rowheaderVent = sheetVent.createRow(colHeaderVent++);
+		            int colCellVent = 0;
+		            for (String field : encabezadoVent) {
+		                Cell cell = rowheaderVent.createCell(colCellVent++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            
+		            int rowNumVent = 1;
+		            for (List<String> key : filaVent) {
+		                Row row = sheetVent.createRow(rowNumVent++);
+		                int colNumVent = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNumVent++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }  
+		            }
+		            
+		            XSSFSheet sheetTarifas = workbook.createSheet();
+		            workbook.setSheetName(3, "Tarifas");
+		            int colHeaderTarifas = 0;
+		            Row rowheaderTarifas = sheetTarifas.createRow(colHeaderTarifas++);
+		            int colCellTarifas = 0;
+		            for (String field : encabezadoTarifas) {
+		                Cell cell = rowheaderTarifas.createCell(colCellTarifas++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            
+		            int rowNumTarifas = 1;
+		            for (List<String> key : filaTarifas) {
+		                Row row = sheetTarifas.createRow(rowNumTarifas++);
+		                int colNumTarifas = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNumTarifas++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }  
+		            }
+		            
+		            XSSFSheet sheetCtasVirtGpos = workbook.createSheet();
+		            workbook.setSheetName(4, "Detalle TXS X CTA");
+		            int colHeaderCtasVirtGpos = 0;
+		            Row rowheaderCtasVirtGpos = sheetCtasVirtGpos.createRow(colHeaderCtasVirtGpos++);
+		            int colCellCtasVirtGpos = 0;
+		            for (String field : encabezadoCtasVirtGpos) {
+		                Cell cell = rowheaderCtasVirtGpos.createCell(colCellCtasVirtGpos++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            
+		            int rowNumCtasVirtGpos = 1;
+		            for (List<String> key : filaCtasVirtGpos) {
+		                Row row = sheetCtasVirtGpos.createRow(rowNumCtasVirtGpos++);
+		                int colNumCtasVirtGpos = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNumCtasVirtGpos++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }  
+		            }
+		            
+		            XSSFSheet sheetTxnsImporte = workbook.createSheet();
+		            workbook.setSheetName(5, "Txns_Con_Importe");
+		            int colHeaderTxnsImporte = 0;
+		            Row rowheaderTxnsImporte = sheetTxnsImporte.createRow(colHeaderTxnsImporte++);
+		            int colCellTxnsImporte = 0;
+		            for (String field : encabezadoTxnsImporte) {
+		                Cell cell = rowheaderTxnsImporte.createCell(colCellTxnsImporte++);
+		                if (field instanceof String) {
+		                    cell.setCellValue((String) field);
+		                }
+		            }
+		            
+		            int rowNumTxnsImporte = 1;
+		            for (List<String> key : filaTxnsImporte) {
+		                Row row = sheetTxnsImporte.createRow(rowNumTxnsImporte++);
+		                int colNumTxnsImporte = 0;
+		                for (String field : key) {
+		                    Cell cell = row.createCell(colNumTxnsImporte++);
+		                    if (field instanceof String) {
+		                        cell.setCellValue((String) field);
+		                    }
+		                }  
+		            }
+		            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		            workbook.write(bos);
+		            bos.close();
+		            Files.write(testFile, bos.toByteArray());
+			
+			 }
+			
+			 	Path reporteCobu = FormatUtils.convertZip(testFile);
+		        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(reporteCobu.toFile()));
 
-			HSSFRow filaDatos1 = sheet1.createRow(0);			
-			String encabezado1[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_BE", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA", "USO11"};
-			
-			for(int i = 0; i < encabezado1.length; i++) {
-				Cell celdaEncabezado1 = filaDatos1.createCell(i);
-				celdaEncabezado1.setCellValue(encabezado1[i]);
-			}
-			
-			int numFila = 1;			
-			for(LayoutBe lista1:dt1) {
-				filaDatos1 = sheet1.createRow(numFila);
-			
-				filaDatos1.createCell(0).setCellValue(lista1.getNumCliente());
-				filaDatos1.createCell(1).setCellValue(lista1.getNombre());
-				filaDatos1.createCell(2).setCellValue(lista1.getSuc());
-				filaDatos1.createCell(3).setCellValue(lista1.getCta());
-				filaDatos1.createCell(4).setCellValue(lista1.getComBe());
-				filaDatos1.createCell(5).setCellValue(lista1.getMontoIva());
-				filaDatos1.createCell(6).setCellValue(lista1.getMontoTotal());
-				filaDatos1.createCell(7).setCellValue(lista1.getAnio());
-				filaDatos1.createCell(8).setCellValue(lista1.getMes());
-				filaDatos1.createCell(9).setCellValue(lista1.getProducto());
-				filaDatos1.createCell(10).setCellValue(lista1.getIva());
-				filaDatos1.createCell(11).setCellValue(lista1.getMoneda());
-				filaDatos1.createCell(12).setCellValue(lista1.getUso11());
-				
-				numFila++;
-			}
-			
-			HSSFSheet sheet2 = reporteCobu.createSheet();
-			reporteCobu.setSheetName(1, "layout_mens");
-			
-			HSSFRow filaDatos2 = sheet2.createRow(0);
-			String encabezado2[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_MENS", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA"};
-			
-			for(int i = 0; i < encabezado2.length; i++) {
-				Cell celdaEncabezado2 = filaDatos2.createCell(i);
-				celdaEncabezado2.setCellValue(encabezado2[i]);
-			}
-			
-			numFila = 1;
-			for(LayoutMens lista2:dt2) {
-				filaDatos2 = sheet2.createRow(numFila);
-				
-				filaDatos2.createCell(0).setCellValue(lista2.getNumCliente());
-				filaDatos2.createCell(1).setCellValue(lista2.getNombre());
-				filaDatos2.createCell(2).setCellValue(lista2.getSuc());
-				filaDatos2.createCell(3).setCellValue(lista2.getCta());
-				filaDatos2.createCell(4).setCellValue(lista2.getComMens());
-				filaDatos2.createCell(5).setCellValue(lista2.getMontoIva());
-				filaDatos2.createCell(6).setCellValue(lista2.getMontoTotal());
-				filaDatos2.createCell(7).setCellValue(lista2.getAnio());
-				filaDatos2.createCell(8).setCellValue(lista2.getMes());
-				filaDatos2.createCell(9).setCellValue(lista2.getProducto());
-				filaDatos2.createCell(10).setCellValue(lista2.getIva());
-				filaDatos2.createCell(10).setCellValue(lista2.getMoneda());
-				
-				numFila++;
-			}
-			
-			HSSFSheet sheet3 = reporteCobu.createSheet();
-			reporteCobu.setSheetName(2, "layout_vent");
-			
-			HSSFRow filaDatos3 = sheet3.createRow(0);
-			String encabezado3[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_VENT", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA", "USO11"};
-			
-			for(int i = 0; i < encabezado3.length; i++) {
-				Cell celdaEncabezado3 = filaDatos3.createCell(i);
-				celdaEncabezado3.setCellValue(encabezado3[i]);
-			}
-			
-			numFila = 1;
-			for(LayoutVent lista3:dt3){
-				filaDatos3 = sheet3.createRow(numFila);
-				
-				filaDatos3.createCell(0).setCellValue(lista3.getNumCliente());
-				filaDatos3.createCell(1).setCellValue(lista3.getNombre());
-				filaDatos3.createCell(2).setCellValue(lista3.getSuc());
-				filaDatos3.createCell(3).setCellValue(lista3.getCta());
-				filaDatos3.createCell(4).setCellValue(lista3.getComVent());
-				filaDatos3.createCell(5).setCellValue(lista3.getMontoIva());
-				filaDatos3.createCell(6).setCellValue(lista3.getMontoTotal());
-				filaDatos3.createCell(7).setCellValue(lista3.getAnio());
-				filaDatos3.createCell(8).setCellValue(lista3.getMes());
-				filaDatos3.createCell(9).setCellValue(lista3.getProducto());
-				filaDatos3.createCell(10).setCellValue(lista3.getIva());
-				filaDatos3.createCell(11).setCellValue(lista3.getMoneda());
-				filaDatos3.createCell(12).setCellValue(lista3.getUso11());
-				
-				numFila++;
-			}
-			
-			HSSFSheet sheet4 = reporteCobu.createSheet();
-			reporteCobu.setSheetName(3, "Tarifas");
-			
-			HSSFRow filaDatos4 = sheet4.createRow(0);
-			String encabezado4[] = new String[] {"NUM_CLIENTE", "TARIFA_BE", "TAFIRA_VENT", "TARIFA_MENS"};
-			
-			for(int i = 0; i < encabezado4.length; i++) {
-				Cell celdaEncabezado4 = filaDatos4.createCell(i);
-				celdaEncabezado4.setCellValue(encabezado4[i]);
-			}
-			
-			numFila = 1;
-			for(Tarifas lista4:dt4) {
-				filaDatos4 = sheet4.createRow(numFila);
-				
-				filaDatos4.createCell(0).setCellValue(lista4.getNumCliente());
-				filaDatos4.createCell(1).setCellValue(lista4.getTarifaTxBe());				
-				filaDatos4.createCell(2).setCellValue(lista4.getTarifaTxSuc());				
-				filaDatos4.createCell(3).setCellValue(lista4.getTarifaMensual());
-				
-				numFila++;
-			}
-			
-			HSSFSheet sheet5 = reporteCobu.createSheet();
-			reporteCobu.setSheetName(4, "Detalle_TXS_X_CTA");
-			
-			HSSFRow filaDatos5 = sheet5.createRow(0);
-			String encabezado5[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "NOMBRE", "CTAS_V", "TXNS_BE", "TXNS_VENT", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS", "COM_BE", "COM_VENT", "COM_MENS", "USO11", "COM_TOTAL", "SUC", "CTA", "FRANQUICIA", "MONEDA", "IVA"};			
-			
-			for(int i = 0; i < encabezado5.length; i++) {
-				Cell celdaEncabezado5 = filaDatos5.createCell(i);
-				celdaEncabezado5.setCellValue(encabezado5[i]);
-			}
-			
-			numFila = 1;
-			for(CtasVirtualesGpos lista5:dt5) {
-				filaDatos5 = sheet5.createRow(numFila);
-				
-				filaDatos5.createCell(0).setCellValue(lista5.getNumCliente());
-				filaDatos5.createCell(1).setCellValue(lista5.getNumCuenta());
-				filaDatos5.createCell(2).setCellValue(lista5.getNombre());
-				filaDatos5.createCell(3).setCellValue(lista5.getCtasV());
-				filaDatos5.createCell(4).setCellValue(lista5.getTxnsBe());
-				filaDatos5.createCell(5).setCellValue(lista5.getTxnsVent());
-				filaDatos5.createCell(6).setCellValue(lista5.getTarifaBe());
-				filaDatos5.createCell(7).setCellValue(lista5.getTarifaVent());
-				filaDatos5.createCell(8).setCellValue(lista5.getTarifaMens());
-				filaDatos5.createCell(9).setCellValue(lista5.getComBe());
-				filaDatos5.createCell(10).setCellValue(lista5.getComVent());
-				filaDatos5.createCell(11).setCellValue(lista5.getComMens());
-				filaDatos5.createCell(12).setCellValue(lista5.getUso11());
-				filaDatos5.createCell(13).setCellValue(lista5.getComTotal());
-				filaDatos5.createCell(14).setCellValue(lista5.getSuc());
-				filaDatos5.createCell(15).setCellValue(lista5.getCuenta());
-				filaDatos5.createCell(16).setCellValue(lista5.getFranquicia());
-				filaDatos5.createCell(17).setCellValue(lista5.getMoneda());
-				filaDatos5.createCell(18).setCellValue(lista5.getIva());
-				
-				numFila++;
-			}
-			
-			HSSFSheet sheet6 = reporteCobu.createSheet();
-			reporteCobu.setSheetName(5, "Txns_Con_Importe");
-			
-			HSSFRow filaDatos6 = sheet6.createRow(0);
-			String encabezado6[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "TIPO", "TXNS", "SumaDeIMP_TRANSACCION"};
-			
-			for(int i = 0; i < encabezado6.length; i++) {
-				Cell celdaEncabezado6 = filaDatos6.createCell(i);
-				celdaEncabezado6.setCellValue(encabezado6[i]);
-			}
-			
-			numFila = 1;
-			for(TxnsImporte lista6:dt6) {
-				filaDatos6 = sheet6.createRow(numFila);
-				
-				filaDatos6.createCell(0).setCellValue(lista6.getNumCliente());
-				filaDatos6.createCell(2).setCellValue(lista6.getNumCuenta());
-				filaDatos6.createCell(3).setCellValue(lista6.getTipo());
-				filaDatos6.createCell(4).setCellValue(lista6.getTxns());
-				filaDatos6.createCell(5).setCellValue(lista6.getSumImpTrans());
-				
-				numFila++;
-			}
-			
-			
-			
-			/////////////////////////////////
-			////////aqui me quede
-			////////////////////////////////
-			
-		}catch(EntityNotFoundException ex) {
-			throw new GenericException("Error al generar reporte", HttpStatus.BAD_REQUEST.toString());
-		}
-		
-		log.info("reporte ::  init");
-		CobuDTO response = new CobuDTO();
-        response.setProcesoCompletado("Proceso Completo");
-        return response;
-	}*/
+		        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+		        ReportesCobuDTO response = new ReportesCobuDTO();
+		        response.setFile(ecoder);
+		        return response;		
+	}
 
 
 	@Override
@@ -789,8 +861,7 @@ public class CobuServiceImpl implements CobuService{
 		            celdas.add(String.valueOf(ld.getCifra()));
 		            filas.add(celdas);          
 			});
-			 Path testFile = Files.createTempFile("CifrasControl", ".xlsx");
-		        //testFile.toFile().deleteOnExit();
+			 Path testFile = Files.createTempFile("CifrasCOBU", ".xlsx");
 		        try(XSSFWorkbook workbook = new XSSFWorkbook()) {
 		            XSSFSheet sheet = workbook.createSheet("Resumen");
 		            int colHeader = 0;
