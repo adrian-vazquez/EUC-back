@@ -47,6 +47,11 @@ public class ConstantUtils {
     final public static String NO_CLIENTES = "No_Clientes";
     final public static String CUENTA_CONTABLE = "Cuenta contable";
 
+    //AppSettings
+    final public static String EMISOR_PRONOSTICOS = "120983";
+    final public static String REF_EMISOR_PERFIL = "1501";
+    final public static String CTA_ABONO_PERFIL = "70010406771";
+
     //LayoutPrevio
     final public static String ENCABEZADO_LAYOUT_PREVIO ="Fec_Carga"+"\t"+"Ctrato_Tel_Cta"+"\t"+"Cta_Origen"+"\t"
     		+"Cantidad"+"\t"+"Emisor"+"\t"+"Dias"+"\t"+"Cta_Abono"+"\t"+"Concepto"+"\t"+"Ref_Emisor"+"\t"+"Leyenda"+"\n";
