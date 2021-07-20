@@ -2,6 +2,7 @@ package com.citi.euces.pronosticos.restcontrollers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
+import com.citi.euces.pronosticos.models.ImpReporteCobroRequest;
 import com.citi.euces.pronosticos.models.MensajeResponse;
-import com.citi.euces.pronosticos.models.TasaCeroRequest;
+import com.citi.euces.pronosticos.services.api.PerfilesService;
 
 @RestController
 @RequestMapping(path= PerfilesController.ORDERS_RESOURCE,
@@ -24,20 +26,19 @@ public class PerfilesController {
 
 	static final String ORDERS_RESOURCE = "/Perfiles";
 	
+	@Autowired
+	private PerfilesService perfilesService;
+	
 	@PostMapping("/ImpReporteCobro")
-	public ResponseEntity<?> TasaCero(@RequestBody TasaCeroRequest request){
+	public ResponseEntity<?> ImpReporteCobro(@RequestBody final ImpReporteCobroRequest request){
 		try {
-			if(request.getFile().isEmpty()) {
-				throw new GenericException("El archivo que intenta subir no es .ZIP.",
-						HttpStatus.BAD_REQUEST.toString());
-			}else if (request.getFecha().isEmpty()) {
-				throw new GenericException("Favor de verificar la fecha de movimiento",
+			if (request.getFechaCobro().isEmpty()) {
+				throw new GenericException("Fecha de Busqueda incorrecta, Favor de verificar la fecha de cobro.",
 						HttpStatus.BAD_REQUEST.toString());
 			}
-			//MensajeResponse response = new MensajeResponse(
-            //	mapfreService.GenerarTasaCero(request.getFile(), request.getFecha()),
-            //   HttpStatus.OK.toString());
-            return null /*new ResponseEntity<MensajeResponse>(response, HttpStatus.OK)*/;
+			MensajeResponse response = new MensajeResponse(
+            	perfilesService.ImpReporteCobro(request.getFechaCobro()),HttpStatus.OK.toString());
+            return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
             
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();

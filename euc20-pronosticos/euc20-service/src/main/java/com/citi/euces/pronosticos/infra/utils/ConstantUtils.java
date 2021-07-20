@@ -46,6 +46,29 @@ public class ConstantUtils {
     final public static String OPEN_ITEM = "OPEN_ITEM";
     final public static String NO_CLIENTES = "No_Clientes";
     final public static String CUENTA_CONTABLE = "Cuenta contable";
+    
+    //Title Reporte Cobros
+    final public static String NUMCLIENTE = "numcliente";
+    final public static String CUENTA_EJE ="CUENTA_EJE";
+    final public static String NUM_CTA_RESP ="Num_Cta_Resp";
+    final public static String ESTATUS_CUENTA_COBRO ="ESTATUS_CUENTA_COBRO";
+    final public static String M_TOTAL = "M_total";
+    final public static String IVA1 = "iva";
+    final public static String COMISION_SIN_IVA1 = "Comision_Sin_IVA";
+    final public static String CAUSA_DEL_RECHAZO ="Causa_del_Rechazo";
+    final public static String ANIO1 ="Anio";
+    final public static String CSI1 ="csi";
+    final public static String CONCEPTO ="Concepto";
+    final public static String COMP ="COMP";
+    final public static String NOPROTECCION ="NoProteccion";
+    final public static String FECHA_COBRO ="fecha_cobro";
+    final public static String FECHA_CONTABLE ="Fecha_Contable";
+    final public static String NUM_CONTRATO ="Num_Contrato";
+
+    //AppSettings
+    final public static String EMISOR_PRONOSTICOS = "120983";
+    final public static String REF_EMISOR_PERFIL = "1501";
+    final public static String CTA_ABONO_PERFIL = "70010406771";
 
     //LayoutPrevio
     final public static String ENCABEZADO_LAYOUT_PREVIO ="Fec_Carga"+"\t"+"Ctrato_Tel_Cta"+"\t"+"Cta_Origen"+"\t"
@@ -66,6 +89,11 @@ public class ConstantUtils {
     //ReporteMora encabezado EXCEL
     final public static String[] TITLE_REP_MORA_EXCEL = {NO_CLIENTES,CUENTA.toUpperCase(),MES.toUpperCase(),ANIO.toUpperCase(),SERVICIO.toUpperCase(),
             COMISION_SIN_IVA.toUpperCase(),IVAA.toUpperCase(),TOTAL.toUpperCase(), LLAVE.toUpperCase(), FRANQUICIA, CUENTA_CONTABLE,OPEN_ITEM.toLowerCase()};
+    
+    //Reporte Cobros - Perfiles EXCEL
+    final public static String[] TITLE_REP_COBROS_EXCEL = {NUMCLIENTE,BLANCO,CUENTA_EJE,NUM_CTA_RESP,ESTATUS_CUENTA_COBRO,M_TOTAL,IVA1,CAUSA_DEL_RECHAZO,
+    		MES,ANIO1,SERVICIO,CSI1,CONCEPTO,COMISION_SIN_IVA1,IVAA,TOTAL,COMP,LLAVE,NOPROTECCION,FRANQUICIA,CATALOGADA,FECHA_COBRO,FECHA_CONTABLE,
+    		CUENTA_PRODUCTO,NUM_CONTRATO};
 
 
 }

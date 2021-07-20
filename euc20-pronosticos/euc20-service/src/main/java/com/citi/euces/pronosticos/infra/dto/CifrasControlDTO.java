@@ -6,9 +6,20 @@ public class CifrasControlDTO implements Serializable{
 
 	private String consulta;
 	private int cifra;
-	private String proceso = "COBU";
+	private String proceso;
 	private Integer id;
 	
+	
+	
+	public CifrasControlDTO(String consulta, int cifra) {
+		super();
+		this.consulta = consulta;
+		this.cifra = cifra;
+	}
+	
+	public CifrasControlDTO() {
+	}
+
 	public String getConsulta() {
 		return consulta;
 	}

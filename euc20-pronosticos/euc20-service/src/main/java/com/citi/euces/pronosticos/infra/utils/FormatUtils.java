@@ -2,6 +2,8 @@ package com.citi.euces.pronosticos.infra.utils;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -55,11 +58,18 @@ public class FormatUtils {
         return formatFecha;
     }
     
+    public static String formatFecCompActual() {
+    	String pattern = "dd_MM_yyyy HH_mm_ss aaa";
+    	Date fecha = new Date();
+    	SimpleDateFormat format = new SimpleDateFormat(pattern);
+    	return format.format(fecha); 
+    }
+    
     public static String formatFecActual () {
     	String pattern = "dd/MM/yyyy";
     	Date fecha = new Date();
-    	SimpleDateFormat anio = new SimpleDateFormat(pattern);
-    	return anio.format(fecha);
+    	SimpleDateFormat format = new SimpleDateFormat(pattern);
+    	return format.format(fecha);
     }
 
     public static String formatMes(Date fecha) {
@@ -226,5 +236,44 @@ public class FormatUtils {
         return testFile;
     }
 
+    
+    public static Path createExcelRepoCobro(List<String> titulos, List<List<String>> renglones, String nameFile ) throws IOException {
+        Path testFile = Files.createTempFile(nameFile, ".xls");
+        testFile.toFile().deleteOnExit();
+        try(XSSFWorkbook workbook = new XSSFWorkbook()) {
+        	//Negrita el titulo
+        	CellStyle style = workbook.createCellStyle();
+        	Font font = workbook.createFont();
+        	font.setBold(true);
+        	style.setFont(font);
+        	
+            XSSFSheet sheet = workbook.createSheet(nameFile);
+            int colHeader = 0;
+            Row rowheader = sheet.createRow(colHeader++);
+            int colCell = 0;
+            for (String field : titulos) {
+                Cell cell = rowheader.createCell(colCell++);
+                if (field instanceof String) {
+                    cell.setCellValue((String) field);
+                }
+            }
+            int rowNum = 1;
+            for (List<String> key : renglones) {
+                Row row = sheet.createRow(rowNum++);
+                int colNum = 0;
+                for (String field : key) {
+                    Cell cell = row.createCell(colNum++);
+                    if (field instanceof String) {
+                        cell.setCellValue((String) field);
+                    }
+                }
+            }
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            workbook.write(bos);
+            bos.close();
+            Files.write(testFile, bos.toByteArray());
+        }
+        return testFile;
+    }
 
 }
