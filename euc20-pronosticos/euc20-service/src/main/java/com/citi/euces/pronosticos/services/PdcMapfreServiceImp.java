@@ -192,9 +192,9 @@ public class PdcMapfreServiceImp implements PdcMapfreService{
 	
 	private String createFileTasaCero(List<ReporteTasaCeroDTO> TasaCeroLayout, String fecha) throws IOException, ParseException {
 		//Genera Archivo TXT
-		 Path fileCrearLayout = Files.createTempFile("TasaCero", ".txt");
-		 fileCrearLayout.toFile().deleteOnExit();
-		 FileOutputStream test = new FileOutputStream(fileCrearLayout.toFile());
+		 Path fileCrearfile = Files.createTempFile("TasaCero", ".txt");
+		 fileCrearfile.toFile().deleteOnExit();
+		 FileOutputStream test = new FileOutputStream(fileCrearfile.toFile());
 		 String content = "";
 		 
    		 // Crear fecha del dia que se hizo la creacion de el layout
@@ -238,8 +238,8 @@ public class PdcMapfreServiceImp implements PdcMapfreService{
 			test.write(content.getBytes(StandardCharsets.UTF_8));
 		 }
 		 
-		 Path fileCrearLayoutZIP = FormatUtils.convertLayoutZip(fileCrearLayout);
-		 String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileCrearLayoutZIP.toFile()));
+		 Path fileCrearTasaCeroZIP = FormatUtils.convertZip(fileCrearfile);
+		 String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileCrearTasaCeroZIP.toFile()));
 		 log.info("File Encoder LayoutPrevio.zip :: "+ ecoder);
 		 return ecoder;
     }	

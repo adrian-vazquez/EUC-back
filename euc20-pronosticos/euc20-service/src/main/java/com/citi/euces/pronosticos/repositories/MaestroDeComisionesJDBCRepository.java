@@ -29,9 +29,7 @@ public class MaestroDeComisionesJDBCRepository {
                 "and (mes = ? and anio = ? or mes = ? and anio = ? or mes = ? and anio = ? or mes = ? and anio = ? or mes = ? and anio = ? or mes = ? and anio = ?) "+
                 "and no_cliente = ? "+
                 "and id_estatus_comision = 3 order by anio, mes";
-        //|| ' | tipo: ' || cs.SERV_OPERACIONES
         System.out.println("QUERY_SQL_Clientes :: ejecute:: " + sql);
-
         return jdbcTemplate.query(
                 sql, new Object[]{mes1, anio1, mes2, anio2, mes3, anio3, mes4, anio4, mes5, anio5, mes6, anio6, cliente},
                 (rs, rowNum) ->
