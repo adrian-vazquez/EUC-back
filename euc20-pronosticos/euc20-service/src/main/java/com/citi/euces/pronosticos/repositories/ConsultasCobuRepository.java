@@ -1,5 +1,6 @@
 package com.citi.euces.pronosticos.repositories;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,6 +23,36 @@ public class ConsultasCobuRepository {
     public ConsultasCobuRepository(JdbcTemplate consultas) {
     	this.consultas = consultas;
 	}
+    
+    public int countLayoutBe() throws SQLException{  
+		String query = "SELECT COUNT(1) FROM ( "
+				+ "SELECT tp.CTA, COUNT(1) "
+				+ "FROM PPC_PCB_LAYOUT_BE tp "
+				+ "GROUP BY tp.CTA "
+				+ "HAVING COUNT(1) > 1)";
+		int count= consultas.queryForObject(query, Integer.class);
+    	return count;		
+    } 
+    public int countLayouMens() throws SQLException{  
+		String query = "SELECT COUNT(1) FROM ( "
+				+ "SELECT tp.CTA, COUNT(1) "
+				+ "FROM PPC_PCB_LAYOUT_MENS tp "
+				+ "GROUP BY tp.CTA "
+				+ "HAVING COUNT(1) > 1)";
+		int count= consultas.queryForObject(query, Integer.class);
+    	return count;	
+    } 
+    public int countLayoutVent() throws SQLException{  
+		String query = "SELECT COUNT(1) FROM ( "
+				+ "SELECT tp.CTA, COUNT(1) "
+				+ "FROM PPC_PCB_LAYOUT_VENT tp "
+				+ "GROUP BY tp.CTA "
+				+ "HAVING COUNT(1) > 1)";
+		int count= consultas.queryForObject(query, Integer.class);
+    	return count;		
+    } 
+    
+    //*****************************************************************//
     
     @Transactional
 	public List<LayoutBeDTO>cosultaLayoutBe(){

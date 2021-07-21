@@ -553,7 +553,7 @@ public class CobuServiceImpl implements CobuService{
 			 procesoCobuRepository.insertCifrasControl(lista, 500);
 		        } catch (Exception e) {
 		            throw new GenericException(
-		                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+		                    "Error al importar registros en Cifras Control" , HttpStatus.NOT_FOUND.toString());
 		        }
 			  
 		   responseMessage = "Proceso Completado";
@@ -565,6 +565,20 @@ public class CobuServiceImpl implements CobuService{
 
 	@Override
 	public ReportesCobuDTO reporte() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException {
+			
+		if (consultasCobuRepository.countLayoutBe() > 0){
+			throw new GenericException("Error existen duplicados en el Layout_Be. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+        }
+
+        if (consultasCobuRepository.countLayouMens() > 0){
+        	throw new GenericException("Error existen duplicados en el Layout_Mens. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+        }
+
+        if (consultasCobuRepository.countLayoutVent() > 0){
+        	throw new GenericException("Error existen duplicados en el Layout_Vent. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+        }
+		
+		
 			List<LayoutBeDTO> consultaBe = consultasCobuRepository.cosultaLayoutBe();
 			List<LayoutMensDTO> consultaMens = consultasCobuRepository.cosultaLayoutMens();
 			List<LayoutVentDTO> consultaVent = consultasCobuRepository.cosultaLayoutVent();
@@ -578,11 +592,7 @@ public class CobuServiceImpl implements CobuService{
 			String encabezadoTarifas[] = new String[] {"NUM_CLIENTE", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS"};
 			String encabezadoCtasVirtGpos[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "NOMBRE", "CTAS_V", "TXNS_BE", "TXNS_VENT", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS", "COM_BE", "COM_VENT", "COM_MENS", "USO11", "COM_TOTAL", "SUC", "CTA", "FRANQUICIA", "MONEDA", "IVA"};						
 			String encabezadoTxnsImporte[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "TIPO", "TXNS", "SumaDeIMP_TRANSACCION"};
-			
-			/*if (consultaBe.isEmpty() || consultaMens.isEmpty() || consultaVent.isEmpty() || consultaTarifas.isEmpty() || consultaCtasVirtGpos.isEmpty() || consultaTxnsImporte.isEmpty()) {
-	            throw new GenericException("No hay registros en las tablas solicitadas",HttpStatus.NOT_FOUND.toString());
-	        }*/
-			
+
 			List<List<String>> filaBe = new ArrayList<>();
 			consultaBe.forEach(ld -> {
 		            List<String> celdaBe = new ArrayList<String>();
@@ -835,14 +845,13 @@ public class CobuServiceImpl implements CobuService{
 		            Files.write(testFile, bos.toByteArray());
 			
 			 }
-			
-			 	Path reporteCobu = FormatUtils.convertZip(testFile);
-		        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(reporteCobu.toFile()));
+			 Path reporteCobu = FormatUtils.convertZip(testFile);
+		     String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(reporteCobu.toFile()));
 
-		        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
-		        ReportesCobuDTO response = new ReportesCobuDTO();
-		        response.setFile(ecoder);
-		        return response;		
+		     log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+		     ReportesCobuDTO response = new ReportesCobuDTO();
+		     response.setFile(ecoder);
+		     return response;		
 	}
 
 
