@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 //import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.citi.euces.pronosticos.infra.dto.BancaDTO;
 import com.citi.euces.pronosticos.infra.dto.NumProteccionDTO;
 import com.citi.euces.pronosticos.infra.dto.RechazosFileDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
