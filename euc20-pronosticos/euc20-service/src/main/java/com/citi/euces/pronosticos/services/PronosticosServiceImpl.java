@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import com.citi.euces.pronosticos.infra.dto.BancaDTO;
 import com.citi.euces.pronosticos.infra.dto.CatServiciosPronosticosDTO;
 import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
+import com.citi.euces.pronosticos.infra.dto.NumProteccionDTO;
 import com.citi.euces.pronosticos.infra.dto.RebajaFileOndemandDTO;
 import com.citi.euces.pronosticos.infra.dto.RechazosFileDTO;
 import com.citi.euces.pronosticos.infra.dto.RespuestasFileDTO;
@@ -66,7 +67,7 @@ public class PronosticosServiceImpl implements PronosticosService {
 	@Autowired
 	private RespPronosticosTmpJDBCRepository respPronosticosTmpJDBCRepository;
 	@Autowired
-	RebajaPronosticoJDBCRepository rebajaPronosticoJDBCRepository;
+	private RebajaPronosticoJDBCRepository rebajaPronosticoJDBCRepository;
 	
 	/**********************************************************************LIMPIAR PRONOSTICOS******************************************************************/
 	@Override
@@ -255,9 +256,10 @@ public class PronosticosServiceImpl implements PronosticosService {
 			MensajeDTO msg = new MensajeDTO();
 			
 			File folder = new File("../ArchivosPronosticos");
+			System.out.print("Ruta predeterminada: " + folder.getAbsolutePath());
 			File[] listOfFiles = folder.listFiles(); 
 			for(File archivos: listOfFiles) {
-				System.out.print("Archivos prueba:" + archivos.getAbsolutePath());
+				System.out.print("Archivos prueba:" + archivos.getName());
 				//archivos.delete();
 			}
 			
@@ -307,50 +309,61 @@ public class PronosticosServiceImpl implements PronosticosService {
 
 	public String leerArchivoRespuestas(Path tempFile) throws IOException, GenericException, ParseException 
 	{
-		String linea, n = null;
-		FileReader f = new FileReader(tempFile.toFile());
-        BufferedReader b = new BufferedReader(f);
-        List<RespuestasFileDTO> listaRespuesta = new ArrayList<RespuestasFileDTO>();
-        
-        while ((linea= b.readLine()) != null) {
-        	log.info(linea);
-        	
-        	RespuestasFileDTO data = new RespuestasFileDTO(); 
-        	data.setNoCliente(Integer.parseInt(linea.substring(39, 51)));
-        	data.setCtaCliente(obtenerCuenta(linea.substring(75, 95)));
-        	data.setContrato(linea.substring(421, 433));
-        	data.setImpOperacion1(Double.parseDouble(linea.substring(13, 28)));
-        	data.setImpOperacion2(Double.parseDouble(linea.substring(476, 491)));
-        	data.setCodOperacion(linea.substring(9, 11));
-        	data.setDescRechazo(linea.substring(381, 421));
-        	data.setLeyendaEmisor(linea.substring(237, 247));
-        	data.setFecOperacion(FormatUtils.stringToDate(linea.substring(28, 36)));
-        	data.setNumProteccion(linea.substring(288, 300));
-        	data.setSecuencial(Integer.parseInt(linea.substring(2, 9)));
-        	data.setFecReal(FormatUtils.stringToDate(linea.substring(9, 11).equals("05") ? linea.substring(420, 440) : ""));
-        	data.setFranquicia(obtenerBanca(Integer.parseInt(linea.substring(39, 51))));
-        	data.setFecVencimiento(FormatUtils.stringToDate(linea.substring(62, 70)));
-        	data.setSecArc(Integer.parseInt(linea.substring(319, 321)));
-        	data.setSecInt(Integer.parseInt(linea.substring(2, 9)));
-        	data.setNomFranquicia("");
-        	listaRespuesta.add(data);
+		try {
+			String linea;
+			FileReader f = new FileReader(tempFile.toFile());
+	        BufferedReader b = new BufferedReader(f);
+	        Date fecha = new Date();
+	        int n = 0;
+	        List<RespuestasFileDTO> listaRespuesta = new ArrayList<RespuestasFileDTO>();
+	        
+	        while ((linea= b.readLine()) != null) {
+	        	log.info(linea);
+	        	
+	        	if(linea.substring(0, 51).replace(" ", "").length() == 51) {
+	        		RespuestasFileDTO data = new RespuestasFileDTO(); 
+		        	data.setNoCliente(linea.substring(39, 51).replace(" ", "").equals("") ? 0 : Integer.parseInt(linea.substring(39, 51)));
+		        	data.setCtaCliente(linea.substring(75, 95).replace(" ", "").equals("") ? "00" : obtenerCuenta(linea.substring(75, 95)));
+		        	data.setContrato(linea.substring(421, 433));
+	        		data.setImpOperacion1(linea.substring(13, 28).replace(" ", "").equals("") ? 0.0 : Double.parseDouble(linea.substring(13, 28)));	
+	        		data.setImpOperacion2(linea.substring(476, 491).replace(" ", "").equals("") ? 0.0 : Double.parseDouble(linea.substring(476, 491)));	
+		        	data.setCodOperacion(linea.substring(9, 11));
+		        	data.setDescRechazo(linea.substring(381, 421));
+		        	data.setLeyendaEmisor(linea.substring(237, 247));
+		        	data.setFecOperacion(linea.substring(28, 36).replace(" ", "").equals("") ? fecha : FormatUtils.stringToDate(obtenerFecha(linea.substring(28, 36))));
+		        	data.setNumProteccion(linea.substring(288, 300));
+		        	data.setSecuencial(linea.substring(2, 9).replace(" ", "").equals("") ? 0 : Integer.parseInt(linea.substring(2, 9).replace(" ", "")));
+		        	//data.setFecReal(linea.substring(9, 11).equals("05") ? FormatUtils.stringToDate(linea.substring(420, 440)) : fecha);
+		        	data.setFecReal(fecha);
+		        	data.setFranquicia(linea.substring(39, 51).replace(" ", "").equals("") ? "" : obtenerBanca(Integer.parseInt(linea.substring(39, 51).replace(" ", ""))));
+		        	data.setFecVencimiento(linea.substring(62, 70).replace(" ", "").equals("") ? fecha : FormatUtils.stringToDate(obtenerFecha(linea.substring(62, 70))));
+		        	data.setSecArc(linea.substring(319, 321).replace(" ", "").equals("") ? 0 : Integer.parseInt(linea.substring(319, 321)));
+		        	data.setSecInt(linea.substring(2, 9).replace(" ", "").equals("") ? 0 : Integer.parseInt(linea.substring(2, 9)));
+		        	data.setNomFranquicia("");
+		        	listaRespuesta.add(data);
+		        	n++;
+	        	}
+	        }
+	        b.close();
+	        
+	        try {
+	        	respPronosticosTmpJDBCRepository.DLBorrarRespPronosticos();
+	        	respPronosticosTmpJDBCRepository.batchInsert(listaRespuesta, 500);
+	        	respPronosticosTmpJDBCRepository.callPronosticosRespuestaUPD();
+	        	respPronosticosTmpJDBCRepository.updateCobrosResp();
+	        } catch (Exception e) {
+	            throw new GenericException( "Ocurrió un problema durante el proceso de respuesta pronosticos :: " , HttpStatus.NOT_FOUND.toString());
+	        }
+	        
+			return "Se importaron existosamente: " + n + " respuestas.";	
+		} catch (Exception e) {
+			e.printStackTrace();
+            throw new GenericException( "Ocurrió un problema durante la extracción de datos de repsuesta al pronostico :: " , HttpStatus.NOT_FOUND.toString());
         }
-        b.close();
-        
-        try {
-        	respPronosticosTmpJDBCRepository.DLBorrarRespPronosticos();
-        	respPronosticosTmpJDBCRepository.batchInsert(listaRespuesta, 500);
-        	n = respPronosticosTmpJDBCRepository.updatePronosticosRespuesta();
-        	respPronosticosTmpJDBCRepository.updateCobrosResp();
-        } catch (Exception e) {
-            throw new GenericException( "Ocurrió un problema durante el proceso de respuesta pronosticos :: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-		return "Se importaron existosamente: " + n + "respuestas.";
 	}
 	
 	public String obtenerCuenta(String cuenta) {
-		String cta = cuenta.substring(9, 11);
+		String cta = cuenta.substring(9, 20);
 		String cta1 = cta.substring(0, 4);
 		String cta2 = cta.substring(4, 7);
 		return cta1 + "-" + cta2;
@@ -367,6 +380,19 @@ public class PronosticosServiceImpl implements PronosticosService {
 		}
 		return banca > 1 ? Integer.toString(banca) : "1";
 	}
+	
+	public String obtenerFecha(String fecha) throws GenericException {
+		try {
+			String dia, mes, anio;
+			anio = fecha.substring(0, 4);
+			mes = fecha.substring(4, 6);
+			dia = fecha.substring(6, 8);
+			return dia+"/"+mes+"/"+anio;
+		} catch (Exception e) {
+			e.printStackTrace();
+            throw new GenericException( "Ocurrió un problema durante la extracción de datos de repsuesta al pronostico :: " , HttpStatus.NOT_FOUND.toString());
+        }
+	}
 	/*************************************************************CARGA ARCHIVO REBAJA***************************************************************************/
 
 	@Override
@@ -374,84 +400,81 @@ public class PronosticosServiceImpl implements PronosticosService {
 		MensajeDTO msg = new MensajeDTO();
 		String message = null;
 		
-		log.info("cargaArhivoRebaja ::  init");
-        log.info("File :: " + file);
-        Path testFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasZIP"), "rebajaZip", ".zip");
-        testFile.toFile().deleteOnExit();
-        byte[] decoder = Base64.getDecoder().decode(file);
-        Files.write(testFile, decoder);
-        System.out.println(testFile.toFile().getAbsoluteFile());
-        System.out.println("ZIP File Saved");
-        
-        ZipFile zipFile = new ZipFile(testFile.toFile());
-        Enumeration<?> enu = zipFile.entries();
-        
-        try {
-        	while (enu.hasMoreElements()) {
-                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-
-                String name = zipEntry.getName();
-                long size = zipEntry.getSize();
-                long compressedSize = zipEntry.getCompressedSize();
-
-                System.out.printf("name: %-20s | size: %6d | compressed size: %6d\n", name, size, compressedSize);
-                InputStream is = zipFile.getInputStream(zipEntry);
-                Path tempFile = Files.createTempFile(Paths.get("/Documents/EUC20/Prueba/Archivos/PruebasTXT"), "rebajaTXT", ".txt");
-                tempFile.toFile().deleteOnExit();
-                try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
-                    IOUtils.copy(is, fos);
-                    message = leerArchivoRespuestas(tempFile);
-                }
-            }
-            zipFile.close();
-        } catch (IOException  e) {
-            e.printStackTrace();
-        }
+		 Path testFile = Files.createTempFile("rebajaPronosticoZip", ".zip");
+	        testFile.toFile().deleteOnExit();
+	        byte[] decoder = Base64.getDecoder().decode(file);
+	        Files.write(testFile, decoder);
+	        ZipFile zipFile = new ZipFile(testFile.toFile());
+	        Enumeration<?> enu = zipFile.entries();
+	        while (enu.hasMoreElements()) {
+	            ZipEntry zipEntry = (ZipEntry) enu.nextElement();
+	            String name = zipEntry.getName();
+	            if (name.endsWith("/") || name.startsWith("__MACOSX")) {
+	                continue;
+	            }
+	            InputStream is = zipFile.getInputStream(zipEntry);
+	            Path tempFile = Files.createTempFile("rebajaPronosticoTXT", ".txt");
+	            tempFile.toFile().deleteOnExit();
+	            try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
+	                IOUtils.copy(is, fos);
+	                message = leerArchivoRebaja(tempFile);
+	            }
+	        }
+	        zipFile.close();
 
         msg.setMensajeInfo("Aviso");
         msg.setMensajeConfirm(message);
         return msg;
 	}
 
-	public String leerArchivoRebaja(Path tempFile) throws IOException, GenericException, ParseException {
-		String linea;
-		FileReader f = new FileReader(tempFile.toFile());
-        BufferedReader b = new BufferedReader(f);
-        List<RebajaFileOndemandDTO> listaRebaja = new ArrayList<RebajaFileOndemandDTO>();
-        Double suma = null;
-        
-        while ((linea= b.readLine()) != null) {
-        	log.info(linea);
-        	RebajaFileOndemandDTO data = new RebajaFileOndemandDTO();
-        	if (linea.contains("120983/") || linea.contains("120984/")) {
-        		if(linea.substring(132, 3).equals("CGO")) {
-        			data.setNumProteccion(Long.parseLong(linea.substring(14, 26)));
-        			data.setImporte(Double.parseDouble(linea.substring(95, 108)));
-        			listaRebaja.add(data);
-        		}
-        	}
-		}
-        b.close();
-        log.info("RebajasFileDTO content init  ::  " + listaRebaja.size());
-        listaRebaja = listaRebaja.stream().distinct().collect(Collectors.toList());
-        Map<Long, List<RebajaFileOndemandDTO>> listaRebajaGroup = listaRebaja.stream().collect(Collectors.groupingBy(RebajaFileOndemandDTO -> RebajaFileOndemandDTO.getNumProteccion()));
-        
-        for(Map.Entry<Long, List<RebajaFileOndemandDTO>> valores: listaRebajaGroup.entrySet()) {
-        	for(RebajaFileOndemandDTO value: valores.getValue()) {
-        		suma += value.getImporte();
-        	}
+	public String leerArchivoRebaja(Path tempFile) throws IOException, GenericException, ParseException 
+	{
+		try {
+			List<RebajaFileOndemandDTO> listaRebaja = new ArrayList<RebajaFileOndemandDTO>();
+	        List<RebajaFileOndemandDTO> numProteccion = new ArrayList<RebajaFileOndemandDTO>();
+			FileReader f = new FileReader(tempFile.toFile());
+	        BufferedReader b = new BufferedReader(f);
+	        String linea, actualizados = "0";
+	        int total = 0;
+	        Double suma = 0.0;
+	        
+	        while ((linea= b.readLine()) != null) {
+	        	RebajaFileOndemandDTO data = new RebajaFileOndemandDTO();
+	        	if (linea.contains("120983/") || linea.contains("120984/")) {
+	        		if(linea.contains("CGO")) {
+	        			log.info("Cadena (120983/120984) CGO: " + linea);
+	        			data.setNumProteccion(Long.parseLong(linea.substring(14, 26)));
+	        			data.setImporte(Double.parseDouble(validaComas(linea.substring(95, 108))));
+	        			listaRebaja.add(data);
+	        		}
+	        	}
+			}
+	        b.close();
+	        
+	        listaRebaja = listaRebaja.stream().distinct().collect(Collectors.toList());
+	        Map<Long, List<RebajaFileOndemandDTO>> listaRebajaGroup = listaRebaja.stream().collect(Collectors.groupingBy(RebajaFileOndemandDTO -> RebajaFileOndemandDTO.getNumProteccion()));
+	        
+	        for(Map.Entry<Long, List<RebajaFileOndemandDTO>> valores: listaRebajaGroup.entrySet()) {
+	        	for(RebajaFileOndemandDTO value: valores.getValue()) {
+	        		suma += value.getImporte();
+	        		numProteccion.add(value);
+	        		total++;
+	        	}
+	        }
+	        
+	        try {
+	        	rebajaPronosticoJDBCRepository.truncateTable();
+	        	rebajaPronosticoJDBCRepository.batchInsert(numProteccion, 500);
+	        	actualizados = rebajaPronosticoJDBCRepository.updateRebajaPronosticosEv(); 
+	        } catch (Exception e) {
+	            throw new GenericException( "Error durante el guardado de rebaja pronósticos :: " , HttpStatus.NOT_FOUND.toString());
+	        }
+	        
+	        return "Elementos totales a cargar: " + total + " Se actualizaron: " + actualizados + " elementos, Abono total: " + suma;	
+		} catch (Exception e) {
+			e.printStackTrace();
+            throw new GenericException( "Ocurrió un problema durante el proceso de rebaja pronosticos :: " , HttpStatus.NOT_FOUND.toString());
         }
-        
-        try {
-        	rebajaPronosticoJDBCRepository.truncateTable();
-        	
-        } catch (Exception e) {
-            throw new GenericException( "Error al limpiar rebaja pronósticos:: " , HttpStatus.NOT_FOUND.toString());
-        }
-        
-        
-        
-        return "";
 	}
 
 	

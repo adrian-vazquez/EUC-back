@@ -16,6 +16,8 @@ import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 //import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
+import com.citi.euces.pronosticos.infra.dto.BancaDTO;
+import com.citi.euces.pronosticos.infra.dto.NumProteccionDTO;
 import com.citi.euces.pronosticos.infra.dto.RechazosFileDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
@@ -29,6 +31,23 @@ public class PronosticosTmpJDBCRepository {
 	
 	public PronosticosTmpJDBCRepository(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+	}
+	
+	@Transactional
+	public List<NumProteccionDTO> selectAllNumProteccion() throws GenericException
+	{
+		try {
+			String sql = "SELECT ID, NUM_PROTECCION FROM PPC_MIS_PRONOSTICOS_TMP WHERE 1 ORDER BY ID";
+	        return jdbcTemplate.query(sql, (cc, rowNum) ->
+	                new NumProteccionDTO(
+	                        cc.getLong("ID"),
+	                        cc.getString("NUM_PROTECCION")
+	                )
+	        );	
+		} catch (Exception e) {
+			e.printStackTrace();
+            throw new GenericException( "Error al obtener los numeros de proteccions de Pronosticos:: " , HttpStatus.NOT_FOUND.toString());
+        }
 	}
 	
 	@Transactional
