@@ -28,7 +28,6 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 public class RespPronosticosTmpJDBCRepository {
 
 	private final JdbcTemplate jdbcTemplate;
-	private SimpleJdbcCall simpleJdbcCallRefCursor;
 	static final Logger log = LoggerFactory.getLogger(RespPronosticosTmpJDBCRepository.class);
 	
 	public RespPronosticosTmpJDBCRepository(JdbcTemplate jdbcTemplate) {
@@ -43,7 +42,7 @@ public class RespPronosticosTmpJDBCRepository {
     public int[][] batchInsert(List<RespuestasFileDTO> books, int batchSize) throws GenericException {
 		try {
 			int[][] updateCounts = jdbcTemplate.batchUpdate(
-	                "INSERT INTO PPC_MIS_RESP_PRONOSTICOS_TMP( NO_CLIENTE, CTA_CLIENTE, CONTRATO, IMP_OPERACION_1, IMP_OPERACION_2, COD_OPERACION, DESC_RECHAZO, LEYENDA_EMISOR, FEC_OPERACION, "
+	                "INSERT INTO PPC_MIS_RESP_PRONOSTICOS_TMP(NO_CLIENTE, CTA_CLIENTE, CONTRATO, IMP_OPERACION_1, IMP_OPERACION_2, COD_OPERACION, DESC_RECHAZO, LEYENDA_EMISOR, FEC_OPERACION, "
 	                + "NUM_PROTECCION, SECUENCIAL, FEC_REAL, FRANQUICIA, FEC_VENCIMIENTO, SEC_ARC, SEC_INT, NOM_FRANQUICIA) "
 	                + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 	                books,
@@ -76,20 +75,12 @@ public class RespPronosticosTmpJDBCRepository {
         }
 	}
 	
-	@Transactional
-    public String updatePronosticosRespuesta() throws GenericException{
+    @Transactional
+    public void callPronosticosRespuestaUPD() throws GenericException{
 		try {
-			jdbcTemplate.setResultsMapCaseInsensitive(true);
-	        simpleJdbcCallRefCursor = new SimpleJdbcCall(jdbcTemplate)
-	                .withProcedureName("PPC_MIS_UPDATE_PRONOSTICO_RESPUESTA")
-	                .declareParameters(new SqlParameter("p_numRegCargados", Types.INTEGER),
-	                new SqlOutParameter("p_numRegCargados", Types.INTEGER));
-	        Map<String, Object> out = simpleJdbcCallRefCursor.execute(new MapSqlParameterSource("p_numRegCargados", 0));
-	        log.info("updatePronosticosRespuesta p_numRegCargados :: >> " +  out.get("p_numRegCargados"));
-	        return out.get("p_numRegCargados").toString();	
-		}catch (Exception e) {
-			e.printStackTrace();
-            throw new GenericException( "Error al ejecutar PPC_MIS_UPDATE_PRONOSTICO_RESPUESTA :: ", HttpStatus.NOT_FOUND.toString());
+			jdbcTemplate.update("{call PPC_MIS_SP_UPDATE_PRONOSTICO_RESPUESTA()}");
+		} catch (Exception e) {
+            throw new GenericException( "Error al ejecutar el SP PPC_MIS_SP_UPD_COBROS_RESP_AUTO:: " , HttpStatus.NOT_FOUND.toString());
         }
     }
 	
@@ -101,4 +92,5 @@ public class RespPronosticosTmpJDBCRepository {
             throw new GenericException( "Error al ejecutar el SP PPC_MIS_SP_UPD_COBROS_RESP_AUTO:: " , HttpStatus.NOT_FOUND.toString());
         }
     }
+
 }
