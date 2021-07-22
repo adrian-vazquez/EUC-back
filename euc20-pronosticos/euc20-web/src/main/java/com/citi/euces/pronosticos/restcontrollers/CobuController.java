@@ -16,7 +16,6 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.CobuRequest;
 import com.citi.euces.pronosticos.models.CobuResponse;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
-import com.citi.euces.pronosticos.models.LayoutPrevioRequest;
 import com.citi.euces.pronosticos.models.ReportesCobuResponse;
 import com.citi.euces.pronosticos.services.api.CobuService;
 

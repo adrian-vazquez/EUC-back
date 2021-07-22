@@ -74,7 +74,7 @@ public class CobuServiceImpl implements CobuService{
 	
 	@Override	
 	public CobuDTO limpiarCobu() throws GenericException{
-		log.info("limpiarCobu ::  init");
+		log.info("limpiarCobu");
 		try {
 			deleteTables.deleteCifrasControl();		
 			deleteTables.deleteCtasVirtualesGpos();
@@ -94,7 +94,7 @@ public class CobuServiceImpl implements CobuService{
 		}catch(Exception ex) {
 			throw new GenericException("Error al borrar tablas", HttpStatus.BAD_REQUEST.toString());
 		}
-		log.info("limpiarCobu ::  init");
+		log.info("limpiarCobu");
 		CobuDTO response = new CobuDTO();
 		response.setMensajeConfirm("Tablas COBU sin datos");
 		response.setProcesoResultado("Proceso Completado");
@@ -108,7 +108,7 @@ public class CobuServiceImpl implements CobuService{
 	@Override
 	public CobuDTO cargaCtasCobu(String file) throws GenericException, IOException, ParseException{
 		try {
-			log.info("Query_Ctas_COBU :: init");
+			log.info("Query_Ctas_COBU");
 	        Path testFile = Files.createTempFile("cargaQueryCtasCobu", ".zip");
 	        testFile.toFile().deleteOnExit();
 	        byte[] decoder = Base64.getDecoder().decode(file);
@@ -146,7 +146,27 @@ public class CobuServiceImpl implements CobuService{
 	
 	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvCtasCobu(Path tempFile) throws GenericException, IOException, ParseException {
-		log.info("inicia ecel:: init");
+		
+		BufferedReader br = new BufferedReader(new FileReader(tempFile.toFile()));
+		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+		List<String> headers = parser.getHeaderNames();
+		List<String> ejemploLista = new ArrayList<String>();
+	      ejemploLista.add("CUENTA");
+	      ejemploLista.add("PREFMDA");
+	      ejemploLista.add("CUENTAMDA");
+	      ejemploLista.add("CVESTATUS");
+	      ejemploLista.add("NOMBRE");
+	      ejemploLista.add("USO");
+	      ejemploLista.add("MON");
+	      ejemploLista.add("ESTATUS");
+	      ejemploLista.add("PROD");
+	      ejemploLista.add("INST");
+	      ejemploLista.add("FRANQUICIA");
+
+		if(!headers.equals(ejemploLista)) {
+			throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+		}
+
 		List<QueryCtosAgrupadoDTO> contenido1 = new ArrayList<QueryCtosAgrupadoDTO>();
 		String responseMessage = "";
 		
@@ -194,7 +214,7 @@ public class CobuServiceImpl implements CobuService{
 	@Override
 	public CobuDTO cargaCtasVirt(String file) throws GenericException, IOException, ParseException{
 		try {
-			log.info("TXS_CTAS_VIRT :: init");
+			log.info("TXS_CTAS_VIRT");
 	        Path testFile = Files.createTempFile("cargaTxsCtasVirt", ".zip");
 	        testFile.toFile().deleteOnExit();
 	        byte[] decoder = Base64.getDecoder().decode(file);
@@ -233,7 +253,6 @@ public class CobuServiceImpl implements CobuService{
 	
 	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvCtasVirt(Path tempFile) throws GenericException, IOException, ParseException {
-		log.info("inicia ecel:: init");
 		List<CtasVirtualesDTO> contenido2 = new ArrayList<CtasVirtualesDTO>();
 		String responseMessage = "";
 		
@@ -280,7 +299,7 @@ public class CobuServiceImpl implements CobuService{
 	@Override
 	public CobuDTO cargaTxsCtas(String file) throws GenericException, IOException, ParseException{
 		try {
-			log.info("Obtiene_TXS_CTAS :: init");
+			log.info("Obtiene_TXS_CTAS");
 	        Path testFile = Files.createTempFile("cargaObtieneTxsCtas", ".zip");
 	        testFile.toFile().deleteOnExit();
 	        byte[] decoder = Base64.getDecoder().decode(file);
@@ -321,7 +340,6 @@ public class CobuServiceImpl implements CobuService{
 	
 	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvTxsCtas(Path tempFile) throws GenericException, IOException, ParseException {
-		log.info("inicia ecel:: init");
 		List<TxsCtasVirtDTO> contenido3 = new ArrayList<TxsCtasVirtDTO>();
 		String responseMessage = "";
 		
@@ -375,7 +393,7 @@ public class CobuServiceImpl implements CobuService{
 	@Override
 	public CobuDTO cargaTarEspCobu(String file) throws GenericException, IOException, ParseException{
 		try {
-			log.info("TAR_ESP_COBU :: init");
+			log.info("TAR_ESP_COBU");
 	        Path testFile = Files.createTempFile("cargaTarEspCobu", ".zip");
 	        testFile.toFile().deleteOnExit();
 	        byte[] decoder = Base64.getDecoder().decode(file);
@@ -413,7 +431,6 @@ public class CobuServiceImpl implements CobuService{
 	
 	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvTarEspCobu(Path tempFile) throws GenericException, IOException, ParseException {
-		log.info("inicia ecel:: init");
 		String responseMessage = "";
 		List<ProcesadoDTO> contenido4 = new ArrayList<ProcesadoDTO>();
 		
@@ -566,7 +583,7 @@ public class CobuServiceImpl implements CobuService{
 	@Override
 	public ReportesCobuDTO reporte() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException {
 			
-		if (consultasCobuRepository.countLayoutBe() > 0){
+		/*if (consultasCobuRepository.countLayoutBe() > 0){
 			throw new GenericException("Error existen duplicados en el Layout_Be. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
         }
 
@@ -576,7 +593,7 @@ public class CobuServiceImpl implements CobuService{
 
         if (consultasCobuRepository.countLayoutVent() > 0){
         	throw new GenericException("Error existen duplicados en el Layout_Vent. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
-        }
+        }*/
 		
 		
 			List<LayoutBeDTO> consultaBe = consultasCobuRepository.cosultaLayoutBe();
@@ -848,7 +865,7 @@ public class CobuServiceImpl implements CobuService{
 			 Path reporteCobu = FormatUtils.convertZip(testFile);
 		     String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(reporteCobu.toFile()));
 
-		     log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+		     log.info("File Encoder ReporteCobu.zip :: " + ecoder);
 		     ReportesCobuDTO response = new ReportesCobuDTO();
 		     response.setFile(ecoder);
 		     return response;		
@@ -901,7 +918,7 @@ public class CobuServiceImpl implements CobuService{
 		        Path cifrasZip = FormatUtils.convertZip(testFile);
 		        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(cifrasZip.toFile()));
 
-		        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+		        log.info("File Encoder CifrasControl.zip :: " + ecoder);
 		        ReportesCobuDTO response = new ReportesCobuDTO();
 		        response.setFile(ecoder);
 		        return response;
