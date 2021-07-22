@@ -144,26 +144,12 @@ public class CobuServiceImpl implements CobuService{
 		
 	}
 	
-	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
-	public String leerCsvCtasCobu(Path tempFile) throws GenericException, IOException, ParseException {
-		
+	public String leerCsvCtasCobu(Path tempFile) throws GenericException, IOException, ParseException {	
 		BufferedReader br = new BufferedReader(new FileReader(tempFile.toFile()));
 		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
-		List<String> headers = parser.getHeaderNames();
-		List<String> ejemploLista = new ArrayList<String>();
-	      ejemploLista.add("CUENTA");
-	      ejemploLista.add("PREFMDA");
-	      ejemploLista.add("CUENTAMDA");
-	      ejemploLista.add("CVESTATUS");
-	      ejemploLista.add("NOMBRE");
-	      ejemploLista.add("USO");
-	      ejemploLista.add("MON");
-	      ejemploLista.add("ESTATUS");
-	      ejemploLista.add("PROD");
-	      ejemploLista.add("INST");
-	      ejemploLista.add("FRANQUICIA");
+		List<String> headerCtasCobu = parser.getHeaderNames();
 
-		if(!headers.equals(ejemploLista)) {
+		if(!headerCtasCobu.equals(FormatUtils.validaCtasCobu())) {
 			throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
 		}
 
@@ -199,9 +185,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertCtasCobu(contenido1, 500);
 	        } catch (Exception e) {
-	        	deleteTables.deleteTxsCtasVirt();
-	            throw new GenericException(
-	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
 	        }
         
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -251,8 +235,15 @@ public class CobuServiceImpl implements CobuService{
 		
 	}
 	
-	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvCtasVirt(Path tempFile) throws GenericException, IOException, ParseException {
+		BufferedReader br = new BufferedReader(new FileReader(tempFile.toFile()));
+		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+		List<String> headerCtasVirt = parser.getHeaderNames();
+		
+		if(!headerCtasVirt.equals(FormatUtils.validaCtasVirt())) {
+			throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+		}
+		
 		List<CtasVirtualesDTO> contenido2 = new ArrayList<CtasVirtualesDTO>();
 		String responseMessage = "";
 		
@@ -284,9 +275,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertCtasVirtuales(contenido2, 500);
 	        } catch (Exception e) {
-	        	deleteTables.deleteTxsCtasVirt();
-	            throw new GenericException(
-	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
 	        }
         
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -318,14 +307,12 @@ public class CobuServiceImpl implements CobuService{
 	                InputStream is = zipFile.getInputStream(zipEntry);
 	                Path tempFile = Files.createTempFile("Obtiene_TXS_CTAS", ".csv");
 	                tempFile.toFile().deleteOnExit();
-	                log.info("empieza ioutils :: init");
 	                try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
 	                    IOUtils.copy(is, fos);
 	                    log.info("termina:: init");
 	                    procesados = leerCsvTxsCtas(tempFile);
 	                 
 	                }
-	                log.info("termina:: init");
 	            }
 	            zipFile.close();
 	       CobuDTO response = new CobuDTO();
@@ -338,8 +325,15 @@ public class CobuServiceImpl implements CobuService{
 		}
 	}
 	
-	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvTxsCtas(Path tempFile) throws GenericException, IOException, ParseException {
+		BufferedReader br = new BufferedReader(new FileReader(tempFile.toFile()));
+		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+		List<String> headerTxsCtas = parser.getHeaderNames();
+		
+		if(!headerTxsCtas.equals(FormatUtils.validaCsvTxsCtas())) {
+			throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+		}
+		
 		List<TxsCtasVirtDTO> contenido3 = new ArrayList<TxsCtasVirtDTO>();
 		String responseMessage = "";
 		
@@ -377,9 +371,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertTxsCtas(contenido3, 500);
 	        } catch (Exception e) {
-	        	deleteTables.deleteTxsCtasVirt();
-	            throw new GenericException(
-	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
 	        }
 
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -429,10 +421,17 @@ public class CobuServiceImpl implements CobuService{
 		}
 	}
 	
-	//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public String leerCsvTarEspCobu(Path tempFile) throws GenericException, IOException, ParseException {
+		BufferedReader br = new BufferedReader(new FileReader(tempFile.toFile()));
+		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+		List<String> headerTarEspCobu = parser.getHeaderNames();
+
+		if(!headerTarEspCobu.equals(FormatUtils.validaTarEspCobu())) {
+			throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+		}
+		
+		List<ProcesadoDTO> contenido4 = new ArrayList<ProcesadoDTO>();	
 		String responseMessage = "";
-		List<ProcesadoDTO> contenido4 = new ArrayList<ProcesadoDTO>();
 		
 		FileReader f = new FileReader(tempFile.toFile());
         BufferedReader b = new BufferedReader(f);
@@ -459,9 +458,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertTarEspCobu(contenido4, 500);
 	        } catch (Exception e) {
-	        	deleteTables.deleteTxsCtasVirt();
-	            throw new GenericException(
-	                    "Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
 	        }
         
         responseMessage = "Se han cargado un total de: " + max + " elementos";

@@ -140,7 +140,61 @@ public class FormatUtils {
         }
         return valid;
     }
-
+    
+    public static List<String> validaCtasCobu(){
+    	List<String> CtasCobu = new ArrayList<String>();
+    	CtasCobu.add("CUENTA");
+    	CtasCobu.add("PREFMDA");
+    	CtasCobu.add("CUENTAMDA");
+    	CtasCobu.add("CVESTATUS");
+    	CtasCobu.add("NOMBRE");
+    	CtasCobu.add("USO");
+    	CtasCobu.add("MON");
+    	CtasCobu.add("ESTATUS");
+    	CtasCobu.add("PROD");
+    	CtasCobu.add("INST");
+    	CtasCobu.add("FRANQUICIA");
+		return CtasCobu;
+    }
+    
+    public static List<String> validaCtasVirt(){
+    	List<String> CtasVirt = new ArrayList<String>();
+    	CtasVirt.add("NUM_CLIENTE");
+    	CtasVirt.add("NUM_CUENTA");
+    	CtasVirt.add("FECH_ALTAX");
+    	CtasVirt.add("CUENTAS_X");
+    	CtasVirt.add("ESTATUS_CTA");
+    	CtasVirt.add("NOMBRE");
+		return CtasVirt;
+    }
+    
+    public static List<String> validaCsvTxsCtas(){
+    	List<String> CsvTxsCtas = new ArrayList<String>();
+    	CsvTxsCtas.add("NUMCLIENTE");
+    	CsvTxsCtas.add("NUM_CUENTA");
+    	CsvTxsCtas.add("CTE_ALIAS");
+    	CsvTxsCtas.add("NOMBRE");
+    	CsvTxsCtas.add("CVE_MONEDASISTEMA");
+    	CsvTxsCtas.add("FEC_INFORMACION");
+    	CsvTxsCtas.add("NUM_MEDIOACCESO");
+    	CsvTxsCtas.add("CVE_TXNSISTEMA");
+    	CsvTxsCtas.add("NUM_SUCPROMTORMDA");
+    	CsvTxsCtas.add("IMP_TRANSACCION");
+    	CsvTxsCtas.add("NUM_AUTRANSACCION");
+    	CsvTxsCtas.add("NUM_SUCOPERADORA");
+    	CsvTxsCtas.add("NUM_SISTEMAORIGTXN");
+		return CsvTxsCtas;
+    }
+    
+    public static List<String> validaTarEspCobu(){
+    	List<String> TarEspCobu = new ArrayList<String>();
+    	TarEspCobu.add("NUMCLIENTE");
+    	TarEspCobu.add("3) BE");
+    	TarEspCobu.add("2) VENTANILLA");
+    	TarEspCobu.add("1) MENSUALIDAD");
+		return TarEspCobu;
+    }
+    
     public static Path convertZip(Path fileReporteRebaja) throws IOException {
         Path fileZip = Files.createTempFile("FileZip", ".zip");
         fileZip.toFile().deleteOnExit();
