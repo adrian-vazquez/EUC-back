@@ -6,11 +6,13 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
 import com.citi.euces.pronosticos.infra.dto.CifrasControlDTO;
+import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
 @Repository
 public class ProcesoCobuRepository{
@@ -22,53 +24,72 @@ public class ProcesoCobuRepository{
 	    this.procesos = procesos;
 	    }
 	   
-		public int insertaTarifas() throws SQLException{  
+		public int insertaTarifas() throws SQLException, GenericException{  
 			int contador = 0;
 			String query = "INSERT INTO PPC_PCB_TARIFAS(NUM_CLIENTE, TARIFA_TX_BE, TARIFA_TX_SUC, TARIFA_MENSUAL, ID) "
 					+ "SELECT NO_CLIENTE, BE, VENTANILLA, MENSUALIDAD, ID FROM PPC_PCB_PROCESADO";
-			contador = procesos.update(query);
+			try {
+				contador = procesos.update(query);
+			}catch(Exception ex) {
+				throw new GenericException("Error, Paso 0: inserta en tarifas" , HttpStatus.CONFLICT.toString());
+			}
 	    	return contador;
 	    	
-	    } 
-	   
+	    } 	   
 
-		public int insertaQueryCtosDuplicado() {
+		public int insertaQueryCtosDuplicado() throws GenericException {
 	    	int contador = 1;
 	    	String query = "INSERT INTO PPC_PCB_QUERY_CTOS_DUPLICADOS(CUENTA, CTA_CUENTA,ID) "
 	    			+ "(SELECT CUENTA, COUNT(CUENTA) AS CTA_CUENTA, '1' AS ID "
 	    			+ "FROM PPC_PCB_QUERY_CTOS_AGRUPADO "
 	    			+ "GROUP BY CUENTA, '1' "
 	    			+ "HAVING Count(CUENTA)>1)";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+				throw new GenericException("Error, Paso 1: inserta en query en costos duplicados" , HttpStatus.CONFLICT.toString());
+			}
 	    	return contador;
 	    }
 	    
-	    public int actualizaQueryCtosDuplicados() {
+	    public int actualizaQueryCtosDuplicados() throws GenericException {
 	    	int contador = 2;
 	    	String query = "UPDATE PPC_PCB_QUERY_CTOS_AGRUPADO SET DUPLICADO = 'SI' "
 	    			+ "WHERE PPC_PCB_QUERY_CTOS_AGRUPADO.CUENTA IN (SELECT DISTINCT(CUENTA) FROM PPC_PCB_QUERY_CTOS_DUPLICADOS)";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+				throw new GenericException("Error, Paso 2: actualiza query en costos duplicados" , HttpStatus.CONFLICT.toString());
+			}
 	    	return contador;
 	    }
 	    
-	    public int insertaCtosUnicos() {
+	    public int insertaCtosUnicos() throws GenericException {
 	    	int contador = 3;
 	    	String query = "INSERT INTO PPC_PCB_CTOS_UNICOS( NUM_CUENTA, SUC, CTA,USO, MON, FRANQUICIA, ID) "
 	    			+ "SELECT CUENTA, PREFMDA, CUENTAMDA, USO, MON, FRANQUICIA,ID "
 	    			+ "FROM PPC_PCB_QUERY_CTOS_AGRUPADO";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 3: inserta costos únicos" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtalesMesyAnio() {
+	    public int actualizaCtasVirtalesMesyAnio() throws GenericException {
 	    	int contador = 4;
 	    	String query = "UPDATE  PPC_PCB_CTAS_VIRTUALES SET MES = extract(month from FEC_ALTA), "
 	    			+ "ANIO = extract(year from FEC_ALTA)";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 4: actualiza en cuentas virtuales mes y anio" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	   
-	    public int insertaCtasVirtualesGpos() {
+	    public int insertaCtasVirtualesGpos() throws GenericException {
 	    	int contador = 5;
 	    	String query = "INSERT INTO PPC_PCB_CTAS_VIRTUALES_GPOS(NUM_CLIENTE, NUM_CUENTA, NOMBRE, CTAS_V, TXNS_BE, TXNS_VENT, "
 	    			+ "TARIFA_BE,TARIFA_VENT,TARIFA_MENS, COM_BE,COM_VENT,COM_MENS, USO_11,COM_TOTAL, SUC, CUENTA, FRANQUICIA, MONEDA, IVA, ID) "
@@ -77,11 +98,15 @@ public class ProcesoCobuRepository{
 	    			+ "0 AS COM_TOTAL, 0 AS SUC, 0 AS CTA, 0 AS FRANQUICIA, 0 AS MONEDA, 0 AS IVA, ID "
 	    			+ "FROM PPC_PCB_CTAS_VIRTUALES "
 	    			+ "GROUP BY NUM_CLIENTE, NUM_CUENTA, NOMBRE, 0, ID, NULL";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 5: inserta en cuentas virtuales grupos" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaTxsCtasVirtNunSucOperadora() {
+	    public int actualizaTxsCtasVirtNunSucOperadora() throws GenericException {
 	    	int contador = 6;
 	    	String query = "UPDATE PPC_PCB_TXS_CTAS_VIRT "
 	    			+ "SET TIPO = "
@@ -91,107 +116,185 @@ public class ProcesoCobuRepository{
 	    			+ "when 859 then 'BE' "
 	    			+ "else 'VENT' "
 	    			+ "end";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 6: actualiza txs_ctas_virt" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int insertaTxnsXTipo() {
+	    public int insertaTxnsXTipo() throws GenericException {
 	    	int contador = 7;
 	    	String query = "INSERT INTO PPC_PCB_TXNS_X_TIPO(NUM_CLIENTE, NUM_CUENTA,TIPO, CTA_NUM_AUT_TRANS, ID) "
 	    			+ "SELECT NUM_CLIENTE, NUM_CTA,TIPO, COUNT(NUM_AUT_TRANS) AS CTA_NUM_AUT_TRANS, ID "
 	    			+ "FROM PPC_PCB_TXS_CTAS_VIRT GROUP BY NUM_CLIENTE, NUM_CTA, TIPO, ID";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 7: inserta en into txns_x_tipo" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtualesGposTxnsBe() {
+	    public int actualizaCtasVirtualesGposTxnsBe() throws GenericException {
 	    	int contador = 8;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "MERGE INTO PPC_PCB_CTAS_VIRTUALES_GPOS E "
+	    			+ "USING (SELECT R.NUM_CUENTA, R.CTA_NUM_AUT_TRANS, R.TIPO, R.NUM_CLIENTE "
+	    			+ "FROM PPC_PCB_TXNS_X_TIPO R) R "
+	    			+ "ON (E.NUM_CUENTA=R.NUM_CUENTA AND E.NUM_CLIENTE=R.NUM_CLIENTE) "
+	    			+ "WHEN MATCHED THEN "
+	    			+ "UPDATE SET E.TXNS_BE=R.CTA_NUM_AUT_TRANS WHERE R.TIPO = 'BE'";
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 8: Actualiza Ctas_Virtuales_Gpos TXNS_BE" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtualesGposTxnsVent() {
+	    public int actualizaCtasVirtualesGposTxnsVent() throws GenericException {
 	    	int contador = 9;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "MERGE INTO PPC_PCB_CTAS_VIRTUALES_GPOS E "
+	    			+ "USING (SELECT R.NUM_CLIENTE, R.TIPO, R.CTA_NUM_AUT_TRANS, R.NUM_CUENTA "
+	    			+ "FROM PPC_PCB_TXNS_X_TIPO R) R "
+	    			+ "ON (E.NUM_CLIENTE=R.NUM_CLIENTE AND E.NUM_CUENTA=R.NUM_CUENTA) "
+	    			+ "WHEN MATCHED THEN "
+	    			+ "UPDATE SET E.COM_VENT=R.CTA_NUM_AUT_TRANS WHERE R.TIPO = 'VENT'";
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 9: Actualiza Ctas_Virtuales_Gpos TXNS_VENT" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaANull() {
+	    public int actualizaANull() throws GenericException {
 	    	int contador = 10;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
 	    			+ "SET "
 	    			+ "TARIFA_BE = Null, "
 	    			+ "TARIFA_VENT = Null, "
 	    			+ "TARIFA_MENS = Null";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 10: Actualiza Ctas_Virtuales_Gpos TARIFAS a nulo" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtualesGposconTablaTarifas() {
+	    public int actualizaCtasVirtualesGposconTablaTarifas() throws GenericException {
 	    	int contador = 11;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "MERGE INTO TSC_EUCS_OWN.PPC_PCB_CTAS_VIRTUALES_GPOS E "
+	    			+ "USING (SELECT R.NUM_CLIENTE, R.TARIFA_TX_BE, R.TARIFA_TX_SUC,R.TARIFA_MENSUAL "
+	    			+ "FROM TSC_EUCS_OWN.PPC_PCB_TARIFAS R) R "
+	    			+ "ON (E.NUM_CLIENTE=R.NUM_CLIENTE) "
+	    			+ "WHEN MATCHED THEN "
+	    			+ "UPDATE SET E.TARIFA_BE=R.TARIFA_TX_BE, "
+	    			+ "E.TARIFA_VENT=R.TARIFA_TX_SUC, "
+	    			+ "E.TARIFA_MENS=R.TARIFA_MENSUAL";
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 11: Actualiza Ctas_Virtuales_Gpos con Tabla Tarifas" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaAUnaTarifaPredefinida() {
+	    public int actualizaAUnaTarifaPredefinida() throws GenericException {
 	    	int contador = 12;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
 	    			+ "SET TARIFA_BE = 4, TARIFA_VENT = 14, TARIFA_MENS = 10 "
 	    			+ "WHERE (((TARIFA_BE) is null) "
 	    			+ "AND ((TARIFA_VENT) is null) "
 	    			+ "AND ((TARIFA_MENS) is null))";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 12: Actualiza Ctas_Virtuales_Gpos TARIFAS a una tarifa predefinida" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtualesGposBeVentMens(){
+	    public int actualizaCtasVirtualesGposBeVentMens() throws GenericException{
 	    	int contador = 13;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS "
 	    			+ "SET "
 	    			+ "COM_BE = TXNS_BE * TARIFA_BE, "
 	    			+ "COM_VENT = TXNS_VENT * TARIFA_VENT, "
 	    			+ "COM_MENS = CTAS_V * TARIFA_MENS";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 13: Actualiza Ctas_Virtuales_Gpos COM_BE,COM_VENT,COM_MENS" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtosUnicos() {
+	    public int actualizaCtosUnicos() throws GenericException {
 	    	int contador = 14;
-	    	String query = "";
-	    	//contador = procesos.update(query);
+	    	String query = "MERGE INTO PPC_PCB_CTOS_UNICOS E "
+	    			+ "USING (SELECT R.NUM_CUENTA, R.SUC, R.CUENTA, R.FRANQUICIA, R.MONEDA "
+	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS R) R "
+	    			+ "ON (E.NUM_CUENTA=R.NUM_CUENTA) "
+	    			+ "WHEN MATCHED THEN "
+	    			+ "UPDATE SET E.SUC=R.SUC, "
+	    			+ "E.CTA=R.CUENTA, "
+	    			+ "E.MON=R.MONEDA, "
+	    			+ "E.FRANQUICIA=R.FRANQUICIA";
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 14: Actualiza Ctos_Unicos" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtosUnicosUso11() {
+	    public int actualizaCtosUnicosUso11() throws GenericException {
 	    	int contador = 0;
-	    	String query = "";
-	    	//procesos.update(query);
+	    	String query = "MERGE INTO PPC_PCB_CTAS_VIRTUALES_GPOS E "
+	    			+ "USING (SELECT R.NUM_CUENTA,R.USO "
+	    			+ "FROM PPC_PCB_CTOS_UNICOS R) R "
+	    			+ "ON (E.NUM_CUENTA=R.NUM_CUENTA) "
+	    			+ "WHEN MATCHED THEN "
+	    			+ "UPDATE SET E.USO_11 = 'USO11' WHERE R.USO = '11'";
+	    	try {
+	    		procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 15: Actualiza Ctos_Unicos USO11" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtualesGposComTotal() {
+	    public int actualizaCtasVirtualesGposComTotal() throws GenericException {
 	    	int contador = 16;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS SET PPC_PCB_CTAS_VIRTUALES_GPOS.COM_TOTAL = "
 	    			+ "case PPC_PCB_CTAS_VIRTUALES_GPOS.USO_11 "
 	    			+ "when 'USO_11' then PPC_PCB_CTAS_VIRTUALES_GPOS.COM_MENS "
 	    			+ "else PPC_PCB_CTAS_VIRTUALES_GPOS.COM_BE + PPC_PCB_CTAS_VIRTUALES_GPOS.COM_VENT + PPC_PCB_CTAS_VIRTUALES_GPOS.COM_MENS "
 	    			+ "end";
+	    	try {
 	    	contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 16: Actualiza Ctas_Virtuales_Gpos COM_TOTAL" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int actualizaCtasVirtualesGposIva() {
+	    public int actualizaCtasVirtualesGposIva() throws GenericException {
 	    	int contador = 17;
 	    	String query = "UPDATE PPC_PCB_CTAS_VIRTUALES_GPOS SET IVA = 16 "
 	    			+ "WHERE (((IVA)=0))";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 17: Actualiza Ctas_Virtuales_Gpos Iva" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int insertaEnLayoutBe() {
+	    public int insertaEnLayoutBe() throws GenericException {
 	    	int contador = 18;
 	    	String query = "INSERT INTO PPC_PCB_LAYOUT_BE(NUM_CLIENTE, NOMBRE, SUC, CTA, COM_BE, "
 	    			+ "MONTO_IVA, MONTO_TOTAL, ANIO,MES,PRODUCTO,IVA, MONEDA, USO_11, ID) "
@@ -202,11 +305,15 @@ public class ProcesoCobuRepository{
 	    			+ "extract(month from (systimestamp)) AS MES, "
 	    			+ "'Cobranza Universal' AS PRODUCTO, IVA, MONEDA, USO_11,ID "
 	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 18: inserta en Layout_BE" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int insertaEnLayoutVent() {
+	    public int insertaEnLayoutVent() throws GenericException {
 	    	int contador = 19;
 	    	String query = "INSERT INTO PPC_PCB_LAYOUT_VENT(NUM_CLIENTE,NOMBRE,SUC,CTA,COM_VENT, "
 	    			+ "MONTO_IVA,MONTO_TOTAL,ANIO,MES,PRODUCTO,IVA,MONEDA,USO_11,ID) "
@@ -217,11 +324,15 @@ public class ProcesoCobuRepository{
 	    			+ "extract(month from (systimestamp)) AS MES, "
 	    			+ "'Cobranza Universal' AS PRODUCTO, IVA, MONEDA, USO_11,ID "
 	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 19: inserta en Layout_VENT" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int insertaEnLayoutMens() {
+	    public int insertaEnLayoutMens() throws GenericException {
 	    	int contador = 20;
 	    	String query = "INSERT INTO PPC_PCB_LAYOUT_MENS(NUM_CLIENTE,NOMBRE,SUC,CTA, "
 	    			+ "COM_MENS,MONTO_IVA, MONTO_TOTAL,ANIO,MES,PRODUCTO,IVA,MONEDA,ID) "
@@ -233,17 +344,25 @@ public class ProcesoCobuRepository{
 	    			+ "extract(month from systimestamp) AS MES, "
 	    			+ "'Cobranza Universal' AS PRODUCTO, IVA, MONEDA, ID "
 	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 20: inserta en Layout_MENS" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
-	    public int insertaEnLayoutTxnsConImporte() {
+	    public int insertaEnLayoutTxnsConImporte() throws GenericException {
 	    	int contador = 21;
 	    	String query = "INSERT INTO PPC_PCB_TXNS_IMPORTE(NUM_CLIENTE,NUM_CUENTA,TIPO,TXNS,SUM_IMP_TRANS,ID) "
 	    			+ "SELECT NUM_CLIENTE,NUM_CTA,TIPO, Count(NUM_CLIENTE) AS TXNS, Sum(IMP_TRANSACCION) AS SUM_IMP_TRANS,ID "
 	    			+ "FROM PPC_PCB_TXS_CTAS_VIRT "
 	    			+ "GROUP BY NUM_CLIENTE, NUM_CTA, TIPO, ID";
-	    	contador = procesos.update(query);
+	    	try {
+	    		contador = procesos.update(query);
+	    	}catch(Exception ex) {
+	    		throw new GenericException("Error, Paso 21: inserta en Layout_Txns_Con_Importe" , HttpStatus.CONFLICT.toString());
+	    	}
 	    	return contador;
 	    }
 	    
