@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.citi.euces.pronosticos.infra.dto.CuentasAlternasDTO;
+import com.citi.euces.pronosticos.infra.dto.GenArcPFECyTCDTO;
 import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.repositories.CuentasAlternasJDBCRepository;
@@ -164,5 +164,56 @@ public class ReintentosServiceImpl implements ReintentosService {
          }
          return cad;
      }
+
+	@Override
+	public MensajeDTO genArchPFService(Integer mes1, Integer anio1, Integer dias1, Integer mes2, Integer anio2, Integer dias2,
+			Integer mes3, Integer anio3, Integer dias3) throws GenericException, IOException, ParseException {
+		MensajeDTO response = new MensajeDTO();
+		Integer conteo=0;
+		try {
+			List<GenArcPFECyTCDTO> result = reintentosJDBCRepository.ConteoReintentosSemanalesPersonaFisica(mes1, anio1, dias1, mes2, anio2, dias2, mes3, anio3, dias3);
+			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
+		} catch (Exception e) {
+			throw new GenericException("Error al consultar tabla en genArchPFService :: ",
+					HttpStatus.NOT_FOUND.toString());
+		}
+		response.setMensajeConfirm("Aviso");
+		response.setMensajeInfo("Se generaran: " + conteo + " registros.");
+		return response;
+	}
+
+	@Override
+	public MensajeDTO genArchECService(Integer mes1, Integer anio1, Integer dias1, Integer mes2, Integer anio2,
+			Integer dias2, Integer mes3, Integer anio3, Integer dias3)
+			throws GenericException, IOException, ParseException {
+		MensajeDTO response = new MensajeDTO();
+		Integer conteo=0;
+		try {
+			List<GenArcPFECyTCDTO> result = reintentosJDBCRepository.ConteoReintentosSemanalesExtraContable(mes1, anio1, dias1, mes2, anio2, dias2, mes3, anio3, dias3);
+			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
+		} catch (Exception e) {
+			throw new GenericException("Error al consultar tabla en genArchPFService :: ",
+					HttpStatus.NOT_FOUND.toString());
+		}
+		response.setMensajeConfirm("Aviso");
+		response.setMensajeInfo("Se generaran: " + conteo + " registros.");
+		return response;
+	}
+
+	@Override
+	public MensajeDTO genArchTCService() throws GenericException, IOException, ParseException {
+		MensajeDTO response = new MensajeDTO();
+		Integer conteo=0;
+		try {
+			List<GenArcPFECyTCDTO> result = reintentosJDBCRepository.ConteoReintentosSemanalesTasaCero();
+			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
+		} catch (Exception e) {
+			throw new GenericException("Error al consultar tabla en genArchPFService :: ",
+					HttpStatus.NOT_FOUND.toString());
+		}
+		response.setMensajeConfirm("Aviso");
+		response.setMensajeInfo("Se generaran: " + conteo + " registros.");
+		return response;
+	}
 
 }
