@@ -1,6 +1,8 @@
 package com.citi.euces.pronosticos.repositories;
 
 import com.citi.euces.pronosticos.entities.MaestroDeComisiones;
+import com.citi.euces.pronosticos.infra.dto.AgregarListaEstatus15DTO;
+import com.citi.euces.pronosticos.infra.dto.ClientesEstatus15DTO;
 import com.citi.euces.pronosticos.infra.dto.ReporteCuadreDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,5 +58,9 @@ public interface MaestroDeComisionesRepository extends JpaRepository<MaestroDeCo
             "PPC_MIS_FN_SUMA_TOTAL_MC_CUADRE(4, 0 , :anioActual  , 0 , 0 , 0 , 0 ) as total from PPC_MIS_MAESTRO_COMISIONES")
     List<ReporteCuadreDTO> getFunctionRepCuadre4(@Param("anioActual") Integer anioActual);
 
+    @Query("SELECT m FROM MaestroDeComisiones m WHERE m.id.llave IN (:llaves)")
+    List<MaestroDeComisiones> findByLlaveIN(@Param("llaves") List<Long> llaves);
 
+    @Query("SELECT m FROM MaestroDeComisiones m WHERE m.id.llave = :llave")
+    List<MaestroDeComisiones> findByLlave(@Param("llave") String llave);
 }

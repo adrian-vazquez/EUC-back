@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.citi.euces.pronosticos.infra.dto.CtasVirtualesDTO;
@@ -32,7 +31,7 @@ public class InsertsCobuRepository {
 	    }
 	    
 	    
-	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertCtasCobu(List<QueryCtosAgrupadoDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_QUERY_CTOS_AGRUPADO(CUENTA, PREFMDA, CUENTAMDA, CVE_ESTATUS, NOMBRE, USO, MON, FRANQUICIA, ID) VALUES(?,?,?,?,?,?,?,?,?)",
@@ -56,7 +55,7 @@ public class InsertsCobuRepository {
 	        return updateCounts;
 	    }
 	    
-	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertCtasVirtuales(List<CtasVirtualesDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_CTAS_VIRTUALES( NUM_CLIENTE, NUM_CUENTA, FEC_ALTA, CUENTAS_X, NOMBRE, ID) VALUES(?,?,?,?,?,?)",
@@ -78,7 +77,7 @@ public class InsertsCobuRepository {
 	    }
 	
 	    
-	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertTxsCtas(List<TxsCtasVirtDTO> books, int batchSize) {
 	    	log.info("empieza insert :: init");
 	        int [][]updateCounts = inserts.batchUpdate(											
@@ -108,7 +107,7 @@ public class InsertsCobuRepository {
 	        return updateCounts;
 	    }
 	    
-	    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
 	    public int[][] insertTarEspCobu(List<ProcesadoDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_PROCESADO( NO_CLIENTE, BE, VENTANILLA, MENSUALIDAD, ID) VALUES(?,?,?,?,?)",

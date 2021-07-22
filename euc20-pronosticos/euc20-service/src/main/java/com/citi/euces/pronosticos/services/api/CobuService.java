@@ -9,6 +9,7 @@ import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.hibernate.exception.SQLGrammarException;
 
 import com.citi.euces.pronosticos.infra.dto.CobuDTO;
+import com.citi.euces.pronosticos.infra.dto.ReportesCobuDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
 public interface CobuService {
@@ -25,7 +26,7 @@ public interface CobuService {
 
 	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException;
 	
-	/*public CobuDTO reporte() throws GenericException;
+	public ReportesCobuDTO reporte() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException;
 	
-	public CobuDTO cifrasControl() throws GenericException;**/
+	public ReportesCobuDTO cifrasControl() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException;
 }
