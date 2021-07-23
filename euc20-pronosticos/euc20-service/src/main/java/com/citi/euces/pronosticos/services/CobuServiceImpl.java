@@ -28,6 +28,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -52,6 +53,7 @@ import com.citi.euces.pronosticos.infra.dto.TarifasDTO;
 import com.citi.euces.pronosticos.infra.dto.TxnsImporteDTO;
 import com.citi.euces.pronosticos.infra.dto.TxsCtasVirtDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
+import com.citi.euces.pronosticos.infra.utils.ConstantUtils;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
 import com.citi.euces.pronosticos.repositories.*;
 import com.citi.euces.pronosticos.services.api.CobuService;
@@ -167,14 +169,14 @@ public class CobuServiceImpl implements CobuService{
         	max++;
         	QueryCtosAgrupadoDTO data1 = new QueryCtosAgrupadoDTO();
         	
-        	data1.setCuenta(Long.parseLong(registro.get(0)));
-			data1.setPrefmda(Integer.parseInt(registro.get(1)));
-			data1.setCuentamda(Integer.parseInt(registro.get(2)));
-			data1.setCveEstatus(Integer.parseInt(registro.get(3)));
-			data1.setNombre(registro.get(4));
-			data1.setUso(Integer.parseInt(registro.get(5)));
-			data1.setMon(Integer.parseInt(registro.get(6)));
-			data1.setFranquicia(Integer.parseInt(registro.get(10)));
+        	data1.setCuenta(Long.parseLong(registro.get(0).replaceAll("\\s","")));
+			data1.setPrefmda(Integer.parseInt(registro.get(1).replaceAll("\\s","")));
+			data1.setCuentamda(Integer.parseInt(registro.get(2).replaceAll("\\s","")));
+			data1.setCveEstatus(Integer.parseInt(registro.get(3).replaceAll("\\s","")));
+			data1.setNombre(String.valueOf(registro.get(4)));
+			data1.setUso(Integer.parseInt(registro.get(5).replaceAll("\\s","")));
+			data1.setMon(Integer.parseInt(registro.get(6).replaceAll("\\s","")));
+			data1.setFranquicia(Integer.parseInt(registro.get(10).replaceAll("\\s","")));
 			data1.setId(max); 
 			
             contenido1.add(data1);   
@@ -185,7 +187,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertCtasCobu(contenido1, 500);
 	        } catch (Exception e) {
-	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros" , HttpStatus.NOT_FOUND.toString());
 	        }
         
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -258,13 +260,13 @@ public class CobuServiceImpl implements CobuService{
         	max++;
         	CtasVirtualesDTO data2 = new CtasVirtualesDTO();
         	
-        	data2.setNumCliente(Long.parseLong(registro.get(0)));
-			data2.setNumCuenta(Long.parseLong(registro.get(1)));
+        	data2.setNumCliente(Long.parseLong(registro.get(0).replaceAll("\\s","")));
+			data2.setNumCuenta(Long.parseLong(registro.get(1).replaceAll("\\s","")));
 		    String date1= "01/".concat(registro.get(2).replaceAll("\\s",""));
 	        date1 = date1.substring(0, date1.length()-4) + "/" +date1.substring(date1.length() - 4) ;
 		    data2.setFecAlta(FormatUtils.stringToDate(date1));
-			data2.setCuentasX(Integer.parseInt(registro.get(3)));
-			data2.setNombre(registro.get(5));
+			data2.setCuentasX(Integer.parseInt(registro.get(3).replaceAll("\\s","")));
+			data2.setNombre(String.valueOf(registro.get(5)));
             data2.setId(max);
             
             contenido2.add(data2); 
@@ -275,7 +277,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertCtasVirtuales(contenido2, 500);
 	        } catch (Exception e) {
-	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros" , HttpStatus.NOT_FOUND.toString());
 	        }
         
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -309,7 +311,6 @@ public class CobuServiceImpl implements CobuService{
 	                tempFile.toFile().deleteOnExit();
 	                try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
 	                    IOUtils.copy(is, fos);
-	                    log.info("termina:: init");
 	                    procesados = leerCsvTxsCtas(tempFile);
 	                 
 	                }
@@ -348,19 +349,19 @@ public class CobuServiceImpl implements CobuService{
         	max++;
         	TxsCtasVirtDTO data3 = new TxsCtasVirtDTO();
         	
-        	data3.setNumCliente(Long.parseLong(registro.get(0)));
-			data3.setNumCta(Long.parseLong(registro.get(1)));
-			data3.setCteAlias((registro.get(2)));
-			data3.setNombre(registro.get(3));
-			data3.setCveMonSistema(Integer.parseInt(registro.get(4)));
-			data3.setFecInformacion(FormatUtils.stringToDate(registro.get(5)));
-			data3.setNumMedAcceso(Double.parseDouble(registro.get(6)));
-			data3.setCveTxnSistema(Integer.parseInt(registro.get(7)));
-			data3.setNumSucPromtormda(Integer.parseInt(registro.get(8)));
-			data3.setImpTransaccion(Double.parseDouble(registro.get(9)));
-			data3.setNumAutTrans(Double.parseDouble(registro.get(10)));
-			data3.setNumSucOperadora(Integer.parseInt(registro.get(11)));
-			data3.setTipo(Integer.parseInt(registro.get(12)));
+        	data3.setNumCliente(Long.parseLong(registro.get(0).replaceAll("\\s","")));
+			data3.setNumCta(Long.parseLong(registro.get(1).replaceAll("\\s","")));
+			data3.setCteAlias(String.valueOf(registro.get(2)));
+			data3.setNombre(String.valueOf(registro.get(3)));
+			data3.setCveMonSistema(Integer.parseInt(registro.get(4).replaceAll("\\s","")));
+			data3.setFecInformacion(FormatUtils.stringToDate(registro.get(5).replaceAll("\\s","")));
+			data3.setNumMedAcceso(Double.parseDouble(registro.get(6).replaceAll("\\s","")));
+			data3.setCveTxnSistema(Integer.parseInt(registro.get(7).replaceAll("\\s","")));
+			data3.setNumSucPromtormda(Integer.parseInt(registro.get(8).replaceAll("\\s","")));
+			data3.setImpTransaccion(Double.parseDouble(registro.get(9).replaceAll("\\s","")));
+			data3.setNumAutTrans(Double.parseDouble(registro.get(10).replaceAll("\\s","")));
+			data3.setNumSucOperadora(Integer.parseInt(registro.get(11).replaceAll("\\s","")));
+			data3.setTipo(Integer.parseInt(registro.get(12).replaceAll("\\s","")));
 			data3.setId(max);
 			
             contenido3.add(data3);    
@@ -371,7 +372,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertTxsCtas(contenido3, 500);
 	        } catch (Exception e) {
-	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros" , HttpStatus.NOT_FOUND.toString());
 	        }
 
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -444,10 +445,10 @@ public class CobuServiceImpl implements CobuService{
         	max++;
         	ProcesadoDTO data4 = new ProcesadoDTO();
         	
-        	data4.setNumCielnte(Long.parseLong(registro.get(0)));
-			data4.setBe(Double.parseDouble(registro.get(1).replace("$", "")));
-			data4.setVentanilla(Double.parseDouble(registro.get(2).replace("$", "")));
-			data4.setMensualidad(Double.parseDouble(registro.get(3).replace("$", "")));
+        	data4.setNumCielnte(Long.parseLong(registro.get(0).replaceAll("\\s","")));
+			data4.setBe(Double.parseDouble(registro.get(1).replace("$", "").replaceAll("\\s","")));
+			data4.setVentanilla(Double.parseDouble(registro.get(2).replace("$", "").replaceAll("\\s","")));
+			data4.setMensualidad(Double.parseDouble(registro.get(3).replace("$", "").replaceAll("\\s","")));
 			data4.setId(max);	
 			
 			contenido4.add(data4);   
@@ -458,7 +459,7 @@ public class CobuServiceImpl implements CobuService{
         try {
 			insertsCobuRepository.insertTarEspCobu(contenido4, 500);
 	        } catch (Exception e) {
-	            throw new GenericException("Error al importar registros :: " , HttpStatus.NOT_FOUND.toString());
+	            throw new GenericException("Error al importar registros" , HttpStatus.NOT_FOUND.toString());
 	        }
         
         responseMessage = "Se han cargado un total de: " + max + " elementos";
@@ -580,7 +581,7 @@ public class CobuServiceImpl implements CobuService{
 	@Override
 	public ReportesCobuDTO reporte() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException {
 			
-		/*if (consultasCobuRepository.countLayoutBe() > 0){
+		if (consultasCobuRepository.countLayoutBe() > 0){
 			throw new GenericException("Error existen duplicados en el Layout_Be. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
         }
 
@@ -590,22 +591,18 @@ public class CobuServiceImpl implements CobuService{
 
         if (consultasCobuRepository.countLayoutVent() > 0){
         	throw new GenericException("Error existen duplicados en el Layout_Vent. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
-        }*/
-		
-		
+        }
+
 			List<LayoutBeDTO> consultaBe = consultasCobuRepository.cosultaLayoutBe();
 			List<LayoutMensDTO> consultaMens = consultasCobuRepository.cosultaLayoutMens();
 			List<LayoutVentDTO> consultaVent = consultasCobuRepository.cosultaLayoutVent();
 			List<TarifasDTO> consultaTarifas = consultasCobuRepository.cosultaTarifas();
 			List<CuentasVirtulesGposDTO> consultaCtasVirtGpos = consultasCobuRepository.cosultaCtasVirtualesGpos();
 			List<TxnsImporteDTO> consultaTxnsImporte = consultasCobuRepository.cosultaTxnsImporte();
-						
-			String encabezadoBe[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_BE", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA", "USO11"};
-			String encabezadoMens[] = new String[] {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_MENS", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA"};
-			String encabezadoVent[] = new String[] {"NUM_CLIENTE", "TARIFA_BE", "TAFIRA_VENT", "TARIFA_MENS"};
-			String encabezadoTarifas[] = new String[] {"NUM_CLIENTE", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS"};
-			String encabezadoCtasVirtGpos[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "NOMBRE", "CTAS_V", "TXNS_BE", "TXNS_VENT", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS", "COM_BE", "COM_VENT", "COM_MENS", "USO11", "COM_TOTAL", "SUC", "CTA", "FRANQUICIA", "MONEDA", "IVA"};						
-			String encabezadoTxnsImporte[] = new String[] {"NUM_CLIENTE", "NUM_CUENTA", "TIPO", "TXNS", "SumaDeIMP_TRANSACCION"};
+			
+			if (consultaBe.isEmpty() || consultaMens.isEmpty() || consultaVent.isEmpty() || consultaTarifas.isEmpty() || consultaCtasVirtGpos.isEmpty() || consultaTxnsImporte.isEmpty()) {
+	            throw new GenericException("No hay registros en las tablas solicitadas",HttpStatus.NOT_FOUND.toString());
+	        }
 
 			List<List<String>> filaBe = new ArrayList<>();
 			consultaBe.forEach(ld -> {
@@ -715,7 +712,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeaderBe = 0;
 		            Row rowheaderBe = sheetBe.createRow(colHeaderBe++);
 		            int colCellBe = 0;
-		            for (String field : encabezadoBe) {
+		            for (String field : ConstantUtils.ENCABEZADOBE) {
 		                Cell cell = rowheaderBe.createCell(colCellBe++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -739,7 +736,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeaderMens = 0;
 		            Row rowheaderMens = sheetMens.createRow(colHeaderMens++);
 		            int colCellMens = 0;
-		            for (String field : encabezadoMens) {
+		            for (String field : ConstantUtils.ENCABEZADOMENS) {
 		                Cell cell = rowheaderMens.createCell(colCellMens++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -763,7 +760,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeaderVent = 0;
 		            Row rowheaderVent = sheetVent.createRow(colHeaderVent++);
 		            int colCellVent = 0;
-		            for (String field : encabezadoVent) {
+		            for (String field : ConstantUtils.ENCABEZADOVENT) {
 		                Cell cell = rowheaderVent.createCell(colCellVent++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -787,7 +784,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeaderTarifas = 0;
 		            Row rowheaderTarifas = sheetTarifas.createRow(colHeaderTarifas++);
 		            int colCellTarifas = 0;
-		            for (String field : encabezadoTarifas) {
+		            for (String field : ConstantUtils.ENCABEZADOTARIFAS) {
 		                Cell cell = rowheaderTarifas.createCell(colCellTarifas++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -811,7 +808,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeaderCtasVirtGpos = 0;
 		            Row rowheaderCtasVirtGpos = sheetCtasVirtGpos.createRow(colHeaderCtasVirtGpos++);
 		            int colCellCtasVirtGpos = 0;
-		            for (String field : encabezadoCtasVirtGpos) {
+		            for (String field : ConstantUtils.ENCABEZADOCTASVIRTGPOS) {
 		                Cell cell = rowheaderCtasVirtGpos.createCell(colCellCtasVirtGpos++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -835,7 +832,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeaderTxnsImporte = 0;
 		            Row rowheaderTxnsImporte = sheetTxnsImporte.createRow(colHeaderTxnsImporte++);
 		            int colCellTxnsImporte = 0;
-		            for (String field : encabezadoTxnsImporte) {
+		            for (String field : ConstantUtils.ENCABEZADOTXNSXIMPORTE) {
 		                Cell cell = rowheaderTxnsImporte.createCell(colCellTxnsImporte++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -862,7 +859,7 @@ public class CobuServiceImpl implements CobuService{
 			 Path reporteCobu = FormatUtils.convertZip(testFile);
 		     String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(reporteCobu.toFile()));
 
-		     log.info("File Encoder ReporteCobu.zip :: " + ecoder);
+		     log.info("File Encoder ReporteCobu.zip" + ecoder);
 		     ReportesCobuDTO response = new ReportesCobuDTO();
 		     response.setFile(ecoder);
 		     return response;		
@@ -871,8 +868,7 @@ public class CobuServiceImpl implements CobuService{
 
 	@Override
 	public ReportesCobuDTO cifrasControl() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException {
-			List<CifrasControlDTO> consultaCifras = consultasCobuRepository.cosultaCifras();
-			String encabezadoCifras[] = new String[] {"Consulta", "Cifra"};			
+			List<CifrasControlDTO> consultaCifras = consultasCobuRepository.cosultaCifras();		
 			if (consultaCifras.isEmpty()) {
 	            throw new GenericException("No hay registros en Cifras Control",HttpStatus.NOT_FOUND.toString());
 	        }
@@ -890,7 +886,7 @@ public class CobuServiceImpl implements CobuService{
 		            int colHeader = 0;
 		            Row rowheader = sheet.createRow(colHeader++);
 		            int colCell = 0;
-		            for (String field : encabezadoCifras) {
+		            for (String field : ConstantUtils.ENCABEZADOCIFRAS) {
 		                Cell cell = rowheader.createCell(colCell++);
 		                if (field instanceof String) {
 		                    cell.setCellValue((String) field);
@@ -915,15 +911,9 @@ public class CobuServiceImpl implements CobuService{
 		        Path cifrasZip = FormatUtils.convertZip(testFile);
 		        String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(cifrasZip.toFile()));
 
-		        log.info("File Encoder CifrasControl.zip :: " + ecoder);
+		        log.info("File Encoder CifrasControl.zip" + ecoder);
 		        ReportesCobuDTO response = new ReportesCobuDTO();
 		        response.setFile(ecoder);
 		        return response;
-	
 	}
-
-
-	
-
-
 }
