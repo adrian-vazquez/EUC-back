@@ -1,11 +1,9 @@
 package com.citi.euces.pronosticos.infra.dto;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class RechazosFileDTO implements Serializable {
+public class PronosticosFinalDTO {
 
-	
 	private Integer id;
 	private Integer cliente;
 	private String blanco;
@@ -33,9 +31,55 @@ public class RechazosFileDTO implements Serializable {
 	private Long idServicio;
 	private Long idOndemand;
 	private Integer evaluacionVirtual;
+	private String cuentacliente;
+	private String contrato;
+	private String franquicia;
+	private String numProtec;
+	private Date fecVencProtec;
 	private String openItem;
-
 	
+	
+	
+	public PronosticosFinalDTO(Integer id, Integer cliente, String blanco, Long cuenta, Double importe, Integer iva,
+			String status, String mes, Integer anio, String servicio, String csi, String com, Double comSinIva,
+			Double ivaa, Double total, Integer tipoComision, String llave, String eje, String catalogada,
+			String secuencial, Date fecha, String concepto, String leyenda, Integer dias, Long idServicio,
+			Long idOndemand, Integer evaluacionVirtual, String cuentacliente, String contrato, String franquicia,
+			String numProtec, Date fecVencProtec, String openItem) {
+		this.id = id;
+		this.cliente = cliente;
+		this.blanco = blanco;
+		this.cuenta = cuenta;
+		this.importe = importe;
+		this.iva = iva;
+		this.status = status;
+		this.mes = mes;
+		this.anio = anio;
+		this.servicio = servicio;
+		this.csi = csi;
+		this.com = com;
+		this.comSinIva = comSinIva;
+		this.ivaa = ivaa;
+		this.total = total;
+		this.tipoComision = tipoComision;
+		this.llave = llave;
+		this.eje = eje;
+		this.catalogada = catalogada;
+		this.secuencial = secuencial;
+		this.fecha = fecha;
+		this.concepto = concepto;
+		this.leyenda = leyenda;
+		this.dias = dias;
+		this.idServicio = idServicio;
+		this.idOndemand = idOndemand;
+		this.evaluacionVirtual = evaluacionVirtual;
+		this.cuentacliente = cuentacliente;
+		this.contrato = contrato;
+		this.franquicia = franquicia;
+		this.numProtec = numProtec;
+		this.fecVencProtec = fecVencProtec;
+		this.openItem = openItem;
+	}
 	public Integer getId() {
 		return id;
 	}
@@ -53,6 +97,12 @@ public class RechazosFileDTO implements Serializable {
 	}
 	public void setBlanco(String blanco) {
 		this.blanco = blanco;
+	}
+	public Long getCuenta() {
+		return cuenta;
+	}
+	public void setCuenta(Long cuenta) {
+		this.cuenta = cuenta;
 	}
 	public Double getImporte() {
 		return importe;
@@ -168,6 +218,12 @@ public class RechazosFileDTO implements Serializable {
 	public void setLeyenda(String leyenda) {
 		this.leyenda = leyenda;
 	}
+	public Integer getDias() {
+		return dias;
+	}
+	public void setDias(Integer dias) {
+		this.dias = dias;
+	}
 	public Long getIdServicio() {
 		return idServicio;
 	}
@@ -186,24 +242,41 @@ public class RechazosFileDTO implements Serializable {
 	public void setEvaluacionVirtual(Integer evaluacionVirtual) {
 		this.evaluacionVirtual = evaluacionVirtual;
 	}
+	public String getCuentacliente() {
+		return cuentacliente;
+	}
+	public void setCuentacliente(String cuentacliente) {
+		this.cuentacliente = cuentacliente;
+	}
+	public String getContrato() {
+		return contrato;
+	}
+	public void setContrato(String contrato) {
+		this.contrato = contrato;
+	}
+	public String getFranquicia() {
+		return franquicia;
+	}
+	public void setFranquicia(String franquicia) {
+		this.franquicia = franquicia;
+	}
+	public String getNumProtec() {
+		return numProtec;
+	}
+	public void setNumProtec(String numProtec) {
+		this.numProtec = numProtec;
+	}
+	public Date getFecVencProtec() {
+		return fecVencProtec;
+	}
+	public void setFecVencProtec(Date fecVencProtec) {
+		this.fecVencProtec = fecVencProtec;
+	}
 	public String getOpenItem() {
 		return openItem;
 	}
 	public void setOpenItem(String openItem) {
 		this.openItem = openItem;
 	}
-	public Long getCuenta() {
-		return cuenta;
-	}
-	public void setCuenta(Long cuenta) {
-		this.cuenta = cuenta;
-	}
-	public Integer getDias() {
-		return dias;
-	}
-	public void setDias(Integer dias) {
-		this.dias = dias;
-	}
-	
 	
 }

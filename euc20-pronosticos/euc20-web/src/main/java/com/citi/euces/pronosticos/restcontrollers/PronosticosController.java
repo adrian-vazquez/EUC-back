@@ -175,4 +175,27 @@ public class PronosticosController {
         }
 	}
 	
+	@PostMapping(path = "/migrarMaestro")
+	public ResponseEntity<?> migrarMaestro(){
+		try {
+			MensajeResponse response = new MensajeResponse(pronosticosService.migracionMaestro(),HttpStatus.OK.toString());
+			return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+		} catch (GenericException ex) 
+		{
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) 
+		{
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+	}
 }
