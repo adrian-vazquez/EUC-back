@@ -31,7 +31,7 @@ public class FormatUtils {
     }
 
     public static String formatDatedmy(Date fecha) {
-        String pattern = "dd-MM-yyyy";
+        String pattern = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String formatFecha = simpleDateFormat.format(fecha);
         return formatFecha;
@@ -253,6 +253,11 @@ public class FormatUtils {
     public static String validaString(String dato) {
         dato = dato == null ? " " : dato;
         return dato;
+    }
+    
+    public static String validaIntegetToString(Integer dato) {
+        String valid = dato == null ? " " : dato.toString();
+        return valid;
     }
 
 

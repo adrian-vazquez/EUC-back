@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +55,7 @@ public class RebajasServiceImp implements RebajasService {
     @Autowired
     private CuentasContablesJDBCRepository cuentasContablesJDBCRepository;
     @Autowired
-    private CatCausaRechazoRepository CatCausaRechazoRepository;
+    private CatCausaRechazoRepository catCausaRechazoRepository;
     @Autowired
     private CatServiciosPronosticoJDBCRepository catServiciosPronosticoRepository;
     @Autowired
@@ -102,9 +103,10 @@ public class RebajasServiceImp implements RebajasService {
 
     @Override
     public MensajeDTO aplicarRebaja() throws GenericException {
-        Integer numRegCargados;
+        Integer numRegCargados = 0;
         try {
             numRegCargados = spRebajaMaestroDeComusionesRepository.spRebajaMaestroComisiones();
+            log.info("numRegCargados:: " +  numRegCargados);
         } catch (Exception e) {
             e.printStackTrace();
             throw new GenericException(
@@ -266,21 +268,21 @@ public class RebajasServiceImp implements RebajasService {
             renglon.add(FormatUtils.validaString(ld.getChequeraCargo())); //chequera_cargo
             renglon.add(validaChequera(ld.getId().getChequera(), ld.getChequeraCargo())); //ValidaChequera
             renglon.add(FormatUtils.validaString(ld.getId().getmTotal().toString()));
-            renglon.add(FormatUtils.validaString(ld.getpIva().toString()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getpIva()));
             renglon.add(getRechazo(ld.getIdCausaRechazo())); //GetRechazo
             renglon.add(FormatUtils.validFechaMes(ld.getId().getMes()));//RetornaMes
-            renglon.add(FormatUtils.validaString(ld.getId().getAnio().toString()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getId().getAnio()));
             renglon.add(getServicio(ld.getId().getIdServicio(), ld.getId().getIdOndemand()));//servicio
-            renglon.add(FormatUtils.validaString(ld.getCsi().toString()));
-            renglon.add(FormatUtils.validaString(ld.getComEc().toString()));
-            renglon.add(FormatUtils.validaString(ld.getmComision().toString()));
-            renglon.add(FormatUtils.validaString(ld.getmIva().toString()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getCsi()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getComEc()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getmComision()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getmIva()));
             renglon.add(FormatUtils.validaString(ld.getId().getmTotal().toString()));
-            renglon.add(FormatUtils.validaString(ld.getComP().toString()));
+            renglon.add(FormatUtils.validaIntegetToString(ld.getComP()));
             renglon.add(FormatUtils.validaString(ld.getId().getLlave().toString()));
             renglon.add(FormatUtils.validaString(ld.getNoProteccion()));
             renglon.add(validFranquicia(ld.getIdFranquicia()));//getNombreFranquicia
-            renglon.add(FormatUtils.validCatalogadaGc(Integer.valueOf(ld.getId().getCatalogadaGc())));//GetCatalogadaGc
+            renglon.add(ld.getId().getCatalogadaGc() != null ? FormatUtils.validCatalogadaGc(Integer.valueOf(ld.getId().getCatalogadaGc())) : "");//GetCatalogadaGc
             renglon.add(FormatUtils.formatDatedmy(ld.getFechaMovimiento()));
             renglon.add(ld.getFechaRegistroContable());//f_registro_contable
             renglon.add(getCuentaContable(ld.getId().getIdServicio(), ld.getId().getIdOndemand()));
@@ -331,7 +333,9 @@ public class RebajasServiceImp implements RebajasService {
         log.info("QUERY reporteMoraFile :::> ");
         log.info(query);
 
-        List<Object[]> reporteMora = entityManager.createNativeQuery(query).getResultList();
+        //List<Object[]> reporteMora = entityManager.createNativeQuery(query).getResultList();
+        Query query1 = entityManager.createNativeQuery(query, Object[].class);
+        List<Object[]> reporteMora = query1.getResultList();
         if(reporteMora.isEmpty()){
             throw new GenericException(
                     "No se encontraron Datos  :: ", HttpStatus.NOT_FOUND.toString());
@@ -341,7 +345,7 @@ public class RebajasServiceImp implements RebajasService {
         List<String> titles = Arrays.asList(ConstantUtils.TITLE_REP_MORA_EXCEL);
         Path fileReporteRebajaZip = FormatUtils.convertZip(FormatUtils.createExcel(titles, renglones,"Repmora".concat(FormatUtils.formatFateFileExcel())));
         String ecoder = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(fileReporteRebajaZip.toFile()));
-        log.info("File Encoder ReporteRebaja.zip :: " + ecoder);
+        log.info("File Encoder ReporteMora.zip :: " + ecoder);
         ReporteRebajaDTO response = new ReporteRebajaDTO();
         response.setFile(ecoder);
         return response;
@@ -403,11 +407,11 @@ public class RebajasServiceImp implements RebajasService {
 
     private String getRechazo(Integer idRechazo) {
         String resp = "";
-        List<CatCausaRechazo> listaRechazos = CatCausaRechazoRepository.findAll();
+        List<CatCausaRechazo> listaRechazos = catCausaRechazoRepository.findAll();
         log.info("listaRechazos size :: " + listaRechazos.size());
         if (!listaRechazos.isEmpty()) {
             List<CatCausaRechazo> validRechazos = listaRechazos.stream().filter(lr -> lr.getIdCausaRechazo().intValue() == idRechazo).collect(Collectors.toList());
-            resp = validRechazos.get(validRechazos.size() - 1).getCausa();
+            resp = validRechazos.get(validRechazos.size() - 1).getCausaProteccion();
         }
         return resp;
     }
@@ -426,7 +430,7 @@ public class RebajasServiceImp implements RebajasService {
 
     private String validFranquicia(Integer idFranquicia) {
         String valid = "";
-        if (!idFranquicia.equals("")) {
+        if (idFranquicia != null && !idFranquicia.equals("")) {
             valid = FormatUtils.getCatFranquicias().get(idFranquicia) != null ? FormatUtils.getCatFranquicias().get(idFranquicia) : "";
         }
         return valid;
