@@ -51,6 +51,13 @@ public class FormatUtils {
         return formatFecha;
     }
 
+    public static String formatDateSinEspacios2(Date fecha) {
+        String pattern = "yyyyMMdd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String formatFecha = simpleDateFormat.format(fecha);
+        return formatFecha;
+    }
+
     public static Date stringToDate(String fecha) throws ParseException {
         String pattern = "dd/MM/yyyy";
         Date formatFecha = new SimpleDateFormat(pattern).parse(fecha);

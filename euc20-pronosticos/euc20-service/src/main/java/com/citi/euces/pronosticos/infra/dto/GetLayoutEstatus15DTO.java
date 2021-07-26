@@ -1,21 +1,19 @@
 package com.citi.euces.pronosticos.infra.dto;
 
-import org.springframework.data.domain.Page;
-
 import java.io.Serializable;
 
 public class GetLayoutEstatus15DTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private MensajeDTO mensaje;
+    private String mensajeInfo;
     private String file;
 
-    public MensajeDTO getMensaje() {
-        return mensaje;
+    public String getMensajeInfo() {
+        return mensajeInfo;
     }
 
-    public void setMensaje(MensajeDTO mensaje) {
-        this.mensaje = mensaje;
+    public void setMensajeInfo(String mensajeInfo) {
+        this.mensajeInfo = mensajeInfo;
     }
 
     public String getFile() {
