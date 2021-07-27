@@ -103,7 +103,6 @@ public class SubirArchivosCobroJDBCRepository {
     	jdbcTemplate.execute(Query);
     }
     
-    
     public void UpdatePreparoResp(){
     	String Query = "UPDATE PPC_PCB_PREPARO_RESPUESTA "
     			+ "SET tipo_registro = null "
@@ -122,7 +121,7 @@ public class SubirArchivosCobroJDBCRepository {
     }
     
     public void UpdateCambioNumero() {
-    	String Query = "UPDATE PPC_PCB_PREPARO_RESPUESTA SET cambio_numero = sec_arc_original WHERE tipo_registro is not null;";
+    	String Query = "UPDATE PPC_PCB_PREPARO_RESPUESTA SET cambio_numero = sec_arc_original WHERE tipo_registro is not null";
     	jdbcTemplate.execute(Query);
     }
 }

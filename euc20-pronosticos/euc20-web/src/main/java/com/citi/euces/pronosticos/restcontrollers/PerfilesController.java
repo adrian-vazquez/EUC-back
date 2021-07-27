@@ -58,7 +58,7 @@ public class PerfilesController {
         }
 	}
 
-	@PostMapping("/ArchivoCobros")
+	@PostMapping("/ReporteCobros")
 	public ResponseEntity<?> ReporteCobros(@RequestBody final CobuRequest request){
 		try {
 			if (request.getFile().isEmpty()) {

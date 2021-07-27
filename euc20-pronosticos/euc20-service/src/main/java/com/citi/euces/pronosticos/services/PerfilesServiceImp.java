@@ -158,11 +158,12 @@ public class PerfilesServiceImp implements PerfilesService{
         		//Se inserta info en la tabla PPC_PCB_RESPUESTA
         		subirArchivosCobroJDBCRepository.batchInsert(content, 500);
         		//Se inserta info en la tabla PPC_PCB_PREPARO_RESPUESTA
-        		//subirArchivosCobroJDBCRepository.InsertPreparoResp();
+        		subirArchivosCobroJDBCRepository.InsertPreparoResp();
 	        	subirArchivosCobroJDBCRepository.UpdatePreparoResp();
-        		//subirArchivosCobroJDBCRepository.DeleteTipoRegistro();
-	        	//subirArchivosCobroJDBCRepository.UpdateNumSecuencia();
-	        	//subirArchivosCobroJDBCRepository.UpdateCambioNumero();
+        		subirArchivosCobroJDBCRepository.DeleteTipoRegistro();
+	        	subirArchivosCobroJDBCRepository.UpdateNumSecuencia();
+	        	subirArchivosCobroJDBCRepository.UpdateCambioNumero();
+        	
         	}else {
         		throw new GenericException(
                         "Error al leer archivo" + HttpStatus.INTERNAL_SERVER_ERROR.toString());
