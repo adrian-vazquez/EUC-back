@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.ArchivoProteccion;
+import com.citi.euces.pronosticos.models.ArchivoRebajaProteccionResquest;
 import com.citi.euces.pronosticos.models.ArchivoRechazos;
 import com.citi.euces.pronosticos.models.ArchivoRespuestaRequest;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
@@ -144,33 +145,9 @@ public class PronosticosController {
             return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
         }
 	}
-	
-	@GetMapping(path = "/borrarArchivoProteccion")
-	public ResponseEntity<?> borrarArchivoProteccion(){
-		try {
-			MensajeResponse response = new MensajeResponse(pronosticosService.borrarArchivoProteccion(),HttpStatus.OK.toString());
-			return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
-		}catch (GenericException ex) 
-		{
-            ErrorGeneric error = new ErrorGeneric();
-            error.setCode(ex.getCodeError());
-            error.setMensaje(ex.getMessage());
-            error.setException(ex);
-            log.info(error.getException());
-            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
-        } catch (Exception e) 
-		{
-            ErrorGeneric error = new ErrorGeneric();
-            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
-            error.setMensaje(e.getMessage());
-            error.setException(e);
-            log.info(error.getException());
-            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
-        }
-	}
-	
+
 	@PostMapping(path = "/cargaArchivoRebaja")
-	public ResponseEntity<?> cargaArchivoRebaja(@RequestBody final ArchivoRechazos request){
+	public ResponseEntity<?> cargaArchivoRebaja(@RequestBody final ArchivoRebajaProteccionResquest request){
 		try {
 			if (request.getFile().isEmpty()) 
 			{
@@ -198,4 +175,27 @@ public class PronosticosController {
         }
 	}
 	
+	@PostMapping(path = "/migrarMaestro")
+	public ResponseEntity<?> migrarMaestro(){
+		try {
+			MensajeResponse response = new MensajeResponse(pronosticosService.migracionMaestro(),HttpStatus.OK.toString());
+			return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+		} catch (GenericException ex) 
+		{
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) 
+		{
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+	}
 }

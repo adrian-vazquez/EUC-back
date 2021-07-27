@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
-//import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
+import com.citi.euces.pronosticos.infra.dto.PronosticosFinalDTO;
 import com.citi.euces.pronosticos.infra.dto.RechazosFileDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
@@ -24,11 +24,56 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 public class PronosticosTmpJDBCRepository {
 
 	private final JdbcTemplate jdbcTemplate;
-	//private SimpleJdbcCall simpleJdbcCallRefCursor;
 	static final Logger log = LoggerFactory.getLogger(PronosticosTmpJDBCRepository.class);
 	
 	public PronosticosTmpJDBCRepository(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+	}
+	
+	public List<PronosticosFinalDTO> selectPronosticosFinal()
+	{
+		String sql = "SELECT ID, CLIENTE, BLANCO, CUENTA, IMPORTE, IVA, STATUS, MES, ANIO, SERVICIO, CSI, COM, COM_SIN_IVA,"
+				+ "IVAA, TOTAL, TIPO_COMISION, LLAVE, EJE, CATALOGADA, SECUENCIAL, FECHA, CONCEPTO, LEYENDA, "
+				+ "DIAS , ID_SERVICIO, ID_ONDEMAND, EVALUACION_VIRTUAL, "
+				+ "CTA_CLIENTE, CONTRATO, FRANQUICIA, NUM_PROTECCION, FEC_VENC_PROTECCION, OPEN_ITEM "
+				+ "FROM PPC_MIS_PRONOSTICOS_TMP WHERE 1";
+        return jdbcTemplate.query(sql, (cc, rowNum) ->
+                new PronosticosFinalDTO(
+                        cc.getInt("ID"),
+                        cc.getInt("CLIENTE"),
+                        cc.getString("BLANCO"),
+                        cc.getLong("CUENTA"),
+                        cc.getDouble("IMPORTE"),
+                        cc.getInt("IVA"),
+                        cc.getString("STATUS"),
+                        cc.getString("MES"),
+                        cc.getInt("ANIO"),
+                        cc.getString("SERVICIO"),
+                        cc.getString("CSI"),
+                        cc.getString("COM"),
+                        cc.getDouble("COM_SIN_IVA"),
+                        cc.getDouble("IVAA"),
+                        cc.getDouble("TOTAL"),
+                        cc.getInt("TIPO_COMISION"),
+                        cc.getString("LLAVE"),
+                        cc.getString("EJE"),
+                        cc.getString("CATALOGADA"),
+                        cc.getString("SECUENCIAL"),
+                        cc.getDate("FECHA"),
+                        cc.getString("CONCEPTO"),
+                        cc.getString("LEYENDA"),
+                        cc.getInt("DIAS"),
+                        cc.getLong("ID_SERVICIO"),
+                        cc.getLong("ID_ONDEMAND"),
+                        cc.getInt("EVALUACION_VIRTUAL"),
+                        cc.getString("CTA_CLIENTE"),
+                        cc.getString("CONTRATO"),
+                        cc.getString("FRANQUICIA"),
+                        cc.getString("NUM_PROTECCION"),
+                        cc.getDate("FEC_VENC_PROTECCION"),
+                        cc.getString("OPEN_ITEM")
+                )
+        );
 	}
 	
 	@Transactional
@@ -68,7 +113,6 @@ public class PronosticosTmpJDBCRepository {
 		                    	ps.setInt(24, content.getDias());
 		                    	ps.setLong(25, content.getIdServicio());
 		                    	ps.setLong(26, content.getIdOndemand());
-		                    	//ps.setInt(27, content.getEvaluacionVirtual());
 		                    	ps.setString(27, content.getOpenItem());	
 	                    	} catch (SQLException e) {
 	                			e.printStackTrace();

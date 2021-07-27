@@ -22,4 +22,6 @@ public interface PronosticosService {
 	public MensajeDTO generaArchivoProteccion(Integer secuArch, Date fechaCarga, Integer cuentaAlterna, String posNopos) throws GenericException;
 	
 	MensajeDTO borrarArchivoProteccion () throws GenericException; 
+	
+	MensajeDTO migracionMaestro () throws GenericException;
 }

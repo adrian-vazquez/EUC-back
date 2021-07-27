@@ -26,7 +26,7 @@ public interface CobuService {
 
 	public CobuDTO procesoCobu() throws GenericException, IOException, ParseException, SQLException;
 	
-	//public CobuDTO reporte() throws GenericException;
+	public ReportesCobuDTO reporte() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException;
 	
-	public ReportesCobuDTO cifrasControl() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException ;
+	public ReportesCobuDTO cifrasControl() throws GenericException, IOException, ParseException, SQLException, InvalidFormatException;
 }

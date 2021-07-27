@@ -95,5 +95,12 @@ public class ConstantUtils {
     		MES,ANIO1,SERVICIO,CSI1,CONCEPTO,COMISION_SIN_IVA1,IVAA,TOTAL,COMP,LLAVE,NOPROTECCION,FRANQUICIA,CATALOGADA,FECHA_COBRO,FECHA_CONTABLE,
     		CUENTA_PRODUCTO,NUM_CONTRATO};
 
-
+    //Reporte Cobu - Encabezado EXCEL
+    final public static String ENCABEZADOBE[] = {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_BE", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA", "USO11"};
+    final public static String ENCABEZADOMENS[] = {"NUM_CLIENTE", "NOMBRE", "SUC", "CTA", "COM_MENS", "MONTO_IVA", "MONTO_TOTAL", "AÑO", "MES", "PRODUCTO", "IVA", "MONEDA"};
+    final public static String ENCABEZADOVENT[] = {"NUM_CLIENTE", "TARIFA_BE", "TAFIRA_VENT", "TARIFA_MENS"};
+    final public static String ENCABEZADOTARIFAS[] = {"NUM_CLIENTE", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS"};
+    final public static String ENCABEZADOCTASVIRTGPOS[] = {"NUM_CLIENTE", "NUM_CUENTA", "NOMBRE", "CTAS_V", "TXNS_BE", "TXNS_VENT", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS", "COM_BE", "COM_VENT", "COM_MENS", "USO11", "COM_TOTAL", "SUC", "CTA", "FRANQUICIA", "MONEDA", "IVA"};						
+    final public static String ENCABEZADOTXNSXIMPORTE[] = {"NUM_CLIENTE", "NUM_CUENTA", "TIPO", "TXNS", "SumaDeIMP_TRANSACCION"};
+    final public static String ENCABEZADOCIFRAS[] = {"Consulta", "Cifra"};	
 }
