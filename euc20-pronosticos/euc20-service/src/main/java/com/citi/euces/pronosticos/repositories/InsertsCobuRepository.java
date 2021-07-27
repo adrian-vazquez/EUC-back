@@ -31,7 +31,7 @@ public class InsertsCobuRepository {
 	    }
 	    
 	    
-	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional
 	    public int[][] insertCtasCobu(List<QueryCtosAgrupadoDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_QUERY_CTOS_AGRUPADO(CUENTA, PREFMDA, CUENTAMDA, CVE_ESTATUS, NOMBRE, USO, MON, FRANQUICIA, ID) VALUES(?,?,?,?,?,?,?,?,?)",
@@ -55,7 +55,7 @@ public class InsertsCobuRepository {
 	        return updateCounts;
 	    }
 	    
-	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional
 	    public int[][] insertCtasVirtuales(List<CtasVirtualesDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_CTAS_VIRTUALES( NUM_CLIENTE, NUM_CUENTA, FEC_ALTA, CUENTAS_X, NOMBRE, ID) VALUES(?,?,?,?,?,?)",
@@ -77,7 +77,7 @@ public class InsertsCobuRepository {
 	    }
 	
 	    
-	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional
 	    public int[][] insertTxsCtas(List<TxsCtasVirtDTO> books, int batchSize) {
 	    	log.info("empieza insert :: init");
 	        int [][]updateCounts = inserts.batchUpdate(											
@@ -107,7 +107,7 @@ public class InsertsCobuRepository {
 	        return updateCounts;
 	    }
 	    
-	    @Transactional//(propagation = Propagation.NOT_SUPPORTED)
+	    @Transactional
 	    public int[][] insertTarEspCobu(List<ProcesadoDTO> books, int batchSize) {
 	        int [][]updateCounts = inserts.batchUpdate(
 	        		"INSERT INTO PPC_PCB_PROCESADO( NO_CLIENTE, BE, VENTANILLA, MENSUALIDAD, ID) VALUES(?,?,?,?,?)",
