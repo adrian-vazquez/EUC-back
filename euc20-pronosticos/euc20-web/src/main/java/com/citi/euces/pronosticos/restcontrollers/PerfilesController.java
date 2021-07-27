@@ -57,12 +57,12 @@ public class PerfilesController {
             return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
         }
 	}
-
-	@PostMapping("/ReporteCobros")
-	public ResponseEntity<?> ReporteCobros(@RequestBody final CobuRequest request){
+	
+	@PostMapping("/UploadRespuesta")
+	public ResponseEntity<?> SubirRespuesta(@RequestBody final CobuRequest request){
 		try {
 			if (request.getFile().isEmpty()) {
-				throw new GenericException("Aviso, Archivo no valido ",
+				throw new GenericException("Alerta, ",
 						HttpStatus.BAD_REQUEST.toString());
 			}
 			MensajeResponse response = new MensajeResponse(
@@ -85,15 +85,15 @@ public class PerfilesController {
         }
 	}
 	
-	@PostMapping("/UploadRespuestas")
-	public ResponseEntity<?> SubirRespuesta(@RequestBody final CobuRequest request){
+	@PostMapping("/ReporteCobros")
+	public ResponseEntity<?> ReporteCobros(@RequestBody final CobuRequest request){
 		try {
 			if (request.getFile().isEmpty()) {
-				throw new GenericException("Alerta, ",
+				throw new GenericException("Aviso, Archivo no valido ",
 						HttpStatus.BAD_REQUEST.toString());
 			}
 			MensajeResponse response = new MensajeResponse(
-            	perfilesService.SubirRespuesta(request.getFile()),HttpStatus.OK.toString());
+            	perfilesService.ArchivoCobros(request.getFile()),HttpStatus.OK.toString());
             return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
 		}catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
