@@ -76,7 +76,6 @@ public class Estatus15Controller {
         }
     }
 
-
     @PostMapping(path = "/agregarALista")
     public ResponseEntity<?> agregarALista(@RequestBody final AgregarListaEstatus15Request request) {
         try {
@@ -108,11 +107,12 @@ public class Estatus15Controller {
     public ResponseEntity<?> generarArchivo(@RequestBody final GetLayoutEstatus15Request request) {
         try {
             log.info("generarArchivo:: ", request.toString());
-            if (request.getDiasProteccion() == null || request.getSecuencialArch() == null || request.getSucursal() == null || request.getCuenta() == null || request.getDias() == null) {
-                throw new GenericException("Request incompleto :: " , HttpStatus.BAD_REQUEST.toString());
+            if (request.getDiasProteccion() == null || request.getSecuencialArch() == null || request.getSucursal() == null || request.getCuenta() == null) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
             }
 
-            GetLayoutEstatus15Response response = new GetLayoutEstatus15Response(estatusService.generarArchivo(request.getDiasProteccion(), request.getSecuencialArch(), request.getSucursal(), request.getCuenta(), request.getDias()), "200");
+            GetLayoutEstatus15Response response = new GetLayoutEstatus15Response(estatusService.generarArchivo(request.getDiasProteccion(), request.getSecuencialArch(),
+                    request.getSucursal(), request.getCuenta()), "200");
             return new ResponseEntity<GetLayoutEstatus15Response>(response, HttpStatus.OK);
         } catch (GenericException ex) {
             ErrorGeneric error = new ErrorGeneric();
@@ -130,4 +130,32 @@ public class Estatus15Controller {
             return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
         }
     }
+
+    @PostMapping(path = "/subirRespuestas")
+    public ResponseEntity<?> subirRespuestas(@RequestBody final SubirRespEstatus15Request request) {
+        try {
+            log.info("generarArchivo:: ", request.toString());
+            if (request.getFile() == null || request.getFile().isEmpty()) {
+                throw new GenericException("Request incompleto :: ", HttpStatus.BAD_REQUEST.toString());
+            }
+
+            MensajeResponse response = new MensajeResponse(estatusService.subirRespuestas(request.getFile()), "200");
+            return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+    }
+
 }

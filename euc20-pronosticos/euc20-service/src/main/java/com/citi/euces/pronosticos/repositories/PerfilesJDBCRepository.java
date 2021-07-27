@@ -140,6 +140,6 @@ public class PerfilesJDBCRepository {
     		+ "m.llave, m.num_proteccion, to_char(m.fec_cobro, 'dd/MM/yyyy') fec_cobro,"
     		+ "to_char(m.fec_cobro + INTERVAL '1' DAY, 'dd/MM/yyyy') fec_contable, m.cntr_cliente_usuario "
     		+ "FROM PPC_PCB_BASEPERFILES m "
-    		+ "WHERE to_char(m.fec_cobro,'dd/MM/yyyy') = ?";
+    		+ "WHERE to_char(m.fec_cobro,'dd/MM/yyyy') = ?";    
     
 }

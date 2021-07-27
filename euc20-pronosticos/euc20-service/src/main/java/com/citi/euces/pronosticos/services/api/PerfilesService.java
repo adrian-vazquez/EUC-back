@@ -11,5 +11,8 @@ public interface PerfilesService {
 	MensajeDTO SubirRebajas(String file) throws GenericException, IOException, ParseException;
 
 	MensajeDTO ImpReporteCobro(String fechaCobro) throws GenericException, IOException, ParseException;
+	
+	MensajeDTO ArchivoCobros(String file) throws GenericException, IOException, ParseException;
 
+	MensajeDTO SubirRespuesta(String file) throws GenericException, IOException, ParseException;
 }

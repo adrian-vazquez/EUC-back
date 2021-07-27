@@ -6,9 +6,8 @@ public class GetLayoutEstatus15Request implements Serializable {
 
     private Integer diasProteccion;
     private Integer secuencialArch;
-    private Integer sucursal;
-    private Integer cuenta;
-    private Integer dias;
+    private Long sucursal;
+    private Long cuenta;
 
     public Integer getDiasProteccion() {
         return diasProteccion;
@@ -26,27 +25,19 @@ public class GetLayoutEstatus15Request implements Serializable {
         this.secuencialArch = secuencialArch;
     }
 
-    public Integer getSucursal() {
+    public Long getSucursal() {
         return sucursal;
     }
 
-    public void setSucursal(Integer sucursal) {
+    public void setSucursal(Long sucursal) {
         this.sucursal = sucursal;
     }
 
-    public Integer getCuenta() {
+    public Long getCuenta() {
         return cuenta;
     }
 
-    public void setCuenta(Integer cuenta) {
+    public void setCuenta(Long cuenta) {
         this.cuenta = cuenta;
-    }
-
-    public Integer getDias() {
-        return dias;
-    }
-
-    public void setDias(Integer dias) {
-        this.dias = dias;
     }
 }

@@ -5,6 +5,8 @@ import com.citi.euces.pronosticos.infra.dto.GetLayoutEstatus15DTO;
 import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 
@@ -16,5 +18,7 @@ public interface Estatus15Service {
 
     MensajeDTO agregarALista(String listaLlaves, String sucursal, String cuentas, Integer dias, String secuencialArch) throws GenericException;
 
-    GetLayoutEstatus15DTO generarArchivo(Integer diasProteccion, Integer secuencialArch, Integer sucursal, Integer cuenta, Integer dias) throws GenericException;
+    GetLayoutEstatus15DTO generarArchivo(Integer diasProteccion, Integer secuencialArch, Long sucursal, Long cuenta) throws GenericException;
+
+    MensajeDTO subirRespuestas(String file)throws GenericException, IOException, ParseException;
 }
