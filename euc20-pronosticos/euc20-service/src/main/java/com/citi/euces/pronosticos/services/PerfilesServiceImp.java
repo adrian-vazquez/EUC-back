@@ -11,10 +11,10 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import com.citi.euces.pronosticos.infra.dto.ImpReporteCobroDTO;
 import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
+import com.citi.euces.pronosticos.infra.dto.SlunifinalexcPerfDTO;
 import com.citi.euces.pronosticos.infra.dto.RebNumProtectDTO;
 import com.citi.euces.pronosticos.infra.dto.RebajaFileOndemandDTO;
 import com.citi.euces.pronosticos.infra.dto.SubirRespuestaDTO;
@@ -245,6 +246,101 @@ public class PerfilesServiceImp implements PerfilesService{
 	        return responseMessage;
 		}
 	
+	///-------------------------SUBIR REBAJA----------------------------------------///
+	@Override
+	public MensajeDTO SubirRebajas(String file) throws GenericException, IOException, ParseException {
+		try {
+			Path testFile = Files.createTempFile("SubirRebaja", ".zip");
+			testFile.toFile().deleteOnExit();
+			byte[] decoder = Base64.getDecoder().decode(file);
+			Files.write(testFile, decoder);
+        
+			ZipFile zipFile = new ZipFile(testFile.toFile());
+			Enumeration<?> enu = zipFile.entries();
+			String proceso = "";
+			while (enu.hasMoreElements()) {
+				ZipEntry zipEntry = (ZipEntry) enu.nextElement();
+
+				InputStream is = zipFile.getInputStream(zipEntry);
+				Path tempFile = Files.createTempFile("SubirRebaja", ".txt");
+				tempFile.toFile().deleteOnExit();
+				try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
+                IOUtils.copy(is, fos);
+
+                proceso = lecturaTxtRebaja(tempFile);
+            }
+        }
+        zipFile.close();
+        
+        MensajeDTO response = new MensajeDTO();
+        response.setMensajeInfo("El archivo se importo exitosamente");
+        response.setMensajeConfirm(proceso);
+		return response;
+		}catch(EntityNotFoundException ex) {
+			throw new GenericException("Error al importar registros", HttpStatus.BAD_REQUEST.toString());
+		}
+		
+	}	
+	
+	public String lecturaTxtRebaja(Path tempFile) throws GenericException, IOException, ParseException {
+		String validar;
+        BufferedReader a = new BufferedReader(new FileReader(tempFile.toFile()));
+        validar = a.readLine();
+        if(!validar.equals(ConstantUtils.VALIDATXT)) {
+        	a.close();
+        	throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
+        }
+        
+		String linea;
+		String[] valores;
+		int ini = 1;
+		FileReader f = new FileReader(tempFile.toFile());
+        BufferedReader b = new BufferedReader(f);
+		List<SlunifinalexcPerfDTO> lista = new ArrayList<SlunifinalexcPerfDTO>();
+		
+		 while ((linea= b.readLine()) != null) {
+			 if (ini != 1) {
+	            valores = linea.split("\t");
+	            SlunifinalexcPerfDTO data = new SlunifinalexcPerfDTO();
+	            
+	            data.setNumCliente(Long.parseLong(valores[0].replaceAll("\\s", "")));
+	            data.setNumContrato(Long.parseLong(valores[1].replaceAll("\\s", "")));
+	            data.setSucursal(Long.parseLong(valores[2].equals("") ? "0" : valores[2].replaceAll("\\s", "")));
+	            data.setSdoFinMes(Double.parseDouble(valores[3].equals("") ? "0" : valores[3].replaceAll("\\s", "")));
+	            data.setSdoFromMes(Double.parseDouble(valores[4].equals("") ? "0" : valores[4].replaceAll("\\s", "")));
+	            data.setSuc(Long.parseLong(valores[5].replaceAll("\\s", "")));
+	            data.setCuenta(Long.parseLong(valores[6].replaceAll("\\s", "")));
+	            data.setDiferencia(Double.parseDouble(valores[7].equals("") ? "0" : valores[7].replaceAll("\\s", "")));
+	            data.setCom(Double.parseDouble(valores[8].replaceAll("\\s", "")));
+	            data.setLlavePre(String.valueOf(valores[9].equals("") ? "0" : valores[9].replaceAll("\\s", "")));       
+	            lista.add(data);
+			 }	
+			 ini = 2;
+		 }
+		
+		 b.close();
+		 try {   
+             perfilesJDBCRepository.deleteSlunifinalexcPerf();
+			 perfilesJDBCRepository.insertSlunifinalexcPerf(lista, 500);
+			 perfilesJDBCRepository.deleteLayoutCarga();
+			 perfilesJDBCRepository.deleteArmadoCuerpo();
+			 perfilesJDBCRepository.deletePreparoCuerpo();
+			 perfilesJDBCRepository.deleteHeader();
+			 perfilesJDBCRepository.deleteTrailer();
+			 perfilesJDBCRepository.deleteTablaErrores();
+			 perfilesJDBCRepository.deletePreparoRespuesta();
+			 perfilesJDBCRepository.deleteTmpRespuesta();
+			 perfilesJDBCRepository.deleteArmadoCuerpo();
+			 perfilesJDBCRepository.insertComPendOper();
+		 } catch (Exception e) {
+			 throw new GenericException("Error al importar registros" , HttpStatus.NOT_FOUND.toString());
+		 }
+	        
+		 	String responseMessage = "Proceso completado";
+	        return responseMessage;
+	}
+	
+	
 	
 	///---------------------------IMPRIMIR REPORTE---------------------------------///
 	@Override
@@ -310,4 +406,5 @@ public class PerfilesServiceImp implements PerfilesService{
 			throw new GenericException("Error ", HttpStatus.BAD_REQUEST.toString());
     	}
 	}
+
 }

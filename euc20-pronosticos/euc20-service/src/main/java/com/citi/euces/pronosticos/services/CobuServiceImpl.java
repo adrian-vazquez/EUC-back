@@ -28,7 +28,6 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -87,7 +86,7 @@ public class CobuServiceImpl implements CobuService{
 			deleteTables.deleteLayoutVent();
 			deleteTables.deleteProcesado();
 			deleteTables.deleteQueryCtosAgrupado();
-			deleteTables.deleteQueryCtosCobu();
+			deleteTables.deleteQueryCtosCobu();/////////////////////////////////
 			deleteTables.deleteQueryCtosDuplicados();
 			deleteTables.deleteTarifas();
 			deleteTables.deleteTxnsImporte();
@@ -121,11 +120,7 @@ public class CobuServiceImpl implements CobuService{
 	        String procesados = "";
 	            while (enu.hasMoreElements()) {
 	                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-	                
-	               /* String name = zipEntry.getName();
-	                long size = zipEntry.getSize();
-	                long compressedSize = zipEntry.getCompressedSize();*/
-	              
+	           
 	                InputStream is = zipFile.getInputStream(zipEntry);
 	                Path tempFile = Files.createTempFile("Query_Ctas_COBU", ".csv");
 	                tempFile.toFile().deleteOnExit();
@@ -210,11 +205,7 @@ public class CobuServiceImpl implements CobuService{
 	        Enumeration<?> enu = zipFile.entries();
 	        String procesados = "";
 	            while (enu.hasMoreElements()) {
-	                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-	                
-	               /* String name = zipEntry.getName();
-	                long size = zipEntry.getSize();
-	                long compressedSize = zipEntry.getCompressedSize();*/
+	                ZipEntry zipEntry = (ZipEntry) enu.nextElement();	             
 	              
 	                InputStream is = zipFile.getInputStream(zipEntry);
 	                Path tempFile = Files.createTempFile("TXS_CTAS_VIRT", ".csv");
@@ -301,11 +292,7 @@ public class CobuServiceImpl implements CobuService{
 	        String procesados = "";
 	            while (enu.hasMoreElements()) {
 	                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-	                
-	               /* String name = zipEntry.getName();
-	                long size = zipEntry.getSize();
-	                long compressedSize = zipEntry.getCompressedSize();*/
-	              
+	        
 	                InputStream is = zipFile.getInputStream(zipEntry);
 	                Path tempFile = Files.createTempFile("Obtiene_TXS_CTAS", ".csv");
 	                tempFile.toFile().deleteOnExit();
@@ -397,11 +384,7 @@ public class CobuServiceImpl implements CobuService{
 	        String procesados = "";
 	            while (enu.hasMoreElements()) {
 	                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
-	                
-	               /* String name = zipEntry.getName();
-	                long size = zipEntry.getSize();
-	                long compressedSize = zipEntry.getCompressedSize();*/
-	              
+	             
 	                InputStream is = zipFile.getInputStream(zipEntry);
 	                Path tempFile = Files.createTempFile("TAR_ESP_COBU", ".csv");
 	                tempFile.toFile().deleteOnExit();
