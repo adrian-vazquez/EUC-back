@@ -8,7 +8,9 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
 public interface PerfilesService {
 	
-	MensajeDTO SubirRebajas(String file) throws GenericException, IOException, ParseException;
+	MensajeDTO SubirRebaja(String file) throws GenericException, IOException, ParseException;
+	
+	MensajeDTO insertar(String dias, String secuencial) throws GenericException, IOException, ParseException;
 
 	MensajeDTO ImpReporteCobro(String fechaCobro) throws GenericException, IOException, ParseException;
 	

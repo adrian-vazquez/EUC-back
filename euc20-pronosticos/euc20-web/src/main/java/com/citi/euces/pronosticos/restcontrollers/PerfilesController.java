@@ -15,6 +15,7 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.models.CobuRequest;
 import com.citi.euces.pronosticos.models.ErrorGeneric;
 import com.citi.euces.pronosticos.models.ImpReporteCobroRequest;
+import com.citi.euces.pronosticos.models.InsertarPerfilesRequest;
 import com.citi.euces.pronosticos.models.MensajeResponse;
 import com.citi.euces.pronosticos.services.api.PerfilesService;
 
@@ -31,13 +32,40 @@ public class PerfilesController {
 	private PerfilesService perfilesService;
 	
 	@PostMapping(path = "/subirRebaja")
-	public ResponseEntity<?>cargaCtasCobu(@RequestBody final CobuRequest request) {
+	public ResponseEntity<?>SubirRebaja(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty()) {
                 throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             MensajeResponse response = new MensajeResponse(
-            	perfilesService.SubirRebajas(request.getFile()),
+            	perfilesService.SubirRebaja(request.getFile()),
+            	HttpStatus.OK.toString());
+            	return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
+        } catch (GenericException ex) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(ex.getCodeError());
+            error.setMensaje(ex.getMessage());
+            error.setException(ex);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorGeneric error = new ErrorGeneric();
+            error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+            error.setMensaje(e.getMessage());
+            error.setException(e);
+            log.info(error.getException());
+            return new ResponseEntity<ErrorGeneric>(error, HttpStatus.OK);
+        }
+	}
+	
+	@PostMapping(path = "/insertar")
+	public ResponseEntity<?>insertar(@RequestBody final InsertarPerfilesRequest request) {
+		try {
+            if (request.getDias().isEmpty() || request.getSecuencial().isEmpty()) {
+                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
+            }
+            MensajeResponse response = new MensajeResponse(
+            	perfilesService.insertar(request.getDias(), request.getSecuencial()),
             	HttpStatus.OK.toString());
             	return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {

@@ -39,6 +39,7 @@ import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.ConstantUtils;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
 import com.citi.euces.pronosticos.repositories.PerfilesJDBCRepository;
+import com.citi.euces.pronosticos.repositories.ProcesoInsertarRepository;
 import com.citi.euces.pronosticos.repositories.SubirArchivosCobroJDBCRepository;
 import com.citi.euces.pronosticos.repositories.SubirRespuestaJDBCRepository;
 import com.citi.euces.pronosticos.services.api.PerfilesService;
@@ -55,6 +56,8 @@ public class PerfilesServiceImp implements PerfilesService{
 	private SubirArchivosCobroJDBCRepository subirArchivosCobroJDBCRepository;
 	@Autowired
 	private SubirRespuestaJDBCRepository subirRespuestaJDBCRepository;
+	@Autowired
+	private ProcesoInsertarRepository procesoInsertarRepository;
 	
 	///---------------------------SUBIR RESPUESTA---------------------------------///	
 	@Override
@@ -248,7 +251,7 @@ public class PerfilesServiceImp implements PerfilesService{
 	
 	///-------------------------SUBIR REBAJA----------------------------------------///
 	@Override
-	public MensajeDTO SubirRebajas(String file) throws GenericException, IOException, ParseException {
+	public MensajeDTO SubirRebaja(String file) throws GenericException, IOException, ParseException {
 		try {
 			Path testFile = Files.createTempFile("SubirRebaja", ".zip");
 			testFile.toFile().deleteOnExit();
@@ -273,7 +276,7 @@ public class PerfilesServiceImp implements PerfilesService{
         zipFile.close();
         
         MensajeDTO response = new MensajeDTO();
-        response.setMensajeInfo("El archivo se importo exitosamente");
+        response.setMensajeInfo("Se cargó el archivo de forma correcta, favor de proseguir");
         response.setMensajeConfirm(proceso);
 		return response;
 		}catch(EntityNotFoundException ex) {
@@ -290,6 +293,7 @@ public class PerfilesServiceImp implements PerfilesService{
         	a.close();
         	throw new GenericException("Layout invalido. Favor de verificar" , HttpStatus.NOT_FOUND.toString());
         }
+        a.close();
         
 		String linea;
 		String[] valores;
@@ -340,6 +344,67 @@ public class PerfilesServiceImp implements PerfilesService{
 	        return responseMessage;
 	}
 	
+	///--------------------------------INSERTAR-------------------------------------///
+	
+	public MensajeDTO insertar(String dias, String secuencial) throws GenericException, IOException, ParseException{
+		int[] cifras = new int[11];
+        String[] consulta = new String[11];
+		
+        cifras[1] = procesoInsertarRepository.cargaLayout();
+        consulta[1] = "Inseta en PPC_PCB_LAYOUT_CARGA";
+        if (cifras[1] == -1) {
+        	throw new GenericException("Error cargaLayout. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+		cifras[2] = procesoInsertarRepository.updateLayout();
+        consulta[2] = "Actualizacion PPC_PCB_LAYOUT_CARGA";
+        if (cifras[2] == -1) {
+        	throw new GenericException("Error updateLayout. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[3] = procesoInsertarRepository.insertaArmadoCuerpo();
+        consulta[3] = "Inserta en PPC_PCB_ARMADO_CUERPO";
+        if (cifras[3] == -1) {
+        	throw new GenericException("Error al insertar armado cuerpo. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[4] = procesoInsertarRepository.llamaProcedimiento();
+        consulta[4] = "Arma cuerpo";
+        if (cifras[4] == -1) {
+        	throw new GenericException("Error durante el procedimiento. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[5] = procesoInsertarRepository.updateArmadoCuerpo(Integer.parseInt(dias), Integer.parseInt(secuencial));
+        consulta[5] = "Actualiza cuerpo con dias y secuencial ";
+        if (cifras[5] == -1) {
+        	throw new GenericException("Error updateArmadoCuerpo. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[6] = procesoInsertarRepository.insertaPreparoCuerpo();
+        consulta[6] = "Inserta en PPC_PCB_PREPARO_CUERPO";
+        if (cifras[6] == -1) {
+        	throw new GenericException("Error insertaPreparoCuerpo. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[7] = procesoInsertarRepository.updatePreparoCuerpo();
+        consulta[7] = "Actualiza en PPC_PCB_PREPARO_CUERPO";
+        if (cifras[7] == -1) {
+        	throw new GenericException("Error updatePreparoCuerpo. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[8] = procesoInsertarRepository.armaHeader(Integer.parseInt(secuencial));
+        consulta[8] = "Arma Header";
+        if (cifras[8] == -1) {
+        	throw new GenericException("Error armaHeader. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[9] = procesoInsertarRepository.armaTrailer();
+        consulta[9] = "Arma Trailer";
+        if (cifras[9] == -1) {
+        	throw new GenericException("Error armaTrailer. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        cifras[10] = procesoInsertarRepository.confirmaPerfiles(Integer.parseInt(secuencial));
+        consulta[10] = "Inserta en PPC_PCB_BASEPERFILES";
+        if (cifras[10] == -1) {
+        	throw new GenericException("Error confirmaPerfiles. La información de protección ha sido completada", HttpStatus.NOT_FOUND.toString());}
+		
+        MensajeDTO response = new MensajeDTO();
+        response.setMensajeInfo("Proceso finalizado");
+        response.setMensajeConfirm("Completo");
+		return response;
+	}
 	
 	
 	///---------------------------IMPRIMIR REPORTE---------------------------------///

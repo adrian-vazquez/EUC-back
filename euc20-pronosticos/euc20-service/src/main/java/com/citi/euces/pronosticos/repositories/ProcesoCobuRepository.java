@@ -234,14 +234,14 @@ public class ProcesoCobuRepository{
 	    
 	    public int actualizaCtosUnicos() throws GenericException {
 	    	int contador = 14;
-	    	String query = "MERGE INTO PPC_PCB_CTOS_UNICOS E "
-	    			+ "USING (SELECT R.NUM_CUENTA, R.SUC, R.CUENTA, R.FRANQUICIA, R.MONEDA "
-	    			+ "FROM PPC_PCB_CTAS_VIRTUALES_GPOS R) R "
+	    	String query = "MERGE INTO PPC_PCB_CTAS_VIRTUALES_GPOS E "
+	    			+ "USING (SELECT R.NUM_CUENTA, R.SUC, R.CTA, R.FRANQUICIA, R.MON "
+	    			+ "FROM PPC_PCB_CTOS_UNICOS R) R "
 	    			+ "ON (E.NUM_CUENTA=R.NUM_CUENTA) "
 	    			+ "WHEN MATCHED THEN "
 	    			+ "UPDATE SET E.SUC=R.SUC, "
-	    			+ "E.CTA=R.CUENTA, "
-	    			+ "E.MON=R.MONEDA, "
+	    			+ "E.CUENTA=R.CTA, "
+	    			+ "E.MONEDA=R.MON, "
 	    			+ "E.FRANQUICIA=R.FRANQUICIA";
 	    	try {
 	    		contador = procesos.update(query);

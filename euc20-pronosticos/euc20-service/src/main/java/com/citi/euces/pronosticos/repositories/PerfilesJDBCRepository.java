@@ -9,14 +9,11 @@ import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 import com.citi.euces.pronosticos.infra.dto.ImpReporteCobroDTO;
-import com.citi.euces.pronosticos.infra.dto.QueryCtosAgrupadoDTO;
 import com.citi.euces.pronosticos.infra.dto.SlunifinalexcPerfDTO;
-import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.FormatUtils;
 
 @Repository
