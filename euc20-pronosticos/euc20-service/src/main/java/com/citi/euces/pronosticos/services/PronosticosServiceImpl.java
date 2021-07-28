@@ -12,10 +12,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -244,6 +247,10 @@ public class PronosticosServiceImpl implements PronosticosService {
 	@Override
 	public MensajeDTO generaArchivoProteccion(Integer secuArch, Date fechaCarga, Integer cuentaAlterna, String posNopos) {
 		MensajeDTO msg = new MensajeDTO();
+		
+		
+		
+		
 		return msg;
 	}
 	
@@ -431,7 +438,8 @@ public class PronosticosServiceImpl implements PronosticosService {
 	        List<RebajaFileOndemandDTO> numProteccion = new ArrayList<RebajaFileOndemandDTO>();
 			FileReader f = new FileReader(tempFile.toFile());
 	        BufferedReader b = new BufferedReader(f);
-	        String linea, actualizados = "0";
+	        String linea;
+	        Integer actualizados = 0;
 	        int total = 0;
 	        Double suma = 0.0;
 	        
@@ -439,7 +447,6 @@ public class PronosticosServiceImpl implements PronosticosService {
 	        	RebajaFileOndemandDTO data = new RebajaFileOndemandDTO();
 	        	if (linea.contains("120983/") || linea.contains("120984/")) {
 	        		if(linea.contains("CGO")) {
-	        			log.info("Cadena (120983/120984) CGO: " + linea);
 	        			data.setNumProteccion(Long.parseLong(linea.substring(14, 26)));
 	        			data.setImporte(Double.parseDouble(validaComas(linea.substring(95, 108))));
 	        			listaRebaja.add(data);
@@ -448,7 +455,9 @@ public class PronosticosServiceImpl implements PronosticosService {
 			}
 	        b.close();
 	        
-	        listaRebaja = listaRebaja.stream().distinct().collect(Collectors.toList());
+	        Set<Long> contentSet = new HashSet<>();
+	        listaRebaja.removeIf(c -> !contentSet.add(c.getNumProteccion()));
+	        listaRebaja.sort(Comparator.comparing(RebajaFileOndemandDTO::getNumProteccion));
 	        Map<Long, List<RebajaFileOndemandDTO>> listaRebajaGroup = listaRebaja.stream().collect(Collectors.groupingBy(RebajaFileOndemandDTO -> RebajaFileOndemandDTO.getNumProteccion()));
 	        
 	        for(Map.Entry<Long, List<RebajaFileOndemandDTO>> valores: listaRebajaGroup.entrySet()) {
@@ -472,6 +481,18 @@ public class PronosticosServiceImpl implements PronosticosService {
 			e.printStackTrace();
             throw new GenericException( "Ocurrió un problema durante el proceso de rebaja pronosticos :: " , HttpStatus.NOT_FOUND.toString());
         }
+	}
+
+	
+	@Override
+	public MensajeDTO migracionMaestro() throws GenericException {
+		try {
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+            throw new GenericException( "Ocurrió un problema durante el proceso de migrar al maestro :: " , HttpStatus.NOT_FOUND.toString());
+        }
+		return null;
 	}
 
 	

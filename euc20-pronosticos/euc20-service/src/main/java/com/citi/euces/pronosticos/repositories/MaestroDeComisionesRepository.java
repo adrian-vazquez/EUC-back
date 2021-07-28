@@ -62,5 +62,5 @@ public interface MaestroDeComisionesRepository extends JpaRepository<MaestroDeCo
     List<MaestroDeComisiones> findByLlaveIN(@Param("llaves") List<Long> llaves);
 
     @Query("SELECT m FROM MaestroDeComisiones m WHERE m.id.llave = :llave")
-    List<MaestroDeComisiones> findByLlave(@Param("llave") String llave);
+    List<MaestroDeComisiones> findByLlave(@Param("llave") Long llave);
 }

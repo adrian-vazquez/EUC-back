@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ public class FormatUtils {
     }
 
     public static String formatDatedmy(Date fecha) {
-        String pattern = "dd-MM-yyyy";
+        String pattern = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String formatFecha = simpleDateFormat.format(fecha);
         return formatFecha;
@@ -52,10 +51,23 @@ public class FormatUtils {
         return formatFecha;
     }
 
+    public static String formatDateSinEspacios2(Date fecha) {
+        String pattern = "yyyyMMdd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String formatFecha = simpleDateFormat.format(fecha);
+        return formatFecha;
+    }
+
     public static Date stringToDate(String fecha) throws ParseException {
         String pattern = "dd/MM/yyyy";
         Date formatFecha = new SimpleDateFormat(pattern).parse(fecha);
         return formatFecha;
+    }
+    
+    public static Date DateCobros(String fecha) throws ParseException{
+    	String pattern = "yyyyMMdd";
+		Date format = new SimpleDateFormat(pattern).parse(fecha);
+        return format; 
     }
     
     public static String formatFecCompActual() {
@@ -254,6 +266,11 @@ public class FormatUtils {
     public static String validaString(String dato) {
         dato = dato == null ? " " : dato;
         return dato;
+    }
+    
+    public static String validaIntegetToString(Integer dato) {
+        String valid = dato == null ? " " : dato.toString();
+        return valid;
     }
 
 

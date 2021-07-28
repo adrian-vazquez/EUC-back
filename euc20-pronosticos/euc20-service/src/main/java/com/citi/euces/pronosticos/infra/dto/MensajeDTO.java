@@ -8,6 +8,14 @@ public class MensajeDTO implements Serializable {
     private String mensajeInfo;
     private String mensajeConfirm;
 
+    public MensajeDTO() {
+    }
+
+    public MensajeDTO(String mensajeInfo, String mensajeConfirm) {
+        this.mensajeInfo = mensajeInfo;
+        this.mensajeConfirm = mensajeConfirm;
+    }
+
     public String getMensajeInfo() {
         return mensajeInfo;
     }
