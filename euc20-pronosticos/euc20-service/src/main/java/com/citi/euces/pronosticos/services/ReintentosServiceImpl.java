@@ -181,8 +181,8 @@ public class ReintentosServiceImpl implements ReintentosService {
 		MensajeDTO response = new MensajeDTO();
 		Integer conteo=0;
 		try {
-			List<GenArcPFECyTCDTO> result = reintentosJDBCRepository.ConteoReintentosSemanalesPersonaFisica(mes1, anio1, dias1, mes2, anio2, dias2, mes3, anio3, dias3);
-			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
+			conteo = reintentosJDBCRepository.ConteoReintentosSemanalesPersonaFisica(mes1, anio1, dias1, mes2, anio2, dias2, mes3, anio3, dias3);
+//			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
 		} catch (Exception e) {
 			throw new GenericException("Error al consultar tabla en genArchPFService :: ",
 					HttpStatus.NOT_FOUND.toString());
@@ -199,8 +199,8 @@ public class ReintentosServiceImpl implements ReintentosService {
 		MensajeDTO response = new MensajeDTO();
 		Integer conteo=0;
 		try {
-			List<GenArcPFECyTCDTO> result = reintentosJDBCRepository.ConteoReintentosSemanalesExtraContable(mes1, anio1, dias1, mes2, anio2, dias2, mes3, anio3, dias3);
-			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
+			conteo = reintentosJDBCRepository.ConteoReintentosSemanalesExtraContable(mes1, anio1, dias1, mes2, anio2, dias2, mes3, anio3, dias3);
+//			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
 		} catch (Exception e) {
 			throw new GenericException("Error al consultar tabla en genArchPFService :: ",
 					HttpStatus.NOT_FOUND.toString());
@@ -215,8 +215,8 @@ public class ReintentosServiceImpl implements ReintentosService {
 		MensajeDTO response = new MensajeDTO();
 		Integer conteo=0;
 		try {
-			List<GenArcPFECyTCDTO> result = reintentosJDBCRepository.ConteoReintentosSemanalesTasaCero();
-			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
+			conteo = reintentosJDBCRepository.ConteoReintentosSemanalesTasaCero();
+//			conteo = result.get(0).getConteo() == null ? 0 : result.get(0).getConteo();
 		} catch (Exception e) {
 			throw new GenericException("Error al consultar tabla en genArchPFService :: ",
 					HttpStatus.NOT_FOUND.toString());

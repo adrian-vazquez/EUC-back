@@ -45,10 +45,10 @@ public class ReintentosJDBCRepository {
 	}
 
 	@Transactional
-	public List<GenArcPFECyTCDTO> ConteoReintentosSemanalesPersonaFisica(Integer mes1, Integer anio1, Integer dias1,
+	public int ConteoReintentosSemanalesPersonaFisica(Integer mes1, Integer anio1, Integer dias1,
 			Integer mes2, Integer anio2, Integer dias2, Integer mes3, Integer anio3, Integer dias3) {
 
-		String sql = "SELECT COUNT(*) AS conteo " + "FROM PPC_MIS_MAESTRO_COMISIONES mc "
+		String sql = "SELECT COUNT(1) AS conteo " + "FROM PPC_MIS_MAESTRO_COMISIONES mc "
 				+ "WHERE mc.ID_ESTATUS_COMISION=3 AND mc.CATALOGADA_GC=5 AND mc.ID_SERVICIO=10 AND mc.ID_ONDEMAND=32"
 				+ " AND (";
 
@@ -64,15 +64,16 @@ public class ReintentosJDBCRepository {
 		sql = sql + " )";
 
 		System.out.println("QUERY_SQL_Clientes :: ejecute:: " + sql);
-
-		return jdbcTemplate.query(sql, (cc, rowNum) -> new GenArcPFECyTCDTO(cc.getInt("CONTEO")));
+		int count= jdbcTemplate.queryForObject(sql, Integer.class);
+    	return count;
+//		return jdbcTemplate.query(sql, (cc, rowNum) -> new GenArcPFECyTCDTO(cc.getInt("CONTEO")));
 	}
 
 	@Transactional
-	public List<GenArcPFECyTCDTO> ConteoReintentosSemanalesExtraContable(Integer mes1, Integer anio1, Integer dias1,
+	public int ConteoReintentosSemanalesExtraContable(Integer mes1, Integer anio1, Integer dias1,
 			Integer mes2, Integer anio2, Integer dias2, Integer mes3, Integer anio3, Integer dias3) {
 
-		String sql = "SELECT COUNT(*) AS conteo " + "FROM PPC_MIS_MAESTRO_COMISIONES mc "
+		String sql = "SELECT COUNT(1) AS conteo " + "FROM PPC_MIS_MAESTRO_COMISIONES mc "
 				+ "WHERE mc.ID_ESTATUS_COMISION=3 AND mc.CATALOGADA_GC=1" + " AND (";
 
 		if (dias1 > 0)
@@ -87,19 +88,21 @@ public class ReintentosJDBCRepository {
 		sql = sql + " )";
 
 		System.out.println("QUERY_SQL_Clientes :: ejecute:: " + sql);
-
-		return jdbcTemplate.query(sql, (cc, rowNum) -> new GenArcPFECyTCDTO(cc.getInt("CONTEO")));
+		int count= jdbcTemplate.queryForObject(sql, Integer.class);
+    	return count;
+//		return jdbcTemplate.query(sql, (cc, rowNum) -> new GenArcPFECyTCDTO(cc.getInt("CONTEO")));
 	}
 
 	@Transactional
-	public List<GenArcPFECyTCDTO> ConteoReintentosSemanalesTasaCero() {
+	public int ConteoReintentosSemanalesTasaCero() {
 
-		String sql = "SELECT COUNT(*) AS conteo " + "FROM PPC_MIS_MAESTRO_COMISIONES mc "
-				+ "WHERE mc.ID_ESTATUS_COMISION=3 AND mc.CATALOGADA_GC=5 AND (mc.ID_SERVICIO=21 and mc.ID_ONDEMAND=31);";
+		String sql = "SELECT COUNT(1) " + "FROM PPC_MIS_MAESTRO_COMISIONES mc "
+				+ "WHERE mc.ID_ESTATUS_COMISION=3 AND mc.CATALOGADA_GC=5 AND (mc.ID_SERVICIO=21 and mc.ID_ONDEMAND=31)";
 
 		System.out.println("QUERY_SQL_Clientes :: ejecute:: " + sql);
-
-		return jdbcTemplate.query(sql, (cc, rowNum) -> new GenArcPFECyTCDTO(cc.getInt("CONTEO")));
+		int count= jdbcTemplate.queryForObject(sql, Integer.class);
+    	return count;
+//		return jdbcTemplate.query(sql, (rs, rowNum) -> new GenArcPFECyTCDTO(rs.getInt("CONTEO")));
 	}
 
 	@Transactional
