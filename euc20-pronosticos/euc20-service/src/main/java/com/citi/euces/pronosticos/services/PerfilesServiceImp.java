@@ -59,7 +59,7 @@ public class PerfilesServiceImp implements PerfilesService{
 	@Autowired
 	private ProcesoInsertarRepository procesoInsertarRepository;
 	
-	///---------------------------SUBIR RESPUESTA---------------------------------///	
+	///---------------------------SUBIR RESPUESTA DE PROTECCION---------------------------------///	
 	@Override
 	public MensajeDTO SubirRespuesta(String file) throws GenericException, IOException, ParseException {
 		try {
@@ -81,7 +81,7 @@ public class PerfilesServiceImp implements PerfilesService{
 	            try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
 	                IOUtils.copy(is, fos);
 	                //Lectura TXT
-	                procesados = leerArchivo(tempFile);
+	                procesados = leerArchivosCobro(tempFile);
 	            }
             }
 			
@@ -97,7 +97,7 @@ public class PerfilesServiceImp implements PerfilesService{
     	}
 	}
 	
-	 public String leerArchivo(Path tempFile) throws IOException, GenericException, ParseException {
+	 public String leerArchivosCobro(Path tempFile) throws IOException, GenericException, ParseException {
 	        String responseMessage = "";
 	        String cadena;
 	        FileReader f = new FileReader(tempFile.toFile());
@@ -177,7 +177,7 @@ public class PerfilesServiceImp implements PerfilesService{
 	    }
 	 
 		
-		///-----------------------------------ARCHIVOS COBRO------------------------------------------------///
+		///-----------------------------------ACTUALIZAR ARCHIVOS COBRO------------------------------------------------///
 		@Override
 		public MensajeDTO ArchivoCobros(String file) throws GenericException, IOException, ParseException {
 			try {
@@ -199,7 +199,7 @@ public class PerfilesServiceImp implements PerfilesService{
 		            try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
 		                IOUtils.copy(is, fos);
 		                //Lectura TXT
-		                procesados = leerArchivosCobro(tempFile);
+		                procesados = leerArchivos(tempFile);
 		            }
 	            }
 				
@@ -214,7 +214,7 @@ public class PerfilesServiceImp implements PerfilesService{
 	    	}
 		}
 		
-		public String leerArchivosCobro(Path tempFile) throws IOException, GenericException, ParseException {
+		public String leerArchivos(Path tempFile) throws IOException, GenericException, ParseException {
 			String responseMessage = "";
 	        String cadena;
 	        FileReader f = new FileReader(tempFile.toFile());
