@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -38,7 +39,7 @@ public class FormatUtils {
     }
 
     public static String formatDateSinEspacios(Date fecha) {
-        String pattern = "yyyyMMddd";
+        String pattern = "yyyyMMdd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String formatFecha = simpleDateFormat.format(fecha);
         return formatFecha;
@@ -104,20 +105,8 @@ public class FormatUtils {
     public static String validFechaMes(Integer mes) {
         String valid = "00";
         if (mes != null) {
-            Map<Integer, String> malidMes = new TreeMap<Integer, String>();
-            malidMes.put(1, "ENE");
-            malidMes.put(2, "FEB");
-            malidMes.put(3, "MAR");
-            malidMes.put(4, "ABR");
-            malidMes.put(5, "MAY");
-            malidMes.put(6, "JUN");
-            malidMes.put(7, "JUL");
-            malidMes.put(8, "AGO");
-            malidMes.put(9, "SEP");
-            malidMes.put(10, "OCT");
-            malidMes.put(11, "NOV");
-            malidMes.put(12, "DIC");
-            valid = malidMes.get(mes) == null ? "00" : malidMes.get(mes);
+            LocalDate now = LocalDate.of(2021,mes,01);
+            valid = now.getMonth().getDisplayName(TextStyle.SHORT, new Locale("es", "ES")).toUpperCase();
         }
         return valid;
     }

@@ -10,6 +10,7 @@ public class LeerArchivoRequest implements Serializable {
     private String file;
     private String fechaMovimiento;
     private String fechaContable;
+    private String fecha;
 
     public String getFile() {
         return file;
@@ -34,4 +35,8 @@ public class LeerArchivoRequest implements Serializable {
     public void setFechaContable(String fechaContable) {
         this.fechaContable = fechaContable;
     }
+    
+    public String getFecha() { return fecha; }
+    
+    public void setFecha(String fecha) { this.fecha = fecha; }
 }
