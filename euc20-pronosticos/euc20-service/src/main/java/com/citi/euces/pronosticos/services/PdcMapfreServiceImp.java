@@ -210,30 +210,30 @@ public class PdcMapfreServiceImp implements PdcMapfreService{
 			
 	        content = "";
 	        
-			content += "1".concat("\t"); //Consecutivo
-			content += str.getNumCliente().concat("\t"); //Cliente
-			content += "".concat("\t"); //Blanco
-			content += str.getSucursal().concat(" ").concat(str.getCuenta()).concat("\t"); //Sucursal + Cuenta
-			content += str.getCostoOperativo().toString().concat("\t"); //Importe Total
-			content += "16".concat("\t"); //Iva
-			content += "".concat("\t"); //Causa Rechazo
-			content += fechaMes.concat("\t"); //Mes
-			content += fechaAnio.concat("\t"); //Año
-			content += "TASA CERO".concat("\t"); //Servicio - TasaCero
-			content += "".concat("\t"); //CSI 
-			content += "TASA CERO".concat("\t"); //COM
-			content += str.getCostoOperativo().toString().concat("\t"); //Comision sin IVA "CostoOperativo - ivaa";
-			content += str.getIva().toString().concat("\t"); // IVA
-			content += total.concat("\t"); // TOTAL
-			content += "".concat("\t"); //COM_P
-			content += "".concat("\t"); //LLAVE
-			content += str.getSucursal().concat(" ").concat(str.getCuenta()).concat("\t"); //EJE
-			content += "Cobro Especial".concat("\t"); //Catalogada
-			content += fechaActual.concat("\t"); //Fecha rechazo
-			content += "".concat("\t"); //Espacio 1 
-			content += "".concat("\t"); //Espacio 2
-			content += "Cobro Especial".concat("\t"); //Base Pendiente
-			content += str.getNombreNegocio().concat("\n"); //Open Item
+			content += "1".concat("\t"); 													//Consecutivo
+			content += str.getNumCliente().concat("\t"); 									//Cliente
+			content += "".concat("\t"); 													//Blanco
+			content += str.getSucursal().concat(" ").concat(str.getCuenta()).concat("\t"); 	//Sucursal + Cuenta
+			content += total.concat("\t"); 								 					//Importe Total
+			content += "16".concat("\t"); 													//Iva
+			content += "".concat("\t"); 													//Causa Rechazo
+			content += fechaMes.concat("\t"); 												//Mes
+			content += fechaAnio.concat("\t"); 												//Año
+			content += "TASA CERO".concat("\t"); 											//Servicio - TasaCero
+			content += "".concat("\t"); 													//CSI 
+			content += "TASA CERO".concat("\t"); 											//COM
+			content += str.getCostoOperativo().toString().concat("\t"); 					//Comision sin IVA "CostoOperativo + ivaa";
+			content += str.getIva().toString().concat("\t"); 								// IVA
+			content += total.concat("\t"); 													// TOTAL
+			content += "".concat("\t"); 													//COM_P
+			content += "".concat("\t"); 													//LLAVE
+			content += str.getSucursal().concat(" ").concat(str.getCuenta()).concat("\t"); 	//EJE
+			content += "Cobro Especial".concat("\t"); 										//Catalogada
+			content += fechaActual.concat("\t"); 											//Fecha rechazo
+			content += "".concat("\t"); 													//Espacio 1 
+			content += "".concat("\t"); 													//Espacio 2
+			content += "Cobro Especial".concat("\t"); 										//Base Pendiente
+			content += str.getNombreNegocio().toString().concat("\n"); 						//Open Item
 			
 			test.write(content.getBytes(StandardCharsets.UTF_8));
 		 }

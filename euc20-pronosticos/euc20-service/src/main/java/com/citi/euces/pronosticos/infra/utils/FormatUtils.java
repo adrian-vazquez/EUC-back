@@ -65,6 +65,12 @@ public class FormatUtils {
         return formatFecha;
     }
     
+    public static Date DateCobros(String fecha) throws ParseException{
+    	String pattern = "yyyyMMdd";
+		Date format = new SimpleDateFormat(pattern).parse(fecha);
+        return format; 
+    }
+    
     public static String formatFecCompActual() {
     	String pattern = "dd_MM_yyyy HH_mm_ss aaa";
     	Date fecha = new Date();

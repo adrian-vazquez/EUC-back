@@ -7,7 +7,14 @@ import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 
 public interface PerfilesService {
+	
+	MensajeDTO subirRebaja(String file) throws GenericException, IOException, ParseException;
+	
+	MensajeDTO insertar(String dias, String secuencial) throws GenericException, IOException, ParseException;
 
 	MensajeDTO ImpReporteCobro(String fechaCobro) throws GenericException, IOException, ParseException;
+	
+	MensajeDTO ArchivoCobros(String file) throws GenericException, IOException, ParseException;
 
+	MensajeDTO SubirRespuesta(String file) throws GenericException, IOException, ParseException;
 }

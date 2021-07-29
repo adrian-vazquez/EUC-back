@@ -103,4 +103,7 @@ public class ConstantUtils {
     final public static String ENCABEZADOCTASVIRTGPOS[] = {"NUM_CLIENTE", "NUM_CUENTA", "NOMBRE", "CTAS_V", "TXNS_BE", "TXNS_VENT", "TARIFA_BE", "TARIFA_VENT", "TARIFA_MENS", "COM_BE", "COM_VENT", "COM_MENS", "USO11", "COM_TOTAL", "SUC", "CTA", "FRANQUICIA", "MONEDA", "IVA"};						
     final public static String ENCABEZADOTXNSXIMPORTE[] = {"NUM_CLIENTE", "NUM_CUENTA", "TIPO", "TXNS", "SumaDeIMP_TRANSACCION"};
     final public static String ENCABEZADOCIFRAS[] = {"Consulta", "Cifra"};	
+    
+    //Valida txt SUBIR REBAJA
+    final public static String VALIDATXT = "NUM_CLIENTE\tNUM_CONTRATO\tSUCURSAL\tSDO_FIN_MES\tSDO_PROMEDIO_MES\tSUC\tCUENTA\tDiferencia\tCOM\tLLAVE_PRE\tCONCEPTO\tLLAVE\tSDO_FIN_ACT\tSDO_PROM_ACT\tFRONTERA";
 }
