@@ -271,7 +271,7 @@ public class PerfilesServiceImp implements PerfilesService{
         zipFile.close();
         
         MensajeDTO response = new MensajeDTO();
-        response.setMensajeInfo("Se cargó el archivo de forma correcta, favor de proseguir");
+        response.setMensajeInfo("Se cargo el archivo de forma correcta, Favor de proseguir");
         response.setMensajeConfirm(proceso);
 		return response;
 		}catch(EntityNotFoundException ex) {
@@ -302,16 +302,16 @@ public class PerfilesServiceImp implements PerfilesService{
 	            valores = linea.split("\t");
 	            SlunifinalexcPerfDTO data = new SlunifinalexcPerfDTO();
 	            
-	            data.setNumCliente(Long.parseLong(valores[0].replaceAll("\\s", "")));
-	            data.setNumContrato(Long.parseLong(valores[1].replaceAll("\\s", "")));
-	            data.setSucursal(Long.parseLong(valores[2].equals("") ? "0" : valores[2].replaceAll("\\s", "")));
-	            data.setSdoFinMes(Double.parseDouble(valores[3].equals("") ? "0" : valores[3].replaceAll("\\s", "")));
-	            data.setSdoFromMes(Double.parseDouble(valores[4].equals("") ? "0" : valores[4].replaceAll("\\s", "")));
-	            data.setSuc(Long.parseLong(valores[5].replaceAll("\\s", "")));
-	            data.setCuenta(Long.parseLong(valores[6].replaceAll("\\s", "")));
-	            data.setDiferencia(Double.parseDouble(valores[7].equals("") ? "0" : valores[7].replaceAll("\\s", "")));
-	            data.setCom(Double.parseDouble(valores[8].replaceAll("\\s", "")));
-	            data.setLlavePre(String.valueOf(valores[9].equals("") ? "0" : valores[9].replaceAll("\\s", "")));       
+	            data.setNumCliente(valores[0].equals("") ? null : Long.parseLong(valores[0].replaceAll("\\s", "")));
+	            data.setNumContrato(valores[1].equals("") ? null : Long.parseLong(valores[1].replaceAll("\\s", "")));
+	            data.setSucursal(valores[2].equals("") ? null : Long.parseLong(valores[2].replaceAll("\\s", "")));
+	            data.setSdoFinMes(valores[3].equals("") ? null : Double.parseDouble(valores[3].replaceAll("\\s", "")));
+	            data.setSdoFromMes(valores[4].equals("") ? null : Double.parseDouble(valores[4].replaceAll("\\s", "")));
+	            data.setSuc(valores[5].equals("") ? null : Long.parseLong(valores[5].replaceAll("\\s", "")));
+	            data.setCuenta(valores[6].equals("") ? null : Long.parseLong(valores[6].replaceAll("\\s", "")));
+	            data.setDiferencia(valores[7].equals("") ? null : Double.parseDouble(valores[7].replaceAll("\\s", "")));
+	            data.setCom(valores[8].equals("") ? null : Double.parseDouble(valores[8].replaceAll("\\s", "")));
+	            data.setLlavePre(valores[9].equals("") ? null : valores[9].replaceAll("\\s", ""));  
 	            lista.add(data);
 			 }	
 			 ini = 2;
