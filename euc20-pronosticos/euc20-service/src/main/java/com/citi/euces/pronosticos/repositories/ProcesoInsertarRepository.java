@@ -1,7 +1,9 @@
 package com.citi.euces.pronosticos.repositories;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class ProcesoInsertarRepository {
 	private final JdbcTemplate procesos;
 

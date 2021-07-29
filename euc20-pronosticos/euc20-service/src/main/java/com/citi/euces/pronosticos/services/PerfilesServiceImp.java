@@ -13,9 +13,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,8 +29,6 @@ import org.springframework.stereotype.Service;
 import com.citi.euces.pronosticos.infra.dto.ImpReporteCobroDTO;
 import com.citi.euces.pronosticos.infra.dto.MensajeDTO;
 import com.citi.euces.pronosticos.infra.dto.SlunifinalexcPerfDTO;
-import com.citi.euces.pronosticos.infra.dto.RebNumProtectDTO;
-import com.citi.euces.pronosticos.infra.dto.RebajaFileOndemandDTO;
 import com.citi.euces.pronosticos.infra.dto.SubirRespuestaDTO;
 import com.citi.euces.pronosticos.infra.exceptions.GenericException;
 import com.citi.euces.pronosticos.infra.utils.ConstantUtils;
@@ -251,7 +246,7 @@ public class PerfilesServiceImp implements PerfilesService{
 	
 	///-------------------------SUBIR REBAJA----------------------------------------///
 	@Override
-	public MensajeDTO SubirRebaja(String file) throws GenericException, IOException, ParseException {
+	public MensajeDTO subirRebaja(String file) throws GenericException, IOException, ParseException {
 		try {
 			Path testFile = Files.createTempFile("SubirRebaja", ".zip");
 			testFile.toFile().deleteOnExit();

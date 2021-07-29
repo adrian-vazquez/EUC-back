@@ -32,13 +32,13 @@ public class PerfilesController {
 	private PerfilesService perfilesService;
 	
 	@PostMapping(path = "/subirRebaja")
-	public ResponseEntity<?>SubirRebaja(@RequestBody final CobuRequest request) {
+	public ResponseEntity<?>subirRebaja(@RequestBody final CobuRequest request) {
 		try {
             if (request.getFile().isEmpty()) {
                 throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
             }
             MensajeResponse response = new MensajeResponse(
-            	perfilesService.SubirRebaja(request.getFile()),
+            	perfilesService.subirRebaja(request.getFile()),
             	HttpStatus.OK.toString());
             	return new ResponseEntity<MensajeResponse>(response, HttpStatus.OK);
         } catch (GenericException ex) {
@@ -62,7 +62,7 @@ public class PerfilesController {
 	public ResponseEntity<?>insertar(@RequestBody final InsertarPerfilesRequest request) {
 		try {
             if (request.getDias().isEmpty() || request.getSecuencial().isEmpty()) {
-                throw new GenericException("Favor de seleccionar un archivo", HttpStatus.BAD_REQUEST.toString());
+                throw new GenericException("Favor de insertar dia y secuencial", HttpStatus.BAD_REQUEST.toString());
             }
             MensajeResponse response = new MensajeResponse(
             	perfilesService.insertar(request.getDias(), request.getSecuencial()),
